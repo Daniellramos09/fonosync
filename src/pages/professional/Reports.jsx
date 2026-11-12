@@ -1,29 +1,17 @@
 import { useState, useEffect } from 'react';
 import {
   FileText,
-  FileCheck2,
   BadgeCheck,
   UploadCloud,
   FileDown,
   Download,
   Eye,
   CheckCircle2,
-  AlertCircle,
   Share2,
   Printer,
   X,
-  Stethoscope,
-  Building,
-  User,
-  Calendar,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  Filter,
   Search,
 } from 'lucide-react';
-import Button from '../../components/Button';
-import Notice from '../../components/Notice';
 import { listPatients } from '../../services/patientService';
 import logoImg from '../../assets/images/ModeloA_Semnome.jpg';
 
@@ -88,7 +76,6 @@ export default function Reports() {
   // Modais de Ação
   const [showEvolutionModal, setShowEvolutionModal] = useState(false);
   const [showInterModal, setShowInterModal] = useState(false);
-  const [showAtestadoModal, setShowAtestadoModal] = useState(false);
   const [previewDoc, setPreviewDoc] = useState(null);
 
   // Estados de formulário
@@ -405,7 +392,7 @@ export default function Reports() {
               <div className="pt-5 mt-4 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setShowAtestadoModal(true)}
+                  onClick={() => setActiveTab('atestados')}
                   className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <BadgeCheck size={15} /> Emitir Atestado Oficial

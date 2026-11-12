@@ -3,6 +3,7 @@ import {
   Activity,
   AlertCircle,
   Calendar,
+  CheckCircle,
   CheckCircle2,
   ChevronDown,
   Clock,

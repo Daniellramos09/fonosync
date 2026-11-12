@@ -1,25 +1,16 @@
 import { useState, useEffect } from 'react';
 import {
-  Calendar,
   CalendarPlus,
-  Clock,
   CheckCircle,
-  XCircle,
   FileText,
-  User,
   Video,
   MapPin,
   ChevronLeft,
   ChevronRight,
-  Filter,
   CheckCircle2,
   X,
-  Plus,
   Stethoscope,
-  Sparkles,
 } from 'lucide-react';
-import Button from '../../components/Button';
-import Notice from '../../components/Notice';
 import { listPatients } from '../../services/patientService';
 
 const initialAppointments = [

@@ -15,7 +15,6 @@ import logoImg from '../assets/images/ModeloA_Semnome.jpg';
 import { useA11y } from '../hooks/useA11y';
 import { useAuth } from '../hooks/useAuth';
 import A11yModal from '../components/A11yModal';
-import Button from '../components/Button';
 
 import Patients from './professional/Patients';
 import MedicalRecordPage from './professional/MedicalRecordPage';
