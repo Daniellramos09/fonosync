@@ -11,6 +11,7 @@ import {
   Printer,
   X,
   Search,
+  Clock,
 } from 'lucide-react';
 import { listPatients } from '../../services/patientService';
 import logoImg from '../../assets/images/ModeloA_Semnome.jpg';
