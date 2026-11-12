@@ -2,6 +2,8 @@ import { api } from './api';
 
 export const listPatients = () => api('/api/paciente');
 
+export const getPatientById = (id) => api(`/api/paciente/${id}`);
+
 export const createPatient = (patient) => api('/api/paciente/register', { method: 'POST', body: patient });
 
 export const updatePatient = (id, patient) => api(`/api/paciente/update/${id}`, { method: 'PUT', body: patient });

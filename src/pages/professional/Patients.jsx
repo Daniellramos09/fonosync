@@ -8,6 +8,8 @@ import {
   listPatients,
   updatePatient,
 } from '../../services/patientService';
+import PatientRecordModal from './PatientRecordModal';
+import { formatCPF, formatPhone } from '../../utils/formatters';
 
 const STATUS = {
   ATIVO: { label: 'Em acompanhamento', type: 'acompanhamento' },
@@ -226,22 +228,6 @@ export default function Patients() {
 
   return (
     <div className="space-y-6 font-sans">
-      
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold font-serif text-[#172C3A] flex items-center gap-2">
-            Gestão de Pacientes
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">Cadastre, busque e gerencie os prontuários ativos e arquivados.</p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="px-4 py-2 bg-white border border-slate-300 text-[#172C3A] text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#0284C7]" /> {activePatientsCount} Pacientes Ativos
-          </div>
-        </div>
-      </div>
-
       <div role="status">
         {notice?.tone === 'success' && (
           <div className="p-3.5 rounded-xl bg-emerald-50 border-l-4 border-emerald-500 flex items-center gap-3 text-xs shadow-sm">
@@ -622,95 +608,14 @@ export default function Patients() {
       )}
 
       {showRecordModal && selectedPatient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg bg-white rounded-2xl border border-slate-300 p-6 shadow-2xl space-y-4 text-[#172C3A]">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-sky-100 text-[#0284C7] font-bold text-sm flex items-center justify-center border border-sky-200">
-                  {selectedPatient.name.slice(0, 2).toUpperCase()}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold font-serif text-[#172C3A]">{selectedPatient.name}</h3>
-                  <p className="text-xs text-slate-500">{selectedPatient.archived ? 'Prontuário Arquivado' : 'Prontuário Clínico Ativo'}</p>
-                </div>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setShowRecordModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <div>
-                  <span className="text-slate-500 block font-bold">Idade:</span>
-                  <span className="font-semibold text-slate-800">{selectedPatient.age !== null && `${selectedPatient.age} anos`}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block font-bold">Contato:</span>
-                  <span className="font-semibold text-slate-800">{selectedPatient.phone}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block font-bold">CPF:</span>
-                  <span className="font-semibold text-slate-800">{selectedPatient.cpfPatient}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block font-bold">Status Clínico:</span>
-                  <span className="font-semibold text-emerald-700">{selectedPatient.status}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block font-bold">CID-10:</span>
-                  <span className="font-semibold text-slate-800">{selectedPatient.cid10 || 'Não informado'}</span>
-                </div>
-              </div>
-
-            </div>
-
-            <div className="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleToggleArchive(selectedPatient)}
-                  className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer border ${
-                    selectedPatient.archived
-                      ? 'border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100'
-                      : 'border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100'
-                  }`}
-                >
-                  {selectedPatient.archived ? <RotateCcw size={14} /> : <FolderArchive size={14} />}
-                  {selectedPatient.archived ? 'Restaurar Paciente' : 'Arquivar Prontuário'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(selectedPatient)}
-                  className="px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer border border-rose-300 text-rose-800 bg-rose-50 hover:bg-rose-100"
-                >
-                  <Trash2 size={14} /> Excluir
-                </button>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => openEditPatient(selectedPatient)}
-                  className="px-4 py-2 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-100 flex items-center gap-1.5 cursor-pointer text-xs"
-                >
-                  <Pencil size={15} /> Editar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowRecordModal(false)}
-                  className="px-5 py-2 bg-[#0284C7] text-white rounded-xl font-bold hover:bg-sky-700 shadow-sm cursor-pointer text-xs"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PatientRecordModal
+          patient={selectedPatient}
+          isOpen={showRecordModal}
+          onClose={() => setShowRecordModal(false)}
+          onEdit={openEditPatient}
+          onToggleArchive={handleToggleArchive}
+          onDelete={handleDelete}
+        />
       )}
 
     </div>
