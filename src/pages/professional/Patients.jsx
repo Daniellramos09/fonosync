@@ -353,14 +353,18 @@ export default function Patients({ onOpenProntuario }) {
                 </tr>
               ) : filteredPatients.length > 0 ? (
                 filteredPatients.map((patient) => (
-                  <tr key={patient.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-4 px-6 font-bold flex items-center gap-3">
+                  <tr
+                    key={patient.id}
+                    onClick={() => handleOpenRecord(patient)}
+                    className="hover:bg-sky-50/60 transition-colors cursor-pointer group"
+                  >
+                    <td className="py-4 px-6 font-bold flex items-center gap-3 group-hover:text-[#0284C7] transition-colors">
                       <div className={`w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center border shrink-0 ${
                         patient.archived ? 'bg-slate-200 text-slate-600 border-slate-300' : 'bg-sky-100 text-[#0284C7] border-sky-200'
                       }`}>
                         {patient.name.slice(0, 2).toUpperCase()}
                       </div>
-                      {patient.name}
+                      <span>{patient.name}</span>
                     </td>
                     <td className="py-4 px-4 text-slate-600">{patient.age !== null && `${patient.age} anos`}</td>
                     <td className="py-4 px-4">
@@ -375,8 +379,11 @@ export default function Patients({ onOpenProntuario }) {
                     <td className="py-4 px-6 text-right">
                       <button
                         type="button"
-                        onClick={() => handleOpenRecord(patient)}
-                        className="text-[#0284C7] hover:underline font-bold text-xs inline-flex items-center gap-1 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenRecord(patient);
+                        }}
+                        className="text-[#0284C7] group-hover:underline font-bold text-xs inline-flex items-center gap-1 cursor-pointer"
                       >
                         {patient.archived ? 'Restaurar / Ver' : 'Abrir Prontuário'} <ChevronRight size={14} />
                       </button>

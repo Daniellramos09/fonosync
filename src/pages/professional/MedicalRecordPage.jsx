@@ -149,6 +149,15 @@ export default function MedicalRecordPage({
         'Expandir situações de comunicação fora da clínica.',
       tags: ['Ansiedade comunicativa', 'Aspecto emocional'],
     },
+    {
+      id: 'sess-4',
+      date: '2025-03-21',
+      sessionNumber: 25,
+      status: 'Agendada',
+      evolution: 'Sessão ainda não realizada.',
+      improvementPoint: '',
+      tags: [],
+    },
   ]);
   const [showNewSessionModal, setShowNewSessionModal] = useState(false);
   const [sessionForm, setSessionForm] = useState({
@@ -476,18 +485,34 @@ export default function MedicalRecordPage({
       ? sessionForm.tags.split(',').map((t) => t.trim()).filter(Boolean)
       : ['Sessão Clínica'];
 
-    const newSess = {
-      id: `sess-${Date.now()}`,
-      date: sessionForm.date,
-      sessionNumber: Number(sessionForm.sessionNumber) || sessions.length + 1,
-      status: 'Realizada',
-      evolution: sessionForm.evolution,
-      improvementPoint: sessionForm.improvementPoint,
-      tags: tagArray,
-    };
+    const sessNum = Number(sessionForm.sessionNumber) || sessions.length + 1;
+    const existingIndex = sessions.findIndex((s) => s.sessionNumber === sessNum);
 
-    setSessions([newSess, ...sessions]);
-    showFeedback('success', 'Sessão registrada com sucesso no histórico!');
+    if (existingIndex >= 0) {
+      const updated = [...sessions];
+      updated[existingIndex] = {
+        ...updated[existingIndex],
+        date: sessionForm.date,
+        status: 'Realizada',
+        evolution: sessionForm.evolution,
+        improvementPoint: sessionForm.improvementPoint,
+        tags: tagArray,
+      };
+      setSessions(updated);
+    } else {
+      const newSess = {
+        id: `sess-${Date.now()}`,
+        date: sessionForm.date,
+        sessionNumber: sessNum,
+        status: 'Realizada',
+        evolution: sessionForm.evolution,
+        improvementPoint: sessionForm.improvementPoint,
+        tags: tagArray,
+      };
+      setSessions([newSess, ...sessions]);
+    }
+
+    showFeedback('success', `Sessão ${sessNum} registrada como realizada com sucesso!`);
     setShowNewSessionModal(false);
     setSessionForm({
       sessionNumber: sessions.length + 2,
@@ -660,6 +685,36 @@ export default function MedicalRecordPage({
                 : 'Reduzir frequência de disfluências em 60% em situações de comunicação espontânea até julho/2025.'}
             </p>
           </div>
+
+          {/* Botões de Ação Rápida do Prontuário (Fiel à Imagem 6) */}
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              onClick={() => setShowNewSessionModal(true)}
+              className="w-full py-2.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <Plus size={15} /> Registrar Sessão
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('diagnostico');
+                setIsEditingDiag(true);
+              }}
+              className="w-full py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <FileEdit size={15} className="text-[#0284C7]" /> Editar Plano Terapêutico
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (onNavigate) onNavigate('relatorios');
+              }}
+              className="w-full py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <FileText size={15} className="text-[#0284C7]" /> Gerar Relatório PDF
+            </button>
+          </div>
         </div>
 
         {/* ------------------------------------------------------------ */}
@@ -699,49 +754,88 @@ export default function MedicalRecordPage({
           {/* ========================================================== */}
           {activeTab === 'historico' && (
             <div className="space-y-4">
-              {sessions.map((sess, idx) => (
-                <div
-                  key={sess.id || idx}
-                  className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3 relative"
-                >
-                  {/* Marcador lateral da Timeline */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#0284C7] ring-4 ring-sky-100" />
-                      <span className="text-xs font-bold text-slate-800">
-                        {formatDateBR(sess.date)} · Sessão {sess.sessionNumber}
+              {sessions.map((sess, idx) => {
+                const isRealizada = sess.status === 'Realizada';
+                return (
+                  <div
+                    key={sess.id || idx}
+                    className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3 relative"
+                  >
+                    {/* Marcador lateral da Timeline */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        {isRealizada ? (
+                          <span className="w-3 h-3 rounded-full bg-[#0284C7] ring-4 ring-sky-100" />
+                        ) : (
+                          <span className="w-3 h-3 rounded-full border-2 border-slate-400 bg-white ring-4 ring-slate-100" />
+                        )}
+                        <span className="text-xs font-bold text-slate-800">
+                          {formatDateBR(sess.date)} · Sessão {sess.sessionNumber}
+                        </span>
+                      </div>
+                      <span
+                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${
+                          isRealizada
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800 border border-amber-200'
+                        }`}
+                      >
+                        {sess.status}
                       </span>
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                      {sess.status}
-                    </span>
-                  </div>
 
-                  <div className="text-xs space-y-1.5 pl-4.5 border-l-2 border-slate-100">
-                    <p className="text-slate-700">
-                      <strong className="text-slate-900">Evolução:</strong> {sess.evolution}
-                    </p>
-                    {sess.improvementPoint && (
-                      <p className="text-slate-700">
-                        <strong className="text-slate-900">Ponto de melhora:</strong> {sess.improvementPoint}
-                      </p>
-                    )}
+                    {isRealizada ? (
+                      <div className="text-xs space-y-1.5 pl-4.5 border-l-2 border-slate-100">
+                        <p className="text-slate-700">
+                          <strong className="text-slate-900">Evolução:</strong> {sess.evolution}
+                        </p>
+                        {sess.improvementPoint && (
+                          <p className="text-slate-700">
+                            <strong className="text-slate-900">Ponto de melhora:</strong> {sess.improvementPoint}
+                          </p>
+                        )}
 
-                    {sess.tags && sess.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-2">
-                        {sess.tags.map((tag, tIdx) => (
-                          <span
-                            key={tIdx}
-                            className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-sky-50 text-[#0284C7] border border-sky-100"
+                        {sess.tags && sess.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-2">
+                            {sess.tags.map((tag, tIdx) => (
+                              <span
+                                key={tIdx}
+                                className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-sky-50 text-[#0284C7] border border-sky-100"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-xs space-y-2.5 pl-4.5 border-l-2 border-slate-100 py-1">
+                        <p className="text-slate-500 italic">
+                          Sessão agendada na clínica. Realize o atendimento para registrar a evolução clínica e os pontos de melhora.
+                        </p>
+                        <div className="pt-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSessionForm({
+                                sessionNumber: sess.sessionNumber,
+                                date: sess.date || new Date().toISOString().split('T')[0],
+                                evolution: '',
+                                improvementPoint: '',
+                                tags: 'Fluência, Linguagem, Respiração',
+                              });
+                              setShowNewSessionModal(true);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
                           >
-                            {tag}
-                          </span>
-                        ))}
+                            <CheckCircle size={14} /> Realizar Atendimento (Registrar Evolução)
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
