@@ -315,7 +315,7 @@ export default function PatientRecordModal({
                 <span>•</span>
                 <span>Nascimento: {formatDateBR(patient.dateOfBirth)}</span>
                 <span>•</span>
-                <span>CPF: {patient.cpfPatient || 'Não informado'}</span>
+                <span>{isMinor ? 'Menor de idade (LGPD)' : `CPF: ${patient.cpfPatient || 'Não informado'}`}</span>
               </p>
             </div>
           </div>
@@ -439,7 +439,15 @@ export default function PatientRecordModal({
                   </div>
                   <div>
                     <span className="text-slate-400 font-semibold block text-[11px]">CPF</span>
-                    <span className="font-bold text-slate-800">{patient.cpfPatient || 'Não informado'}</span>
+                    <span className="font-bold text-slate-800">
+                      {isMinor ? (
+                        <span className="text-emerald-700 font-semibold text-[10px] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          Protegido (Menor)
+                        </span>
+                      ) : (
+                        patient.cpfPatient || 'Não informado'
+                      )}
+                    </span>
                   </div>
                   <div>
                     <span className="text-slate-400 font-semibold block text-[11px]">Contato Principal</span>

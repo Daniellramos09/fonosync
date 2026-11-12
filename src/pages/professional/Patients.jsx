@@ -195,10 +195,11 @@ export default function Patients() {
         guardianId = guardian.id;
       }
 
+      const isMinorPatient = formAge !== null && formAge < 18;
       const data = {
         name: form.name.trim(),
         dateOfBirth: form.dateOfBirth || null,
-        cpfPatient: form.cpf || null,
+        cpfPatient: isMinorPatient ? null : (form.cpf ? form.cpf.trim() : null),
         contactPatient: form.phone || null,
         sex: form.sex || null,
         cid10: form.cid10.trim() || null,
@@ -492,16 +493,22 @@ export default function Patients() {
                     className="w-full p-2.5 border border-slate-300 rounded-xl font-medium focus:ring-2 focus:ring-[#0284C7]"
                   />
                 </div>
-                <div>
-                  <label className="block font-bold mb-1 text-slate-700">CPF</label>
-                  <input
-                    type="text"
-                    placeholder="000.000.000-00"
-                    value={form.cpf}
-                    onChange={update('cpf')}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl font-medium focus:ring-2 focus:ring-[#0284C7]"
-                  />
-                </div>
+                {formAge !== null && formAge < 18 ? (
+                  <div className="col-span-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-900 flex items-center gap-2">
+                    <span>🛡️ <strong>Proteção de Menores (LGPD):</strong> Por segurança e privacidade da criança, não solicitamos CPF do menor de idade. Apenas o responsável legal possui CPF registrado.</span>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block font-bold mb-1 text-slate-700">CPF do Paciente Adulto</label>
+                    <input
+                      type="text"
+                      placeholder="000.000.000-00"
+                      value={form.cpf}
+                      onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })}
+                      className="w-full p-2.5 border border-slate-300 rounded-xl font-medium focus:ring-2 focus:ring-[#0284C7]"
+                    />
+                  </div>
+                )}
                 <div>
                   <label className="block font-bold mb-1 text-slate-700">Sexo</label>
                   <select

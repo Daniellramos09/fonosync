@@ -153,7 +153,6 @@ export default function AccessArea() {
     patientName: '',
     patientBirthDate: '',
     patientSex: 'MASCULINO',
-    patientCpf: '',
     // Acesso
     email: '',
     password: '',
@@ -335,12 +334,12 @@ export default function AccessArea() {
         console.warn('Aviso ao criar responsável:', err);
       }
 
-      // 3. Cria registro do paciente dependente com status de pré-cadastro
+      // 3. Cria registro do paciente dependente com status de pré-cadastro (sem CPF para proteção do menor)
       try {
         await createPatient({
           name: guardianForm.patientName.trim(),
           dateOfBirth: guardianForm.patientBirthDate,
-          cpfPatient: guardianForm.patientCpf.trim() || null,
+          cpfPatient: null,
           contactPatient: guardianForm.guardianPhone.trim(),
           sex: guardianForm.patientSex,
           guardianId,
@@ -878,7 +877,7 @@ export default function AccessArea() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                       <FormSelect
                         id="pat-sex"
                         label="Sexo Biológico *"
@@ -891,14 +890,13 @@ export default function AccessArea() {
                         ]}
                       />
 
-                      <FormInput
-                        id="pat-cpf"
-                        label="CPF do Menor (Opcional)"
-                        icon={FileBadge}
-                        placeholder="000.000.000-00"
-                        value={guardianForm.patientCpf}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, patientCpf: formatCPF(e.target.value) })}
-                      />
+                      <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800 flex items-start gap-2">
+                        <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+                        <span>
+                          <strong>Proteção de Menores (LGPD):</strong> Por segurança e privacidade da criança, não
+                          coletamos CPF ou dados frágeis do menor de idade.
+                        </span>
+                      </div>
                     </div>
                   </div>
 
