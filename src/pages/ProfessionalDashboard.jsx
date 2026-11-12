@@ -18,6 +18,7 @@ import A11yModal from '../components/A11yModal';
 import Button from '../components/Button';
 
 import Patients from './professional/Patients';
+import MedicalRecordPage from './professional/MedicalRecordPage';
 import Tracking from './professional/Tracking';
 import Schedule from './professional/Schedule';
 import Reports from './professional/Reports';
@@ -27,6 +28,7 @@ import { listPatients } from '../services/patientService';
 const navItems = [
   { id: 'dashboard', label: 'Início', icon: Home },
   { id: 'pacientes', label: 'Pacientes', icon: Users },
+  { id: 'prontuario', label: 'Prontuário', icon: FileText },
   { id: 'acompanhamento', label: 'Acompanhamento', icon: Activity },
   { id: 'agenda', label: 'Agenda', icon: Calendar },
   { id: 'relatorios', label: 'Relatórios', icon: FileText },
@@ -36,6 +38,7 @@ const navItems = [
 const pageInfo = {
   dashboard: { title: 'Painel do Profissional', subtitle: '' },
   pacientes: { title: 'Gestão de Pacientes', subtitle: 'Cadastre, busque e gerencie os prontuários ativos.' },
+  prontuario: { title: 'Prontuário', subtitle: 'Acompanhe evolução, histórico de sessões, diagnóstico e exames.' },
   acompanhamento: { title: 'Acompanhamento Clínico', subtitle: 'Analise parâmetros fonéticos e registre evoluções.' },
   agenda: { title: 'Agenda de Atendimentos', subtitle: 'Organize sessões presenciais e teleatendimentos.' },
   relatorios: { title: 'Relatórios e Documentos', subtitle: 'Emita laudos, atestados e exportações acessíveis.' },
@@ -126,6 +129,7 @@ export default function ProfessionalDashboard({ section = 'dashboard' }) {
   const [patients, setPatients] = useState([]);
   const [patientsLoading, setPatientsLoading] = useState(true);
   const [patientsError, setPatientsError] = useState('');
+  const [selectedProntuarioPatientId, setSelectedProntuarioPatientId] = useState(null);
 
   useEffect(() => {
     listPatients()
@@ -224,23 +228,40 @@ export default function ProfessionalDashboard({ section = 'dashboard' }) {
       </aside>
 
       <main className="min-w-0 flex-1 space-y-6 overflow-y-auto p-4 md:p-8">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-navy">{info.title}</h1>
-            <p className="text-sm text-muted">{activeSection === 'dashboard' ? `Olá, ${professionalName}.` : info.subtitle}</p>
-          </div>
-          <div className="flex items-center gap-2 rounded-md border border-primary bg-primary/10 px-4 py-2">
-            <Users className="text-primary" size={18} aria-hidden="true" />
-            <span className="text-xs font-bold text-navy">
-              {patientsLoading || patientsError ? '—' : patients.filter((patient) => patient.patientStatus !== 'ARQUIVADO').length} Pacientes Ativos
-            </span>
-          </div>
-        </header>
+        {activeSection !== 'prontuario' && (
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+            <div>
+              <h1 className="font-serif text-3xl font-bold text-navy">{info.title}</h1>
+              <p className="text-sm text-muted">{activeSection === 'dashboard' ? `Olá, ${professionalName}.` : info.subtitle}</p>
+            </div>
+            <div className="flex items-center gap-2 rounded-md border border-primary bg-primary/10 px-4 py-2">
+              <Users className="text-primary" size={18} aria-hidden="true" />
+              <span className="text-xs font-bold text-navy">
+                {patientsLoading || patientsError ? '—' : patients.filter((patient) => patient.patientStatus !== 'ARQUIVADO').length} Pacientes Ativos
+              </span>
+            </div>
+          </header>
+        )}
 
         {activeSection === 'dashboard' && (
           <DashboardHome onNavigate={navigateTo} patients={patients} loading={patientsLoading} error={patientsError} />
         )}
-        {activeSection === 'pacientes' && <Patients />}
+        {activeSection === 'pacientes' && (
+          <Patients
+            onOpenProntuario={(patient) => {
+              setSelectedProntuarioPatientId(patient.id);
+              navigateTo('prontuario');
+            }}
+          />
+        )}
+        {activeSection === 'prontuario' && (
+          <MedicalRecordPage
+            patients={patients}
+            selectedPatientId={selectedProntuarioPatientId}
+            onSelectPatient={(patient) => setSelectedProntuarioPatientId(patient.id)}
+            onNavigate={navigateTo}
+          />
+        )}
         {activeSection === 'acompanhamento' && <Tracking />}
         {activeSection === 'agenda' && <Schedule />}
         {activeSection === 'relatorios' && <Reports />}

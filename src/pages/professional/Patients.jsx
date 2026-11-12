@@ -52,7 +52,7 @@ function toRow(patient) {
   };
 }
 
-export default function Patients() {
+export default function Patients({ onOpenProntuario }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('todos'); // 'todos', 'acompanhamento', 'pre-cadastro', 'arquivados'
 
@@ -109,8 +109,12 @@ export default function Patients() {
   });
 
   const handleOpenRecord = (patient) => {
-    setSelectedPatient(patient);
-    setShowRecordModal(true);
+    if (onOpenProntuario) {
+      onOpenProntuario(patient);
+    } else {
+      setSelectedPatient(patient);
+      setShowRecordModal(true);
+    }
   };
 
   const replacePatient = (updated) => {
