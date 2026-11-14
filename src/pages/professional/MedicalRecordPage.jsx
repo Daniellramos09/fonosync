@@ -108,6 +108,25 @@ export default function MedicalRecordPage({
   const [uploading, setUploading] = useState(false);
 
   // Histórico de Sessões / Evoluções Clínicas
+  const getStoredSessions = (patientId) => {
+    if (!patientId) return [];
+    try {
+      const raw = localStorage.getItem(`fonosync:sessions:${patientId}`);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveStoredSessions = (patientId, list) => {
+    if (!patientId) return;
+    try {
+      localStorage.setItem(`fonosync:sessions:${patientId}`, JSON.stringify(list));
+    } catch (e) {
+      console.error('Erro ao salvar sessões no storage:', e);
+    }
+  };
+
   const [sessions, setSessions] = useState([]);
   const [showNewSessionModal, setShowNewSessionModal] = useState(false);
   const [sessionForm, setSessionForm] = useState({
@@ -130,6 +149,14 @@ export default function MedicalRecordPage({
   // Carrega os dados quando o paciente ativo muda
   useEffect(() => {
     if (!patient) return;
+
+    // 0. Carrega Sessões do paciente (persistência local enquanto módulo de agenda/sessão é concluído no backend)
+    const storedSessions = getStoredSessions(patient.id);
+    setSessions(storedSessions);
+    setSessionForm((prev) => ({
+      ...prev,
+      sessionNumber: storedSessions.length + 1,
+    }));
 
     // 1. Carrega dados do Responsável se menor ou se tiver guardianId
     if (patient.guardianId) {
@@ -335,6 +362,7 @@ export default function MedicalRecordPage({
     const sessNum = Number(sessionForm.sessionNumber) || sessions.length + 1;
     const existingIndex = sessions.findIndex((s) => s.sessionNumber === sessNum);
 
+    let nextSessions;
     if (existingIndex >= 0) {
       const updated = [...sessions];
       updated[existingIndex] = {
@@ -345,7 +373,7 @@ export default function MedicalRecordPage({
         improvementPoint: sessionForm.improvementPoint,
         tags: tagArray,
       };
-      setSessions(updated);
+      nextSessions = updated;
     } else {
       const newSess = {
         id: `sess-${Date.now()}`,
@@ -356,13 +384,16 @@ export default function MedicalRecordPage({
         improvementPoint: sessionForm.improvementPoint,
         tags: tagArray,
       };
-      setSessions([newSess, ...sessions]);
+      nextSessions = [newSess, ...sessions];
     }
+
+    setSessions(nextSessions);
+    saveStoredSessions(patient.id, nextSessions);
 
     showFeedback('success', `Sessão ${sessNum} registrada como realizada com sucesso!`);
     setShowNewSessionModal(false);
     setSessionForm({
-      sessionNumber: sessions.length + 2,
+      sessionNumber: nextSessions.length + 1,
       date: new Date().toISOString().split('T')[0],
       evolution: '',
       improvementPoint: '',
@@ -643,7 +674,30 @@ export default function MedicalRecordPage({
           {/* ========================================================== */}
           {activeTab === 'historico' && (
             <div className="space-y-4">
-              {sessions.map((sess, idx) => {
+              {sessions.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3">
+                  <p className="text-xs font-semibold text-slate-500">
+                    Nenhuma sessão clínica registrada para este paciente ainda.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSessionForm({
+                        sessionNumber: 1,
+                        date: new Date().toISOString().split('T')[0],
+                        evolution: '',
+                        improvementPoint: '',
+                        tags: '',
+                      });
+                      setShowNewSessionModal(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition shadow-2xs cursor-pointer"
+                  >
+                    + Registrar Primeira Sessão
+                  </button>
+                </div>
+              ) : (
+                sessions.map((sess, idx) => {
                 const isRealizada = sess.status === 'Realizada';
                 return (
                   <div
@@ -724,7 +778,8 @@ export default function MedicalRecordPage({
                     )}
                   </div>
                 );
-              })}
+              })
+            )}
             </div>
           )}
 
