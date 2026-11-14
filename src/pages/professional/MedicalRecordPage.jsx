@@ -443,9 +443,9 @@ export default function MedicalRecordPage({
       {/* ============================================================== */}
       {/* BARRA DE CONTROLE: SELETOR DE PACIENTE + AÇÕES RÁPIDAS         */}
       {/* ============================================================== */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
         {/* Seletor Dropdown de Paciente */}
-        <div className="relative min-w-[260px]">
+        <div className="relative w-full sm:w-auto sm:min-w-[260px]">
           <select
             value={activePatientId}
             onChange={handlePatientSelectChange}
@@ -464,36 +464,38 @@ export default function MedicalRecordPage({
           />
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowNewSessionModal(true)}
-          className="flex items-center gap-1.5 px-3.5 py-2.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
-        >
-          <Plus size={15} /> Registrar Sessão
-        </button>
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setShowNewSessionModal(true)}
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
+          >
+            <Plus size={15} /> Registrar Sessão
+          </button>
 
-        <button
-          type="button"
-          onClick={handleToggleArchive}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border shadow-2xs transition cursor-pointer ${
-            isArchived
-              ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100'
-              : 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
-          }`}
-          title={isArchived ? 'Restaurar paciente para ativos' : 'Arquivar prontuário do paciente'}
-        >
-          {isArchived ? <RotateCcw size={15} /> : <Archive size={15} />}
-          {isArchived ? 'Restaurar Paciente' : 'Arquivar Prontuário'}
-        </button>
+          <button
+            type="button"
+            onClick={handleToggleArchive}
+            className={`flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border shadow-2xs transition cursor-pointer ${
+              isArchived
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100'
+                : 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
+            }`}
+            title={isArchived ? 'Restaurar paciente para ativos' : 'Arquivar prontuário do paciente'}
+          >
+            {isArchived ? <RotateCcw size={15} /> : <Archive size={15} />}
+            {isArchived ? 'Restaurar' : 'Arquivar'}
+          </button>
 
-        <button
-          type="button"
-          onClick={handleDeletePatient}
-          className="flex items-center gap-1.5 px-3.5 py-2.5 bg-rose-50 border border-rose-300 hover:bg-rose-100 text-rose-800 rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer ml-auto"
-          title="Excluir paciente permanentemente"
-        >
-          <Trash2 size={15} /> Excluir Paciente
-        </button>
+          <button
+            type="button"
+            onClick={handleDeletePatient}
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-rose-50 border border-rose-300 hover:bg-rose-100 text-rose-800 rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer sm:ml-auto"
+            title="Excluir paciente permanentemente"
+          >
+            <Trash2 size={15} /> Excluir Paciente
+          </button>
+        </div>
       </div>
 
       {/* ============================================================== */}

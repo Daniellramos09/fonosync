@@ -4,10 +4,12 @@ import {
   FileText,
   Home,
   LogOut,
+  Menu,
   PersonStanding,
   Settings,
   Users,
   Volume2,
+  X,
 } from 'lucide-react';
 import logoImg from '../assets/images/ModeloA_Semnome.jpg';
 import { useA11y } from '../hooks/useA11y';
@@ -48,6 +50,7 @@ function authenticatedName(session) {
 export default function ProfessionalDashboard({ section = 'dashboard', recordId }) {
   const activeSection = section;
   const [showA11y, setShowA11y] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { speakPageContent } = useA11y();
   const { logout, session } = useAuth();
   const [patients, setPatients] = useState([]);
@@ -63,6 +66,7 @@ export default function ProfessionalDashboard({ section = 'dashboard', recordId 
   }, [activeSection]);
 
   const navigateTo = (newSection) => {
+    setMobileMenuOpen(false);
     window.location.assign(`#/profissional/${newSection}`);
   };
 
@@ -78,9 +82,30 @@ export default function ProfessionalDashboard({ section = 'dashboard', recordId 
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas font-sans md:flex-row">
-      <aside className="flex w-full shrink-0 flex-col justify-between bg-band p-5 text-white md:w-64">
+      {/* Barra de Topo exclusiva para Mobile */}
+      <div className="flex items-center justify-between border-b border-line bg-band p-4 text-white md:hidden">
+        <div className="flex items-center gap-2.5">
+          <img src={logoImg} alt="FonoSync Logo" className="h-8 w-auto rounded bg-white object-contain p-0.5" />
+          <span className="font-serif text-lg font-bold text-white">FonoSync</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="rounded-lg border border-white/20 p-2 text-white hover:bg-white/10"
+          aria-label={mobileMenuOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Menu Lateral Desktop / Gaveta Mobile */}
+      <aside
+        className={`${
+          mobileMenuOpen ? 'flex' : 'hidden'
+        } w-full shrink-0 flex-col justify-between bg-band p-5 text-white transition-all md:flex md:w-64`}
+      >
         <div>
-          <div className="mb-8 flex items-center gap-3">
+          <div className="mb-8 hidden items-center gap-3 md:flex">
             <img src={logoImg} alt="FonoSync Logo" className="h-9 w-auto rounded bg-white object-contain p-0.5" />
             <span className="font-serif text-xl font-bold text-white">FonoSync</span>
           </div>
