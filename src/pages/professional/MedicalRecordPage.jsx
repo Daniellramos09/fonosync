@@ -621,6 +621,17 @@ export default function MedicalRecordPage({
             <button
               type="button"
               onClick={() => {
+                setActiveTab('anexos');
+                const el = document.getElementById('prontuario-tabs-anchor');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="w-full py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <Paperclip size={15} className="text-[#0284C7]" /> Ver Exames e Anexos ({attachments.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => {
                 if (onNavigate) onNavigate('relatorios');
               }}
               className="w-full py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
@@ -633,15 +644,15 @@ export default function MedicalRecordPage({
         {/* ------------------------------------------------------------ */}
         {/* COLUNA DIREITA: NAVEGAÇÃO DE ABAS E CONTEÚDOS CLÍNICOS       */}
         {/* ------------------------------------------------------------ */}
-        <div className="lg:col-span-8 space-y-4">
-          {/* Barra de Abas do Prontuário */}
-          <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-2 rounded-t-xl overflow-x-auto scrollbar-none">
+        <div id="prontuario-tabs-anchor" className="lg:col-span-8 space-y-4">
+          {/* Barra de Abas do Prontuário com rolagem e toque aprimorado */}
+          <div className="flex items-center gap-1 sm:gap-2 border-b border-slate-200 bg-white px-2 rounded-t-xl overflow-x-auto scrollbar-none py-1">
             {[
               { id: 'historico', label: 'Histórico', icon: Clock },
               { id: 'avaliacoes', label: 'Avaliações', icon: Stethoscope },
               { id: 'diagnostico', label: 'Diagnóstico', icon: FileCheck2 },
               { id: 'anamnese', label: 'Anamnese', icon: FileText },
-              { id: 'anexos', label: 'Anexos', icon: Paperclip },
+              { id: 'anexos', label: `Anexos (${attachments.length})`, icon: Paperclip },
             ].map(({ id, label, icon: Icon }) => {
               const active = activeTab === id;
               return (

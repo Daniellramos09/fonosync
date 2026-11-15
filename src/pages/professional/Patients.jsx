@@ -282,7 +282,75 @@ export default function Patients({ onOpenProntuario }) {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Visualização Mobile em Cards (< md) */}
+        <div className="block md:hidden divide-y divide-slate-100">
+          {loading ? (
+            <div className="py-8 text-center text-slate-500">
+              <span className="inline-flex items-center gap-2 text-xs">
+                <span className="size-4 animate-spin rounded-full border-2 border-slate-300 border-t-[#0284C7]" aria-hidden="true" />
+                Carregando pacientes...
+              </span>
+            </div>
+          ) : filteredPatients.length > 0 ? (
+            filteredPatients.map((patient) => (
+              <div
+                key={patient.id}
+                onClick={() => handleOpenRecord(patient)}
+                className="p-4 space-y-3 hover:bg-sky-50/50 transition cursor-pointer"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={`w-9 h-9 rounded-full font-bold text-xs flex items-center justify-center border shrink-0 ${
+                      patient.archived ? 'bg-slate-200 text-slate-600 border-slate-300' : 'bg-sky-100 text-[#0284C7] border-sky-200'
+                    }`}>
+                      {patient.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-sm text-[#172C3A] truncate">{patient.name}</p>
+                      <p className="text-xs text-slate-500">{patient.age !== null ? `${patient.age} anos` : 'Idade não informada'}</p>
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                    patient.statusType === 'acompanhamento' ? 'bg-emerald-50 text-emerald-800' :
+                    patient.statusType === 'pre-cadastro' ? 'bg-amber-50 text-amber-800' : 'bg-slate-100 text-slate-700'
+                  }`}>
+                    {patient.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-50 text-xs">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditPatient(patient);
+                    }}
+                    className="text-slate-600 hover:text-[#0284C7] font-bold inline-flex items-center gap-1 py-1 px-2.5 rounded-lg border border-slate-200 bg-slate-50"
+                  >
+                    <Pencil size={12} /> Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenRecord(patient);
+                    }}
+                    className="bg-[#0284C7] text-white font-bold inline-flex items-center gap-1 py-1.5 px-3 rounded-lg shadow-2xs hover:bg-sky-700"
+                  >
+                    {patient.archived ? 'Ver Prontuário' : 'Abrir Prontuário'} <ChevronRight size={13} />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className={`py-8 text-center text-xs ${loadError ? 'font-bold text-rose-700' : 'text-slate-400'}`}>
+              {loadError || 'Nenhum paciente encontrado nesta categoria.'}
+            </div>
+          )}
+        </div>
+
+        {/* Tabela Tradicional Desktop (>= md) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
