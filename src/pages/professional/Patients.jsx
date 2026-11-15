@@ -494,14 +494,26 @@ export default function Patients({ onOpenProntuario }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold mb-1 text-slate-700">CID-10</label>
+                  <label className="block font-bold mb-1 text-slate-700">CID-10 (Sugestão Clínica)</label>
                   <input
                     type="text"
-                    placeholder="Ex.: F80.9"
+                    list="cid10-sugestoes"
+                    placeholder="Ex.: F80.0, F80.1, R47.0..."
                     value={form.cid10}
                     onChange={update('cid10')}
                     className="w-full p-2.5 border border-slate-300 rounded-xl font-medium focus:ring-2 focus:ring-[#0284C7]"
                   />
+                  <datalist id="cid10-sugestoes">
+                    <option value="F80.0">F80.0 - Transtorno específico da articulação da fala</option>
+                    <option value="F80.1">F80.1 - Transtorno expressivo da linguagem</option>
+                    <option value="F80.2">F80.2 - Transtorno receptivo da linguagem</option>
+                    <option value="F80.8">F80.8 - Outros transtornos do desenvolvimento da fala</option>
+                    <option value="F80.9">F80.9 - Transtorno não especificado do desenvolvimento</option>
+                    <option value="F98.5">F98.5 - Gagueira (Tartamudez)</option>
+                    <option value="R47.0">R47.0 - Disfasia e Afasia</option>
+                    <option value="R49.0">R49.0 - Disfonia (Alteração vocal)</option>
+                    <option value="H90">H90 - Perda de audição por transtorno de condução/neurossensorial</option>
+                  </datalist>
                 </div>
               </div>
 

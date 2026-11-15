@@ -663,10 +663,17 @@ export default function MedicalRecordPage({
           </div>
 
           {(loadingAnamnese || loadingDiag || loadingEval || loadingAtt) && (
-            <p className="flex items-center gap-2 text-xs text-slate-500">
-              <span className="size-4 animate-spin rounded-full border-2 border-slate-300 border-t-[#0284C7]" aria-hidden="true" />
-              Carregando prontuário...
-            </p>
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="size-4 rounded-full bg-slate-200" />
+                <div className="h-4 bg-slate-200 rounded w-48" />
+              </div>
+              <div className="space-y-2.5">
+                <div className="h-3.5 bg-slate-100 rounded w-full" />
+                <div className="h-3.5 bg-slate-100 rounded w-5/6" />
+                <div className="h-3.5 bg-slate-100 rounded w-2/3" />
+              </div>
+            </div>
           )}
 
           {/* ========================================================== */}
@@ -871,37 +878,69 @@ export default function MedicalRecordPage({
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">CID-10</label>
+                    <label className="text-slate-500 font-bold block">CID-10 (Sugestão Clínica)</label>
                     <input
                       type="text"
+                      list="cid10-prontuario-sugestoes"
+                      placeholder="Ex: F80.0, F80.1, F98.5..."
                       disabled={!isEditingDiag}
                       value={diagForm.cid10}
                       onChange={(e) => setDiagForm({ ...diagForm, cid10: e.target.value })}
                       className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-bold text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
                     />
+                    <datalist id="cid10-prontuario-sugestoes">
+                      <option value="F80.0">F80.0 - Transtorno específico da articulação da fala</option>
+                      <option value="F80.1">F80.1 - Transtorno expressivo da linguagem</option>
+                      <option value="F80.2">F80.2 - Transtorno receptivo da linguagem</option>
+                      <option value="F80.8">F80.8 - Outros transtornos do desenvolvimento da fala</option>
+                      <option value="F80.9">F80.9 - Transtorno não especificado do desenvolvimento</option>
+                      <option value="F98.5">F98.5 - Gagueira (Tartamudez)</option>
+                      <option value="R47.0">R47.0 - Disfasia e Afasia</option>
+                      <option value="R49.0">R49.0 - Disfonia (Alteração vocal)</option>
+                      <option value="H90">H90 - Perda auditiva por condução/neurossensorial</option>
+                    </datalist>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">Área terapêutica</label>
+                    <label className="text-slate-500 font-bold block">Área Terapêutica</label>
                     <input
                       type="text"
+                      list="areas-terapeuticas-sugestoes"
+                      placeholder="Ex: Linguagem, Voz, Motricidade Orofacial..."
                       disabled={!isEditingDiag}
                       value={diagForm.therapeuticArea}
                       onChange={(e) => setDiagForm({ ...diagForm, therapeuticArea: e.target.value })}
                       className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
                     />
+                    <datalist id="areas-terapeuticas-sugestoes">
+                      <option value="Linguagem">Linguagem (Desenvolvimento infantil, fala e escrita)</option>
+                      <option value="Voz">Voz (Disfonias, reabilitação vocal)</option>
+                      <option value="Motricidade Orofacial">Motricidade Orofacial (Mastigação, deglutição, respiração)</option>
+                      <option value="Audiologia">Audiologia (Processamento auditivo, reabilitação)</option>
+                      <option value="Disfagia">Disfagia (Dificuldade de deglutição)</option>
+                      <option value="Fluência">Fluência (Gagueira e taquifemia)</option>
+                    </datalist>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">Frequência das sessões</label>
+                    <label className="text-slate-500 font-bold block">Periodicidade / Frequência das Sessões</label>
                     <input
                       type="text"
+                      list="frequencia-sessoes-sugestoes"
+                      placeholder="Ex: 2x por semana · 50 min"
                       disabled={!isEditingDiag}
                       value={diagForm.sessionFrequency}
                       onChange={(e) => setDiagForm({ ...diagForm, sessionFrequency: e.target.value })}
                       className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
                     />
+                    <datalist id="frequencia-sessoes-sugestoes">
+                      <option value="1x por semana · 45 min">1x por semana · 45 min</option>
+                      <option value="2x por semana · 50 min">2x por semana · 50 min</option>
+                      <option value="3x por semana · 40 min">3x por semana · 40 min</option>
+                      <option value="Quinzenal · 50 min">Quinzenal · 50 min</option>
+                      <option value="Monitoramento Mensal">Monitoramento Mensal</option>
+                    </datalist>
                   </div>
                 </div>
 
@@ -1224,10 +1263,10 @@ export default function MedicalRecordPage({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Tags Clínicas (separadas por vírgula)</label>
+                <label className="font-bold text-slate-700 block">Marcadores Clínicos / Focos da Sessão (separados por vírgula)</label>
                 <input
                   type="text"
-                  placeholder="Ex: Fluência, Respiração, Leitura em voz alta"
+                  placeholder="Ex: Fonologia, Fluência, Articulação, Leitura guiada"
                   value={sessionForm.tags}
                   onChange={(e) => setSessionForm({ ...sessionForm, tags: e.target.value })}
                   className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"

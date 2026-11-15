@@ -48,8 +48,14 @@ export async function api(path, { method = 'GET', body } = {}) {
   }
 
   if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error('Acesso não autorizado: sua conta não tem permissão de fonoaudiólogo para esta operação ou a sessão expirou.');
+    }
+    if (response.status === 409) {
+      throw new Error(data?.message || 'Conflito de dados: verifique se já existe um cadastro com este mesmo identificador/CPF no sistema.');
+    }
     const fieldMessage = data?.fieldErrors?.[0]?.message;
-    throw new Error(fieldMessage || data?.message || 'Não foi possível concluir a ação. Tente de novo.');
+    throw new Error(fieldMessage || data?.message || data?.detail || 'Não foi possível concluir a ação. Verifique os dados e tente novamente.');
   }
   return data;
 }
