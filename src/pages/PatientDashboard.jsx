@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AudioWaveform, ClipboardList, Gamepad2, Home, LogOut, MessageSquare, PersonStanding, School, Settings, Volume2 } from 'lucide-react';
+import { AudioWaveform, ClipboardList, Gamepad2, Home, LogOut, Menu, MessageSquare, PersonStanding, School, Settings, Volume2, X } from 'lucide-react';
 import logoImg from '../assets/images/ModeloA_Semnome.jpg';
 import A11yModal from '../components/A11yModal';
 import { buttonClass } from '../components/buttonStyles';
@@ -50,6 +50,7 @@ function ActivityList() {
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState('inicio');
   const [showA11y, setShowA11y] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { session, logout } = useAuth();
   const { isPlayerOpen, speakPageContent } = useA11y();
 
@@ -65,9 +66,30 @@ export default function PatientDashboard() {
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas font-sans md:flex-row">
-      <aside className="flex w-full shrink-0 flex-col justify-between bg-band p-5 text-white md:w-64">
+      {/* Barra de Topo exclusiva para Mobile */}
+      <div className="flex items-center justify-between border-b border-line bg-band p-4 text-white md:hidden">
+        <div className="flex items-center gap-2.5">
+          <img src={logoImg} alt="FonoSync Logo" className="h-8 w-auto rounded bg-white object-contain p-0.5" />
+          <span className="font-serif text-lg font-bold text-white">FonoSync</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="rounded-lg border border-white/20 p-2 text-white hover:bg-white/10"
+          aria-label={mobileMenuOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Menu Lateral Desktop / Gaveta Mobile */}
+      <aside
+        className={`${
+          mobileMenuOpen ? 'flex' : 'hidden'
+        } w-full shrink-0 flex-col justify-between bg-band p-5 text-white transition-all md:flex md:w-64`}
+      >
         <div>
-          <div className="mb-8 flex items-center gap-3">
+          <div className="mb-8 hidden items-center gap-3 md:flex">
             <img src={logoImg} alt="FonoSync Logo" className="h-9 w-auto rounded bg-white object-contain p-0.5" />
             <span className="font-serif text-xl font-bold text-white">FonoSync</span>
           </div>
@@ -81,7 +103,10 @@ export default function PatientDashboard() {
                 <button
                   key={id}
                   type="button"
-                  onClick={() => setActiveTab(id)}
+                  onClick={() => {
+                    setActiveTab(id);
+                    setMobileMenuOpen(false);
+                  }}
                   aria-current={isActive ? 'page' : undefined}
                   className={`flex min-h-11 w-full items-center gap-3 rounded-r-md border-l-4 px-3 text-left text-sm font-bold transition-colors ${
                     isActive

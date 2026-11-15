@@ -6,10 +6,13 @@ import {
   CheckCircle2,
   ClipboardList,
   Download,
+  HeartHandshake,
   History,
   MessageSquare,
+  PhoneCall,
   School,
   Search,
+  Stethoscope,
   TriangleAlert,
   Volume2,
 } from 'lucide-react';
@@ -455,33 +458,82 @@ export default function TriagemGame() {
         </div>
       </div>
 
-      {formResultVisible && (
-        <section aria-labelledby="triagem-marcos-resultado" className="mt-6 rounded-2xl border border-line bg-surface p-5 shadow-sm md:p-8">
-          <h3 id="triagem-marcos-resultado" className="font-serif text-2xl font-bold text-navy">Respostas da triagem</h3>
-          <p className="mt-2 text-sm text-muted">Este resumo registra as respostas informadas e não constitui diagnóstico ou avaliação clínica.</p>
-          <div className="mt-5 overflow-x-auto">
-            <table className="w-full min-w-[32rem] text-left text-sm">
-              <thead className="bg-mist text-navy">
-                <tr>
-                  <th scope="col" className="px-4 py-3">Área observada</th>
-                  <th scope="col" className="px-4 py-3">Resposta</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formQuestions.map((item) => {
-                  const response = item.options.find((option) => option.value === formAnswers[item.id]);
-                  return (
-                    <tr key={item.id} className="border-t border-line">
-                      <th scope="row" className="px-4 py-3 font-semibold text-ink">{item.category}</th>
-                      <td className="px-4 py-3 text-ink">{response?.label ?? 'Não respondida'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+      {formResultVisible && (() => {
+        const answers = Object.values(formAnswers);
+        const naoCount = answers.filter((a) => a === 'nao').length;
+        const parcialCount = answers.filter((a) => a === 'parcial').length;
+        const hasSigns = naoCount >= 2 || (naoCount >= 1 && parcialCount >= 2);
+
+        return (
+          <section aria-labelledby="triagem-marcos-resultado" className="mt-6 rounded-2xl border border-line bg-surface p-5 shadow-sm md:p-8 space-y-6">
+            <div>
+              <h3 id="triagem-marcos-resultado" className="font-serif text-2xl font-bold text-navy">Respostas da triagem</h3>
+              <p className="mt-1 text-sm text-muted">Este resumo registra as respostas informadas e não constitui diagnóstico ou avaliação clínica.</p>
+            </div>
+
+            {hasSigns ? (
+              <div className="rounded-2xl border-2 border-amber-300 bg-amber-50/80 p-5 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-amber-200 text-amber-800 shrink-0">
+                    <HeartHandshake size={22} />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-base font-bold text-amber-950">Atenção e Cuidado no Desenvolvimento da Fala</h4>
+                    <p className="text-xs sm:text-sm text-amber-900 leading-relaxed">
+                      Identificamos que alguns marcos esperados para esta faixa etária podem estar levando um pouco mais de tempo para se desenvolver. 
+                      <strong> Fique tranquilo(a):</strong> cada criança possui seu próprio ritmo, e a estimulação precoce com um fonoaudiólogo faz toda a diferença para que ela se comunique com segurança e alegria.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-amber-200/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  <span className="text-xs font-semibold text-amber-800">
+                    Recomendação: Realizar uma avaliação clínica fonoaudiológica acolhedora.
+                  </span>
+                  <a
+                    href="#/acesso"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                  >
+                    <Search size={14} /> Buscar Fonoaudiólogo
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50/80 p-5 space-y-2">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 size={22} className="text-emerald-700 shrink-0" />
+                  <h4 className="text-base font-bold text-emerald-950">Desenvolvimento Dentro do Esperado</h4>
+                </div>
+                <p className="text-xs sm:text-sm text-emerald-900 leading-relaxed">
+                  Os marcos relatados estão progredindo bem! Continue conversando bastante, cantando e lendo historinhas juntos no dia a dia.
+                </p>
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[32rem] text-left text-sm">
+                <thead className="bg-mist text-navy">
+                  <tr>
+                    <th scope="col" className="px-4 py-3">Área observada</th>
+                    <th scope="col" className="px-4 py-3">Resposta</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formQuestions.map((item) => {
+                    const response = item.options.find((option) => option.value === formAnswers[item.id]);
+                    return (
+                      <tr key={item.id} className="border-t border-line">
+                        <th scope="row" className="px-4 py-3 font-semibold text-ink">{item.category}</th>
+                        <td className="px-4 py-3 text-ink">{response?.label ?? 'Não respondida'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        );
+      })()}
     </div>
   );
 
@@ -653,12 +705,55 @@ export default function TriagemGame() {
 
           <button type="button" onClick={() => setCheckResultVisible(true)} className={`${buttonClass('primary')} mt-6 w-full`}>Ver Análise da Triagem <ArrowRight size={16} aria-hidden="true" /></button>
 
-          {checkResultVisible && (
-            <div className="mt-6 rounded-2xl border-2 border-yellow-200 bg-yellow-50 p-5">
-              <div className="mb-2 text-lg font-extrabold text-orange-600">{Object.values(checkListState).filter(Boolean).length} de {checklistItems.length} indicadores marcados</div>
-              <p className="text-base leading-7 text-muted">{Object.values(checkListState).filter(Boolean).length <= 1 ? '✅ Perfil dentro do esperado. Nenhum encaminhamento necessário no momento. Reavaliar em 30 dias.' : Object.values(checkListState).filter(Boolean).length <= 3 ? '⚠️ Atenção recomendada. Alguns comportamentos persistentes foram identificados. Sugere-se comunicar a família e monitorar por mais 2 semanas. Se mantiver, encaminhar para triagem fonoaudiológica.' : '🚨 Múltiplos indicadores de risco identificados. Recomenda-se encaminhamento para avaliação fonoaudiológica com urgência. Informar a coordenação pedagógica e a família.'}</p>
-            </div>
-          )}
+          {checkResultVisible && (() => {
+            const markedCount = Object.values(checkListState).filter(Boolean).length;
+            const hasRisk = markedCount >= 2;
+
+            return (
+              <div className="mt-6 space-y-4">
+                <div className="rounded-2xl border-2 border-yellow-200 bg-yellow-50 p-5">
+                  <div className="mb-2 text-lg font-extrabold text-orange-600">
+                    {markedCount} de {checklistItems.length} indicadores marcados
+                  </div>
+                  <p className="text-base leading-7 text-muted">
+                    {markedCount <= 1
+                      ? '✅ Perfil dentro do esperado para a idade escolar. Recomenda-se continuar estimulando a leitura e a conversação.'
+                      : markedCount <= 3
+                      ? '⚠️ Indicadores de atenção identificados. A criança pode se beneficiar de uma avaliação fonoaudiológica para prevenir dificuldades futuras na leitura e escrita.'
+                      : '🚨 Múltiplos sinais observados em sala de aula. Recomenda-se encaminhamento fonoaudiológico especializado para avaliação completa.'}
+                  </p>
+                </div>
+
+                {hasRisk && (
+                  <div className="rounded-2xl border-2 border-[#0284C7]/40 bg-sky-50/80 p-5 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-[#0284C7] text-white shrink-0">
+                        <HeartHandshake size={22} />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-base font-bold text-[#172C3A]">Orientação Acolhedora para a Família e Escola</h4>
+                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                          Identificar essas características precocemente é o primeiro passo para apoiar o desenvolvimento da criança sem cobranças. 
+                          O acompanhamento fonoaudiológico ajuda a superar trocas na fala e dificuldades na alfabetização de forma leve e motivadora.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-sky-200/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                      <span className="text-xs font-semibold text-sky-900">
+                        Encontre profissionais especializados cadastrados na plataforma:
+                      </span>
+                      <a
+                        href="#/acesso"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                      >
+                        <Search size={14} /> Buscar Fonoaudiólogos
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>
