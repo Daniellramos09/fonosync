@@ -157,16 +157,19 @@ export default function Patients({ onOpenProntuario }) {
         dateOfBirth: form.dateOfBirth || null,
         cpfPatient: isMinorPatient ? null : (form.cpf ? form.cpf.trim() : null),
         contactPatient: form.phone || null,
-        sex: form.sex || null,
-        cid10: form.cid10.trim() || null,
+        sex: form.sex ? form.sex.toUpperCase() : null,
+        cid10: form.cid10 ? form.cid10.trim() : null,
         guardianId,
       };
 
       if (editingPatient) {
-        replacePatient(
-          await updatePatient(editingPatient.id, { ...data, patientStatus: editingPatient.patientStatus }),
-        );
-        showNotice('success', 'Dados do paciente atualizados.');
+        const payload = {
+          ...data,
+          patientStatus: editingPatient.patientStatus || 'ATIVO',
+        };
+        const updated = await updatePatient(editingPatient.id, payload);
+        replacePatient(updated);
+        showNotice('success', 'Dados do paciente atualizados com sucesso!');
       } else {
         const created = await createPatient(data);
         setPatients([toRow(created), ...patients]);
