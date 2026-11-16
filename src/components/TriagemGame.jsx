@@ -122,6 +122,7 @@ const animals = [
   { emoji: '🐍', name: 'COBRA', phonemes: '/k/ + /o/ + /b/ + /r/ + /a/', target: 'cobra', alts: { coba: 'Omissão do /r/ em encontro consonantal (processo comum até 4a)', corra: 'Troca de /b/ → /r/', cobla: 'Metátese do encontro consonantal' } },
   { emoji: '🌸', name: 'FLOR', phonemes: '/f/ + /l/ + /o/ + /r/', target: 'flor', alts: { for: 'Redução do encontro consonantal /fl/ → /f/ (processo fonológico típico)', fror: 'Metátese /fl/ → /fr/ (variação no encontro consonantal)', flô: 'Omissão do /r/ final (regionalismo ou processo fonológico)' } },
   { emoji: '🚂', name: 'TREM', phonemes: '/t/ + /r/ + /e/ + /m/', target: 'trem', alts: { tem: 'Redução do encontro consonantal /tr/ (muito comum até 5a)', telen: 'Múltiplos processos fonológicos simultâneos', crem: 'Troca de /t/ → /k/ (assimilação velar)' } },
+  { emoji: '🦆', name: 'PATO', phonemes: '/p/ + /a/ + /t/ + /u/', target: 'pato', alts: { bato: 'Troca de /p/ → /b/ (Sonorização incorreta)', tato: 'Troca de /p/ → /t/ (Anteriorização de fonema)', patu: 'Escrita fonética — pronúncia padrão com vogal átona', pao: 'Omissão de sílaba final' } },
 ];
 
 const rimaPairs = [
@@ -179,7 +180,14 @@ export default function TriagemGame() {
   const [wordIndex, setWordIndex] = useState(0);
   const [answers, setAnswers] = useState(() => Array(words.length).fill(null));
   const [result, setResult] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem('fonosync:triagem_history');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [downloaded, setDownloaded] = useState(false);
   const [showA11y, setShowA11y] = useState(false);
   const [formAnswers, setFormAnswers] = useState({});
@@ -191,10 +199,12 @@ export default function TriagemGame() {
   const [gameComparison, setGameComparison] = useState([]);
   const [acertos, setAcertos] = useState(0);
   const [trocas, setTrocas] = useState(0);
+  const [game24Finished, setGame24Finished] = useState(false);
   const [rimaIndex, setRimaIndex] = useState(0);
   const [rimaAcertos, setRimaAcertos] = useState(0);
   const [rimaErros, setRimaErros] = useState(0);
   const [rimaFeedback, setRimaFeedback] = useState('');
+  const [rimaFinished, setRimaFinished] = useState(false);
   const [checkListState, setCheckListState] = useState({});
   const [checkResultVisible, setCheckResultVisible] = useState(false);
   const { isPlayerOpen, speakPageContent, stopSpeaking, speakText } = useA11y();
@@ -241,7 +251,15 @@ export default function TriagemGame() {
     };
 
     setResult(record);
-    setHistory((list) => [record, ...list]);
+    setHistory((list) => {
+      const updated = [record, ...list];
+      try {
+        window.localStorage.setItem('fonosync:triagem_history', JSON.stringify(updated));
+      } catch (e) {
+        console.error('Erro ao persistir historico de triagem:', e);
+      }
+      return updated;
+    });
     setDownloaded(false);
     setScreenStack((prev) => [...prev, 'result']);
   };
@@ -342,10 +360,24 @@ export default function TriagemGame() {
   };
 
   const nextAnimal = () => {
-    setGameAnimalIndex((previous) => (previous + 1) % animals.length);
+    if (gameAnimalIndex + 1 >= animals.length) {
+      setGame24Finished(true);
+      return;
+    }
+    setGameAnimalIndex((previous) => previous + 1);
     setGameResponse('');
     setGameAnalysis('');
     setGameComparison([]);
+  };
+
+  const restartGame24 = () => {
+    setGameAnimalIndex(0);
+    setGameResponse('');
+    setGameAnalysis('');
+    setGameComparison([]);
+    setAcertos(0);
+    setTrocas(0);
+    setGame24Finished(false);
   };
 
   const answerRima = (answer) => {
@@ -359,9 +391,22 @@ export default function TriagemGame() {
     }
 
     window.setTimeout(() => {
-      setRimaIndex((value) => (value + 1) % rimaPairs.length);
-      setRimaFeedback('');
-    }, 1800);
+      if (rimaIndex + 1 >= rimaPairs.length) {
+        setRimaFinished(true);
+        setRimaFeedback('');
+      } else {
+        setRimaIndex((value) => value + 1);
+        setRimaFeedback('');
+      }
+    }, 1500);
+  };
+
+  const restartRima = () => {
+    setRimaIndex(0);
+    setRimaAcertos(0);
+    setRimaErros(0);
+    setRimaFeedback('');
+    setRimaFinished(false);
   };
 
   const toggleCheckItem = (index) => {
@@ -541,8 +586,8 @@ export default function TriagemGame() {
     <section className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-serif text-2xl font-bold text-navy">Histórico desta sessão</h2>
-          <p className="mt-1 text-sm text-muted">Os resultados ficam disponíveis enquanto esta página estiver aberta.</p>
+          <h2 className="font-serif text-2xl font-bold text-navy">Histórico de Triagens</h2>
+          <p className="mt-1 text-sm text-muted">Resultados salvos das triagens realizadas neste navegador.</p>
         </div>
         <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
           <ArrowLeft size={16} aria-hidden="true" /> Voltar à triagem
@@ -556,119 +601,262 @@ export default function TriagemGame() {
     </section>
   );
 
-  const renderGame24Screen = () => (
-
-<div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
-        <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Palavra</h2>
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">2 – 4 anos</span>
-      </div>
-
-      <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-        <div className="flex items-center gap-4 bg-gradient-to-r from-pink-400 to-pink-600 p-6 text-white">
-          <div className="text-4xl">🎮</div>
-          <div>
-            <h3 className="font-serif text-2xl font-extrabold">Identificação de Trocas Fonéticas</h3>
-            <p className="mt-1 text-sm text-white/90">Mostre a imagem para a criança, peça que diga o nome do animal e digite abaixo o que ela falou</p>
-          </div>
-        </div>
-
-        <div className="p-8">
-          <div className="mb-8 flex flex-wrap items-center justify-center gap-3 text-center">
-            <div className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-extrabold text-navy ring-2 ring-yellow-300">Rodada {gameAnimalIndex + 1}/4</div>
-            <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">🎯 Trocas: {trocas}</div>
-            <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">✅ Corretas: {acertos}</div>
+  const renderGame24Screen = () => {
+    if (game24Finished) {
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
+            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Palavra — Conclusão</h2>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">2 – 4 anos</span>
           </div>
 
-          <div className="mb-8 text-center">
-            <div className="inline-block rounded-[24px] border-4 border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100 px-8 py-7 shadow-[0_8px_24px_rgba(253,203,110,0.3)]">
-              <div className="text-7xl">{currentAnimal.emoji}</div>
-              <div className="mt-3 font-serif text-4xl font-black tracking-[0.2em] text-navy">{currentAnimal.name}</div>
-              <div className="mt-2 text-lg font-semibold text-muted">{currentAnimal.phonemes}</div>
-            </div>
-          </div>
-
-          <div className="mb-8 rounded-2xl border-2 border-sky-200 bg-sky-50 p-4 text-center text-base font-bold text-sky-700">👆 Aponte para o animal e pergunte à criança: <strong>"O que é isso?"</strong><br />Digite abaixo exatamente como ela disse:</div>
-
-          <div className="mb-5">
-            <label htmlFor="fns-child-word" className="mb-2 block text-base font-extrabold text-ink">O que a criança disse:</label>
-            <input id="fns-child-word" type="text" value={gameResponse} onChange={(event) => {
-              setGameResponse(event.target.value.toLowerCase());
-              evaluateWordGuess(event.target.value);
-            }} className="w-full rounded-2xl border-4 border-line bg-white px-5 py-4 text-xl font-bold text-ink outline-none transition focus:border-pink-400" placeholder="ex: faca, baca, vaka..." style={{ textTransform: 'lowercase' }} />
-          </div>
-
-          {gameComparison.length > 0 && (
-            <div className="rounded-2xl border-2 border-yellow-200 bg-yellow-50 p-5">
-              <div className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-slate-600">Análise fonema a fonema:</div>
-              <div className="mb-4 flex flex-wrap gap-3">
-                {gameComparison.map((item, index) => (
-                  <span key={`${item.char}-${index}`} className={`rounded-xl px-3 py-2 text-2xl font-black ${item.matched ? 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300' : 'bg-red-100 text-red-800 border-2 border-red-300'}`}>
-                    {item.char}
-                  </span>
-                ))}
+          <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
+            <div className="flex items-center gap-4 bg-gradient-to-r from-pink-500 to-rose-600 p-6 text-white">
+              <div className="text-4xl">🎉</div>
+              <div>
+                <h3 className="font-serif text-2xl font-extrabold">Parabéns! Jogo Concluído!</h3>
+                <p className="mt-1 text-sm text-white/90">A criança completou as 5 rodadas da triagem lúdica de trocas fonéticas.</p>
               </div>
-              <div className="rounded-xl border border-yellow-200 bg-yellow-100 p-4 text-sm font-semibold leading-6 text-amber-900">{gameAnalysis}</div>
-              <div className="mt-5 flex justify-end"><button type="button" onClick={nextAnimal} className={buttonClass('primary')}>Próximo animal <ArrowRight size={16} aria-hidden="true" /></button></div>
             </div>
-          )}
+
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
+                  <span className="text-4xl">🌟</span>
+                  <div className="mt-2 text-3xl font-black text-emerald-800">{acertos} / 5</div>
+                  <div className="text-sm font-bold text-emerald-700">Pronúncias Corretas</div>
+                </div>
+                <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6">
+                  <span className="text-4xl">🔍</span>
+                  <div className="mt-2 text-3xl font-black text-amber-800">{trocas} / 5</div>
+                  <div className="text-sm font-bold text-amber-700">Trocas / Processos Observados</div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-sky-200 bg-sky-50 p-6">
+                <h4 className="font-serif text-lg font-bold text-navy flex items-center gap-2">
+                  <span>💡</span> Orientação ao Responsável
+                </h4>
+                <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                  {trocas > 1
+                    ? 'Identificamos algumas trocas e simplificações comuns no processo de aquisição da fala. Para entender se são variações típicas da idade ou se necessitam de estímulo fonoterápico precoce, recomendamos uma avaliação detalhada com um profissional de fonoaudiologia.'
+                    : 'Excelente desempenho! A criança demonstrou boa correspondência fonética para a idade. Continue estimulando com conversas, leituras de histórias e brincadeiras orais.'}
+                </p>
+                <p className="mt-3 text-xs text-muted">
+                  ⚠️ Esta é uma atividade de triagem lúdica e preventiva. Não substitui consulta e diagnóstico fonoaudiológico.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-line">
+                <button type="button" onClick={restartGame24} className={buttonClass('secondary')}>
+                  🔁 Jogar Novamente
+                </button>
+                <div className="flex flex-wrap gap-3">
+                  <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+                    Voltar ao Menu
+                  </button>
+                  <a
+                    href="#/profissional/pacientes"
+                    className="inline-flex items-center gap-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white px-5 py-3 text-sm font-bold shadow-md transition"
+                  >
+                    <span>🩺</span> Buscar Fonoaudiólogo
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
+          <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Palavra</h2>
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">2 – 4 anos</span>
+        </div>
+
+        <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
+          <div className="flex items-center gap-4 bg-gradient-to-r from-pink-400 to-pink-600 p-6 text-white">
+            <div className="text-4xl">🎮</div>
+            <div>
+              <h3 className="font-serif text-2xl font-extrabold">Identificação de Trocas Fonéticas</h3>
+              <p className="mt-1 text-sm text-white/90">Mostre a imagem para a criança, peça que diga o nome do animal e digite abaixo o que ela falou</p>
+            </div>
+          </div>
+
+          <div className="p-8">
+            <div className="mb-8 flex flex-wrap items-center justify-center gap-3 text-center">
+              <div className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-extrabold text-navy ring-2 ring-yellow-300">Rodada {gameAnimalIndex + 1}/{animals.length}</div>
+              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">🎯 Trocas: {trocas}</div>
+              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">✅ Corretas: {acertos}</div>
+            </div>
+
+            <div className="mb-8 text-center">
+              <div className="inline-block rounded-[24px] border-4 border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100 px-8 py-7 shadow-[0_8px_24px_rgba(253,203,110,0.3)]">
+                <div className="text-7xl">{currentAnimal.emoji}</div>
+                <div className="mt-3 font-serif text-4xl font-black tracking-[0.2em] text-navy">{currentAnimal.name}</div>
+                <div className="mt-2 text-lg font-semibold text-muted">{currentAnimal.phonemes}</div>
+              </div>
+            </div>
+
+            <div className="mb-8 rounded-2xl border-2 border-sky-200 bg-sky-50 p-4 text-center text-base font-bold text-sky-700">👆 Aponte para o animal e pergunte à criança: <strong>"O que é isso?"</strong><br />Digite abaixo exatamente como ela disse:</div>
+
+            <div className="mb-5">
+              <label htmlFor="fns-child-word" className="mb-2 block text-base font-extrabold text-ink">O que a criança disse:</label>
+              <input id="fns-child-word" type="text" value={gameResponse} onChange={(event) => {
+                setGameResponse(event.target.value.toLowerCase());
+                evaluateWordGuess(event.target.value);
+              }} className="w-full rounded-2xl border-4 border-line bg-white px-5 py-4 text-xl font-bold text-ink outline-none transition focus:border-pink-400" placeholder="ex: faca, baca, vaka..." style={{ textTransform: 'lowercase' }} />
+            </div>
+
+            {gameComparison.length > 0 && (
+              <div className="rounded-2xl border-2 border-yellow-200 bg-yellow-50 p-5">
+                <div className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-slate-600">Análise fonema a fonema:</div>
+                <div className="mb-4 flex flex-wrap gap-3">
+                  {gameComparison.map((item, index) => (
+                    <span key={`${item.char}-${index}`} className={`rounded-xl px-3 py-2 text-2xl font-black ${item.matched ? 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300' : 'bg-red-100 text-red-800 border-2 border-red-300'}`}>
+                      {item.char}
+                    </span>
+                  ))}
+                </div>
+                <div className="rounded-xl border border-yellow-200 bg-yellow-100 p-4 text-sm font-semibold leading-6 text-amber-900">{gameAnalysis}</div>
+                <div className="mt-5 flex justify-end">
+                  <button type="button" onClick={nextAnimal} className={buttonClass('primary')}>
+                    {gameAnimalIndex + 1 >= animals.length ? 'Finalizar Jogo' : 'Próximo animal'} <ArrowRight size={16} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  const renderRimaScreen = () => (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
-        <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima</h2>
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">4 – 5 anos</span>
-      </div>
+  const renderRimaScreen = () => {
+    if (rimaFinished) {
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
+            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima — Conclusão</h2>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">4 – 5 anos</span>
+          </div>
 
-      <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-        <div className="flex items-center gap-4 bg-gradient-to-r from-emerald-400 to-teal-500 p-6 text-white">
-          <div className="text-4xl">🎵</div>
-          <div>
-            <h3 className="font-serif text-2xl font-extrabold">Consciência Fonológica</h3>
-            <p className="mt-1 text-sm text-white/90">Mostre as imagens para a criança e pergunte: "essas duas palavras rimam?"</p>
+          <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
+            <div className="flex items-center gap-4 bg-gradient-to-r from-emerald-500 to-teal-600 p-6 text-white">
+              <div className="text-4xl">🎵</div>
+              <div>
+                <h3 className="font-serif text-2xl font-extrabold">Parabéns! Rodadas de Rima Finalizadas!</h3>
+                <p className="mt-1 text-sm text-white/90">A criança completou a triagem lúdica de consciência fonológica e percepção de rimas.</p>
+              </div>
+            </div>
+
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
+                  <span className="text-4xl">🎯</span>
+                  <div className="mt-2 text-3xl font-black text-emerald-800">{rimaAcertos} / {rimaPairs.length}</div>
+                  <div className="text-sm font-bold text-emerald-700">Rimas Identificadas com Precisão</div>
+                </div>
+                <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6">
+                  <span className="text-4xl">🔄</span>
+                  <div className="mt-2 text-3xl font-black text-amber-800">{rimaErros} / {rimaPairs.length}</div>
+                  <div className="text-sm font-bold text-amber-700">Dificuldades / Hesitações</div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-teal-200 bg-teal-50 p-6">
+                <h4 className="font-serif text-lg font-bold text-navy flex items-center gap-2">
+                  <span>💡</span> Orientação Fonoaudiológica & Pedagógica
+                </h4>
+                <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                  {rimaAcertos >= 4
+                    ? 'Excelente percepção auditiva e consciência fonológica! A habilidade de reconhecer padrões sonoros é um dos principais preditores positivos para o processo de alfabetização.'
+                    : 'A percepção de rimas e sons semelhantes ainda está em desenvolvimento. Brincadeiras com cantigas, parlendas e poemas rimados em família ajudam bastante. Se a dificuldade persistir, um fonoaudiólogo pode orientar exercícios específicos.'}
+                </p>
+                <p className="mt-3 text-xs text-muted">
+                  ⚠️ Esta é uma ferramenta lúdica educativa. Não substitui avaliações clínicas ou testes psicométricos padronizados.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-line">
+                <button type="button" onClick={restartRima} className={buttonClass('secondary')}>
+                  🔁 Jogar Novamente
+                </button>
+                <div className="flex flex-wrap gap-3">
+                  <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+                    Voltar ao Menu
+                  </button>
+                  <a
+                    href="#/profissional/pacientes"
+                    className="inline-flex items-center gap-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white px-5 py-3 text-sm font-bold shadow-md transition"
+                  >
+                    <span>🩺</span> Buscar Fonoaudiólogo
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      );
+    }
 
-        <div className="p-8">
-          <div className="mb-8 flex flex-wrap justify-center gap-3">
-            <div className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-extrabold text-navy ring-2 ring-emerald-300">Par {rimaIndex + 1}/{rimaPairs.length}</div>
-            <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">✅ Acertos: {rimaAcertos}</div>
-            <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">❌ Erros: {rimaErros}</div>
-          </div>
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
+          <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima</h2>
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">4 – 5 anos</span>
+        </div>
 
-          <div className="mb-8 flex flex-wrap items-center justify-center gap-5">
-            <div className="min-w-[160px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
-              <span className="mb-3 block text-6xl">{rimaPair.e1}</span>
-              <div className="font-serif text-3xl font-extrabold text-navy">{rimaPair.w1}</div>
-            </div>
-            <div className="text-3xl font-black text-muted">VS</div>
-            <div className="min-w-[160px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
-              <span className="mb-3 block text-6xl">{rimaPair.e2}</span>
-              <div className="font-serif text-3xl font-extrabold text-navy">{rimaPair.w2}</div>
-            </div>
-          </div>
-
-          <div className="mb-6 text-center">
-            <p className="text-2xl font-bold text-ink">🎤 Pergunte à criança: <strong>"{rimaPair.w1} e {rimaPair.w2} rimam?"</strong></p>
-            <div className="mt-5 flex flex-wrap justify-center gap-4">
-              <button type="button" onClick={() => answerRima(true)} className="rounded-2xl bg-green-500 px-8 py-4 text-lg font-extrabold text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:scale-[1.03] transition">👍 SIM, rimam!</button>
-              <button type="button" onClick={() => answerRima(false)} className="rounded-2xl bg-orange-500 px-8 py-4 text-lg font-extrabold text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:scale-[1.03] transition">👎 NÃO rimam</button>
+        <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
+          <div className="flex items-center gap-4 bg-gradient-to-r from-emerald-400 to-teal-500 p-6 text-white">
+            <div className="text-4xl">🎵</div>
+            <div>
+              <h3 className="font-serif text-2xl font-extrabold">Consciência Fonológica</h3>
+              <p className="mt-1 text-sm text-white/90">Mostre as imagens para a criança e pergunte: "essas duas palavras rimam?"</p>
             </div>
           </div>
 
-          {rimaFeedback && (
-            <div className="rounded-2xl border-2 bg-[#f0fdf4] p-5 text-center text-lg font-bold text-green-700">{rimaFeedback}</div>
-          )}
+          <div className="p-8">
+            <div className="mb-8 flex flex-wrap justify-center gap-3">
+              <div className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-extrabold text-navy ring-2 ring-emerald-300">Par {rimaIndex + 1}/{rimaPairs.length}</div>
+              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">✅ Acertos: {rimaAcertos}</div>
+              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">❌ Erros: {rimaErros}</div>
+            </div>
+
+            <div className="mb-8 flex flex-wrap items-center justify-center gap-5">
+              <div className="min-w-[160px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
+                <span className="mb-3 block text-6xl">{rimaPair.e1}</span>
+                <div className="font-serif text-3xl font-extrabold text-navy">{rimaPair.w1}</div>
+              </div>
+              <div className="text-3xl font-black text-muted">VS</div>
+              <div className="min-w-[160px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
+                <span className="mb-3 block text-6xl">{rimaPair.e2}</span>
+                <div className="font-serif text-3xl font-extrabold text-navy">{rimaPair.w2}</div>
+              </div>
+            </div>
+
+            <div className="mb-6 text-center">
+              <p className="text-2xl font-bold text-ink">🎤 Pergunte à criança: <strong>"{rimaPair.w1} e {rimaPair.w2} rimam?"</strong></p>
+              <div className="mt-5 flex flex-wrap justify-center gap-4">
+                <button type="button" onClick={() => answerRima(true)} className="rounded-2xl bg-green-500 px-8 py-4 text-lg font-extrabold text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:scale-[1.03] transition">👍 SIM, rimam!</button>
+                <button type="button" onClick={() => answerRima(false)} className="rounded-2xl bg-orange-500 px-8 py-4 text-lg font-extrabold text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:scale-[1.03] transition">👎 NÃO rimam</button>
+              </div>
+            </div>
+
+            {rimaFeedback && (
+              <div className="rounded-2xl border-2 bg-[#f0fdf4] p-5 text-center text-lg font-bold text-green-700">{rimaFeedback}</div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderCheckScreen = () => (
     <div className="space-y-6">
