@@ -197,6 +197,8 @@ export default function TriagemGame() {
   const [gameResponse, setGameResponse] = useState('');
   const [gameAnalysis, setGameAnalysis] = useState('');
   const [gameComparison, setGameComparison] = useState([]);
+  const [gameEvaluated, setGameEvaluated] = useState(false);
+  const [gameRoundsHistory, setGameRoundsHistory] = useState([]);
   const [acertos, setAcertos] = useState(0);
   const [trocas, setTrocas] = useState(0);
   const [game24Finished, setGame24Finished] = useState(false);
@@ -204,6 +206,7 @@ export default function TriagemGame() {
   const [rimaAcertos, setRimaAcertos] = useState(0);
   const [rimaErros, setRimaErros] = useState(0);
   const [rimaFeedback, setRimaFeedback] = useState('');
+  const [rimaRoundsHistory, setRimaRoundsHistory] = useState([]);
   const [rimaFinished, setRimaFinished] = useState(false);
   const [checkListState, setCheckListState] = useState({});
   const [checkResultVisible, setCheckResultVisible] = useState(false);
@@ -322,12 +325,8 @@ export default function TriagemGame() {
   };
 
   const evaluateWordGuess = (guess) => {
-    const normalizedGuess = guess.trim().toLowerCase();
-    if (!normalizedGuess) {
-      setGameAnalysis('');
-      setGameComparison([]);
-      return;
-    }
+    const normalizedGuess = (guess || gameResponse).trim().toLowerCase();
+    if (!normalizedGuess) return;
 
     const target = currentAnimal.target;
     const maxLen = Math.max(target.length, normalizedGuess.length);
@@ -342,21 +341,37 @@ export default function TriagemGame() {
 
     setGameComparison(comparison);
 
+    let isCorrect = false;
+    let analysisText = '';
+
     if (normalizedGuess === target) {
-      setAcertos((value) => value + 1);
-      setGameAnalysis('✅ Pronúncia correta! A criança reproduziu a palavra-alvo sem trocas fonéticas. Nenhum processo fonológico identificado nesta rodada.');
-      return;
+      isCorrect = true;
+      analysisText = '✅ Pronúncia correta! A criança reproduziu a palavra-alvo sem trocas fonéticas. Nenhum processo fonológico identificado nesta rodada.';
+      setAcertos((prev) => prev + 1);
+    } else if (currentAnimal.alts[normalizedGuess]) {
+      analysisText = `⚠️ Processo fonológico identificado: ${currentAnimal.alts[normalizedGuess]}`;
+      setTrocas((prev) => prev + 1);
+    } else {
+      const diff = [...normalizedGuess].filter((letter, index) => letter !== (target[index] || '')).length;
+      analysisText = `⚠️ ${diff} diferença(s) detectada(s) entre a palavra-alvo "${target}" e o que foi dito "${normalizedGuess}". Possível troca ou omissão de fonemas.`;
+      setTrocas((prev) => prev + 1);
     }
 
-    if (currentAnimal.alts[normalizedGuess]) {
-      setTrocas((value) => value + 1);
-      setGameAnalysis(`⚠️ Processo fonológico identificado: ${currentAnimal.alts[normalizedGuess]}`);
-      return;
-    }
+    setGameAnalysis(analysisText);
+    setGameEvaluated(true);
 
-    setTrocas((value) => value + 1);
-    const diff = [...normalizedGuess].filter((letter, index) => letter !== (target[index] || '')).length;
-    setGameAnalysis(`⚠️ ${diff} diferença(s) detectada(s) entre a palavra-alvo "${target}" e o que foi dito "${normalizedGuess}". Possível troca ou omissão de fonemas.`);
+    setGameRoundsHistory((prev) => [
+      ...prev,
+      {
+        rodada: gameAnimalIndex + 1,
+        animal: currentAnimal.name,
+        emoji: currentAnimal.emoji,
+        alvo: target,
+        falou: normalizedGuess,
+        isCorrect,
+        analysis: analysisText,
+      },
+    ]);
   };
 
   const nextAnimal = () => {
@@ -368,6 +383,7 @@ export default function TriagemGame() {
     setGameResponse('');
     setGameAnalysis('');
     setGameComparison([]);
+    setGameEvaluated(false);
   };
 
   const restartGame24 = () => {
@@ -375,20 +391,37 @@ export default function TriagemGame() {
     setGameResponse('');
     setGameAnalysis('');
     setGameComparison([]);
+    setGameEvaluated(false);
+    setGameRoundsHistory([]);
     setAcertos(0);
     setTrocas(0);
     setGame24Finished(false);
   };
 
   const answerRima = (answer) => {
+    if (rimaFeedback) return; // Evita duplo clique
     const isCorrect = answer === rimaPair.rima;
+    const feedbackText = isCorrect
+      ? `✅ Resposta correta! ${rimaPair.w1} e ${rimaPair.w2} ${rimaPair.rima ? 'rimam' : 'não rimam'}.`
+      : `❌ Não foi dessa vez! ${rimaPair.w1} e ${rimaPair.w2} ${rimaPair.rima ? 'rimam' : 'não rimam'}.`;
+
     if (isCorrect) {
       setRimaAcertos((value) => value + 1);
-      setRimaFeedback(`✅ Resposta correta! ${rimaPair.w1} e ${rimaPair.w2} ${rimaPair.rima ? 'rimam' : 'não rimam'}.`);
     } else {
       setRimaErros((value) => value + 1);
-      setRimaFeedback(`❌ Não foi dessa vez! ${rimaPair.w1} e ${rimaPair.w2} ${rimaPair.rima ? 'rimam' : 'não rimam'}.`);
     }
+    setRimaFeedback(feedbackText);
+
+    setRimaRoundsHistory((prev) => [
+      ...prev,
+      {
+        rodada: rimaIndex + 1,
+        par: `${rimaPair.w1} (${rimaPair.e1}) e ${rimaPair.w2} (${rimaPair.e2})`,
+        respostaCriança: answer ? 'Sim, rimam' : 'Não rimam',
+        gabarito: rimaPair.rima ? 'Rimam' : 'Não rimam',
+        isCorrect,
+      },
+    ]);
 
     window.setTimeout(() => {
       if (rimaIndex + 1 >= rimaPairs.length) {
@@ -406,6 +439,7 @@ export default function TriagemGame() {
     setRimaAcertos(0);
     setRimaErros(0);
     setRimaFeedback('');
+    setRimaRoundsHistory([]);
     setRimaFinished(false);
   };
 
@@ -648,6 +682,30 @@ export default function TriagemGame() {
                 </p>
               </div>
 
+              {gameRoundsHistory.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-serif text-base font-bold text-navy">📋 Detalhamento das 5 Rodadas Realizadas</h4>
+                  <div className="space-y-2">
+                    {gameRoundsHistory.map((item, idx) => (
+                      <div key={idx} className={`p-4 rounded-xl border ${item.isCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'} flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{item.emoji}</span>
+                          <div>
+                            <span className="font-bold text-slate-800">Rodada {item.rodada}: {item.animal}</span>
+                            <span className="text-slate-500 block">Alvo: <strong>{item.alvo}</strong> · Criança disse: <strong>"{item.falou}"</strong></span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold ${item.isCorrect ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'}`}>
+                            {item.isCorrect ? 'Correto' : 'Troca / Processo'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-line">
                 <button type="button" onClick={restartGame24} className={buttonClass('secondary')}>
                   🔁 Jogar Novamente
@@ -704,12 +762,35 @@ export default function TriagemGame() {
 
             <div className="mb-8 rounded-2xl border-2 border-sky-200 bg-sky-50 p-4 text-center text-base font-bold text-sky-700">👆 Aponte para o animal e pergunte à criança: <strong>"O que é isso?"</strong><br />Digite abaixo exatamente como ela disse:</div>
 
-            <div className="mb-5">
-              <label htmlFor="fns-child-word" className="mb-2 block text-base font-extrabold text-ink">O que a criança disse:</label>
-              <input id="fns-child-word" type="text" value={gameResponse} onChange={(event) => {
-                setGameResponse(event.target.value.toLowerCase());
-                evaluateWordGuess(event.target.value);
-              }} className="w-full rounded-2xl border-4 border-line bg-white px-5 py-4 text-xl font-bold text-ink outline-none transition focus:border-pink-400" placeholder="ex: faca, baca, vaka..." style={{ textTransform: 'lowercase' }} />
+            <div className="mb-5 space-y-3">
+              <label htmlFor="fns-child-word" className="block text-base font-extrabold text-ink">O que a criança disse:</label>
+              <div className="flex gap-3">
+                <input
+                  id="fns-child-word"
+                  type="text"
+                  value={gameResponse}
+                  disabled={gameEvaluated}
+                  onChange={(event) => setGameResponse(event.target.value.toLowerCase())}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !gameEvaluated && gameResponse.trim()) {
+                      evaluateWordGuess(gameResponse);
+                    }
+                  }}
+                  className="flex-1 rounded-2xl border-4 border-line bg-white px-5 py-4 text-xl font-bold text-ink outline-none transition focus:border-pink-400 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                  placeholder="ex: faca, baca, vaka, pato..."
+                  style={{ textTransform: 'lowercase' }}
+                />
+                {!gameEvaluated && (
+                  <button
+                    type="button"
+                    onClick={() => evaluateWordGuess(gameResponse)}
+                    disabled={!gameResponse.trim()}
+                    className="rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-50 text-white px-6 py-4 font-bold text-base shadow-sm transition"
+                  >
+                    Confirmar Fala
+                  </button>
+                )}
+              </div>
             </div>
 
             {gameComparison.length > 0 && (
@@ -782,6 +863,27 @@ export default function TriagemGame() {
                   ⚠️ Esta é uma ferramenta lúdica educativa. Não substitui avaliações clínicas ou testes psicométricos padronizados.
                 </p>
               </div>
+
+              {rimaRoundsHistory.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-serif text-base font-bold text-navy">📋 Detalhamento das 5 Rodadas Realizadas</h4>
+                  <div className="space-y-2">
+                    {rimaRoundsHistory.map((item, idx) => (
+                      <div key={idx} className={`p-4 rounded-xl border ${item.isCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'} flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
+                        <div>
+                          <span className="font-bold text-slate-800">Par {item.rodada}: {item.par}</span>
+                          <span className="text-slate-500 block">Resposta: <strong>{item.respostaCriança}</strong> (Gabarito: <strong>{item.gabarito}</strong>)</span>
+                        </div>
+                        <div className="text-right">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold ${item.isCorrect ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'}`}>
+                            {item.isCorrect ? 'Acertou' : 'Errou'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-line">
                 <button type="button" onClick={restartRima} className={buttonClass('secondary')}>
