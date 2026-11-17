@@ -1,20 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   ArrowLeft,
-  ArrowRight,
-  AudioWaveform,
-  CheckCircle2,
-  ClipboardList,
   Download,
-  HeartHandshake,
-  History,
-  MessageSquare,
   RotateCcw,
-  School,
   Search,
-  ShieldCheck,
-  Stethoscope,
-  TriangleAlert,
   Volume2,
 } from 'lucide-react';
 import A11yModal from './A11yModal';
@@ -142,13 +131,6 @@ const checklistItems = [
 
 export default function TriagemGame() {
   const [screenStack, setScreenStack] = useState(['home']);
-  const [selectedActivity, setSelectedActivity] = useState(null);
-
-  // Etapa 1: LGPD e Dados Mínimos da Criança
-  const [hasConsent, setHasConsent] = useState(false);
-  const [childNickname, setChildNickname] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [ageWarning, setAgeWarning] = useState('');
 
   // Etapa 2: Jogo Fonético (2-4 anos)
   const [phoneticIndex, setPhoneticIndex] = useState(0);
@@ -183,27 +165,6 @@ export default function TriagemGame() {
 
   const activeScreen = screenStack[screenStack.length - 1];
 
-  // Cálculo da idade em meses a partir da data de nascimento
-  const childAgeMonths = useMemo(() => {
-    if (!birthDate) return null;
-    const parts = birthDate.split('-');
-    if (parts.length !== 3) return null;
-    const birth = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-    const now = new Date();
-    const years = now.getFullYear() - birth.getFullYear();
-    const months = now.getMonth() - birth.getMonth();
-    const total = years * 12 + months;
-    return Math.max(0, total);
-  }, [birthDate]);
-
-  const childAgeLabel = useMemo(() => {
-    if (childAgeMonths === null) return '';
-    if (childAgeMonths < 24) return `${childAgeMonths} meses`;
-    const years = Math.floor(childAgeMonths / 12);
-    const remMonths = childAgeMonths % 12;
-    return remMonths > 0 ? `${years} anos e ${remMonths} meses` : `${years} anos`;
-  }, [childAgeMonths]);
-
   const showScreen = (screenId) => {
     setScreenStack((prev) => (prev[prev.length - 1] === screenId ? prev : [...prev, screenId]));
   };
@@ -212,45 +173,24 @@ export default function TriagemGame() {
     setScreenStack((prev) => (prev.length <= 1 ? ['home'] : prev.slice(0, -1)));
   };
 
-  // Iniciar fluxo escolhendo o jogo
+  // Iniciar fluxo diretamente na atividade selecionada
   const handleSelectActivity = (activityId) => {
-    setSelectedActivity(activityId);
-    showScreen('consent_data');
-  };
-
-  // Validar consentimento e ir para o jogo selecionado
-  const handleConfirmConsentAndStart = (e) => {
-    e.preventDefault();
-    if (!hasConsent) return;
-
-    // Verificar se faixa etária confere
-    if (childAgeMonths !== null) {
-      if (selectedActivity === 'form02' && childAgeMonths > 24) {
-        setAgeWarning('A idade indicada é maior que 2 anos. Recomendamos o Jogo Fonético (2 a 4 anos).');
-      } else if (selectedActivity === 'game24' && (childAgeMonths < 24 || childAgeMonths > 48)) {
-        setAgeWarning('A idade indicada está fora de 24 a 48 meses. Você ainda pode realizar o jogo como triagem lúdica.');
-      } else if (selectedActivity === 'rima45' && childAgeMonths < 48) {
-        setAgeWarning('Para crianças menores de 4 anos, a percepção de rimas ainda pode ser desafiadora.');
-      } else {
-        setAgeWarning('');
-      }
-    }
-
-    if (selectedActivity === 'form02') showScreen('form02');
-    else if (selectedActivity === 'game24') {
+    if (activityId === 'form02') {
+      showScreen('form02');
+    } else if (activityId === 'game24') {
       setPhoneticIndex(0);
       setPhoneticAnswers([]);
       setPhoneticFeedback(null);
       setIsTypingCustom(false);
       setCustomWordInput('');
       showScreen('game24');
-    } else if (selectedActivity === 'rima45') {
+    } else if (activityId === 'rima45') {
       setRimaExampleFinished(false);
       setRimaIndex(0);
       setRimaAnswers([]);
       setRimaFeedback('');
       showScreen('rima45');
-    } else if (selectedActivity === 'check6') {
+    } else if (activityId === 'check6') {
       showScreen('check6');
     }
   };
@@ -314,8 +254,7 @@ export default function TriagemGame() {
     const sessionRecord = {
       id: Date.now(),
       date: new Date().toLocaleDateString('pt-BR'),
-      nickname: childNickname || 'Criança',
-      age: childAgeLabel || '2-4 anos',
+      age: '2 a 4 anos',
       activity: 'Jogo Fonético',
       answers,
       score: `${answers.length - trocas}/${answers.length}`,
@@ -367,8 +306,7 @@ export default function TriagemGame() {
     const sessionRecord = {
       id: Date.now(),
       date: new Date().toLocaleDateString('pt-BR'),
-      nickname: childNickname || 'Criança',
-      age: childAgeLabel || '4-5 anos',
+      age: '4 a 5 anos',
       activity: 'Jogo da Rima',
       answers,
       score: `${acertos}/${answers.length}`,
@@ -397,7 +335,7 @@ export default function TriagemGame() {
     const lines = [
       'FONOSYNC — RESUMO DE RASTREIO FONOAUDIOLÓGICO',
       `Data: ${rec.date}`,
-      `Identificação: ${rec.nickname} (${rec.age})`,
+      `Faixa etária: ${rec.age}`,
       `Atividade: ${rec.activity}`,
       `Resultado: ${rec.nivel === 'ESPERADO' ? 'Dentro do esperado' : rec.nivel === 'ATENCAO' ? 'Pontos de Atenção' : 'Encaminhar para Avaliação'}`,
       `Desempenho: ${rec.score}`,
@@ -413,7 +351,7 @@ export default function TriagemGame() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `rastreio-fonosync-${rec.nickname || 'crianca'}.txt`;
+    link.download = `rastreio-fonosync-${rec.id}.txt`;
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
@@ -466,97 +404,7 @@ export default function TriagemGame() {
   );
 
   // ==========================================
-  // TELA 2: CONSENTIMENTO LGPD E DADOS MÍNIMOS
-  // ==========================================
-  const renderConsentDataScreen = () => (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div className="flex items-center gap-4">
-        <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
-          <ArrowLeft size={16} aria-hidden="true" /> Voltar
-        </button>
-        <h2 className="font-serif text-2xl font-extrabold text-navy">Consentimento e Identificação</h2>
-      </div>
-
-      <div className="rounded-2xl border border-line bg-white p-6 md:p-8 shadow-sm space-y-6">
-        <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 flex items-start gap-3">
-          <ShieldCheck className="size-6 text-[#0284C7] shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-            <strong>Privacidade em primeiro lugar (LGPD):</strong> Não solicitamos CPF, endereço ou nome completo. 
-            Os dados servem apenas para calcular a idade em meses e contextualizar a atividade.
-          </div>
-        </div>
-
-        <form onSubmit={handleConfirmConsentAndStart} className="space-y-5">
-          <div>
-            <label htmlFor="child-nick" className="block text-sm font-bold text-navy mb-1">
-              Apelido ou Iniciais da Criança:
-            </label>
-            <input
-              id="child-nick"
-              type="text"
-              required
-              value={childNickname}
-              onChange={(e) => setChildNickname(e.target.value)}
-              placeholder="Ex.: Dani, Léo, M. S."
-              className="w-full rounded-xl border border-line px-4 py-3 text-base text-ink focus:border-[#0284C7] outline-none"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="birth-date" className="block text-sm font-bold text-navy mb-1">
-              Data de Nascimento:
-            </label>
-            <input
-              id="birth-date"
-              type="date"
-              required
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              className="w-full rounded-xl border border-line px-4 py-3 text-base text-ink focus:border-[#0284C7] outline-none"
-            />
-            {childAgeMonths !== null && (
-              <span className="mt-1 block text-xs font-semibold text-sky-700">
-                Idade estimada: {childAgeLabel} ({childAgeMonths} meses)
-              </span>
-            )}
-          </div>
-
-          <div className="pt-2 border-t border-line">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                required
-                checked={hasConsent}
-                onChange={(e) => setHasConsent(e.target.checked)}
-                className="mt-1 size-4 rounded border-gray-300 text-[#0284C7] focus:ring-[#0284C7]"
-              />
-              <span className="text-xs text-slate-600 leading-relaxed">
-                Sou responsável pela criança e concordo em responder a esta triagem lúdica de desenvolvimento fonoaudiológico. 
-                Estou ciente de que <strong>este sistema não fornece diagnóstico médico</strong> e serve como rastreio inicial.
-              </span>
-            </label>
-          </div>
-
-          {ageWarning && (
-            <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-bold text-amber-800">
-              ⚠️ {ageWarning}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={!hasConsent || !childNickname.trim() || !birthDate}
-            className="w-full rounded-xl bg-[#0284C7] hover:bg-sky-700 disabled:opacity-50 text-white py-3.5 text-base font-bold transition shadow-sm cursor-pointer"
-          >
-            Avançar para a Atividade →
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-
-  // ==========================================
-  // TELA 3: JOGO FONÉTICO (2 A 4 ANOS - BOTÕES RÁPIDOS)
+  // TELA 2: JOGO FONÉTICO (2 A 4 ANOS - BOTÕES RÁPIDOS)
   // ==========================================
   const renderGame24Screen = () => {
     const currentWord = phoneticWords[phoneticIndex];
@@ -569,7 +417,7 @@ export default function TriagemGame() {
           </button>
           <div>
             <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo Fonético (2 a 4 anos)</h2>
-            <span className="text-xs text-muted">Avaliando {childNickname || 'a criança'} · {childAgeLabel}</span>
+            <span className="text-xs text-muted">Triagem lúdica de trocas fonéticas</span>
           </div>
         </div>
 
@@ -826,7 +674,7 @@ export default function TriagemGame() {
           {/* Header por nível de atenção */}
           <div className={`p-6 text-white ${isEsperado ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : isAtencao ? 'bg-gradient-to-r from-amber-500 to-orange-600' : 'bg-gradient-to-r from-rose-500 to-pink-600'}`}>
             <span className="text-xs font-bold uppercase tracking-wider text-white/90">
-              {currentResult.activity} · {currentResult.nickname} ({currentResult.age})
+              {currentResult.activity} · {currentResult.age}
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl font-extrabold mt-1">
               {isEsperado ? 'Desenvolvimento Dentro do Esperado' : isAtencao ? 'Pontos que Merecem Atenção' : 'Recomendamos Conversar com Fonoaudiólogo'}
@@ -838,7 +686,7 @@ export default function TriagemGame() {
             <div className="text-sm sm:text-base leading-relaxed text-slate-700 space-y-3">
               {isEsperado && (
                 <p>
-                  Com a idade de <strong>{currentResult.age}</strong>, o desempenho de <strong>{currentResult.nickname}</strong> ficou dentro do esperado para a faixa etária. 
+                  Para a faixa de <strong>{currentResult.age}</strong>, o desempenho ficou dentro do esperado. 
                   Continue conversando, lendo historinhas e brincando com cantigas no dia a dia. Se notar mudanças, você sempre pode fazer uma nova triagem.
                 </p>
               )}
@@ -958,8 +806,7 @@ export default function TriagemGame() {
             saveSessionResult({
               id: Date.now(),
               date: new Date().toLocaleDateString('pt-BR'),
-              nickname: childNickname || 'Bebê',
-              age: childAgeLabel || '0-2 anos',
+              age: '0 a 2 anos',
               activity: 'Formulário de Marcos',
               answers: formQuestions.map((q) => ({ word: q.category, spoken: formAnswers[q.id], isCorrect: formAnswers[q.id] === 'sim' })),
               score: `${formQuestions.length - naos}/${formQuestions.length}`,
@@ -1014,8 +861,7 @@ export default function TriagemGame() {
             saveSessionResult({
               id: Date.now(),
               date: new Date().toLocaleDateString('pt-BR'),
-              nickname: childNickname || 'Aluno',
-              age: childAgeLabel || '6+ anos',
+              age: '6+ anos',
               activity: 'Checklist Escolar',
               answers: checklistItems.map((item, i) => ({ word: item, spoken: checkListState[i] ? 'Observado' : 'Não observado', isCorrect: !checkListState[i] })),
               score: `${checklistItems.length - marked}/${checklistItems.length}`,
@@ -1077,7 +923,6 @@ export default function TriagemGame() {
 
       <main className="bg-canvas p-4 md:p-8">
         {activeScreen === 'home' && renderHomeScreen()}
-        {activeScreen === 'consent_data' && renderConsentDataScreen()}
         {activeScreen === 'game24' && renderGame24Screen()}
         {activeScreen === 'rima45' && renderRimaScreen()}
         {activeScreen === 'form02' && renderFormScreen()}
