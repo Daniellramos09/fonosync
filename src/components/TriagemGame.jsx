@@ -9,9 +9,10 @@ import {
   HeartHandshake,
   History,
   MessageSquare,
-  PhoneCall,
+  RotateCcw,
   School,
   Search,
+  ShieldCheck,
   Stethoscope,
   TriangleAlert,
   Volume2,
@@ -22,68 +23,80 @@ import Notice from './Notice';
 import { buttonClass } from './buttonStyles';
 import { useA11y } from '../hooks/useA11y';
 
-const modalities = [
-  { id: '0-2', age: '0-2 anos', icon: ClipboardList, title: 'Formulário de Marcos', desc: 'Observação guiada de comunicação, compreensão e expressão.' },
-  { id: '2-4', age: '2-4 anos', icon: MessageSquare, title: 'Jogo da Palavra', desc: 'Nomeação e repertório em tarefas breves com apoio do responsável.' },
-  { id: '4-5', age: '4-5 anos', icon: AudioWaveform, title: 'Jogo da Rima', desc: 'Consciência fonológica com pares sonoros e instruções narradas.' },
-  { id: '6+', age: '6+ anos', icon: School, title: 'Checklist do Professor', desc: 'Sinais funcionais observados em sala e recomendação de encaminhamento.' },
-];
-
-const words = [
-  { word: 'casa', article: 'uma', emoji: '🏠' },
-  { word: 'bola', article: 'uma', emoji: '⚽' },
-  { word: 'gato', article: 'um', emoji: '🐱' },
-  { word: 'flor', article: 'uma', emoji: '🌸' },
-  { word: 'sol', article: 'o', emoji: '☀️' },
-  { word: 'lua', article: 'a', emoji: '🌙' },
-  { word: 'pato', article: 'um', emoji: '🦆' },
-  { word: 'copo', article: 'um', emoji: '🥛' },
-  { word: 'livro', article: 'um', emoji: '📖' },
-  { word: 'peixe', article: 'um', emoji: '🐟' },
-];
-
-const responses = [
-  { id: 'espontanea', label: 'Falou espontaneamente' },
-  { id: 'ajuda', label: 'Falou com ajuda' },
-  { id: 'nao', label: 'Não falou' },
-];
-
-const RISK_LEVELS = [
+// Banco de palavras para o Jogo Fonético (2 a 4 anos) com opções rápidas baseadas no MD
+const phoneticWords = [
   {
-    min: 70,
-    label: 'Risco baixo',
-    tone: 'success',
-    text: 'Poucos sinais de dificuldade na nomeação nesta triagem.',
-    advice: 'Continue acompanhando o desenvolvimento da fala e repita a triagem se surgirem dúvidas.',
+    id: 'vaca',
+    name: 'VACA',
+    emoji: '🐄',
+    phonemes: '/v/ + /a/ + /k/ + /a/',
+    target: 'vaca',
+    quickOptions: [
+      { label: 'Vaca', value: 'vaca', isCorrect: true, note: 'Pronúncia correta do fonema /v/' },
+      { label: 'Faca', value: 'faca', isCorrect: false, note: 'Troca de /v/ → /f/ (Ensurdecimento de fricativa)' },
+      { label: 'Baca', value: 'baca', isCorrect: false, note: 'Troca de /v/ → /b/ (Oclusivização)' },
+    ],
   },
   {
-    min: 40,
-    label: 'Risco moderado',
-    tone: 'warning',
-    text: 'Sinais em nomeação pedem observação profissional.',
-    advice: 'Agende avaliação fonoaudiológica para investigação da fala e leve este resumo à consulta.',
+    id: 'cobra',
+    name: 'COBRA',
+    emoji: '🐍',
+    phonemes: '/k/ + /o/ + /b/ + /r/ + /a/',
+    target: 'cobra',
+    quickOptions: [
+      { label: 'Cobra', value: 'cobra', isCorrect: true, note: 'Pronúncia correta com encontro consonantal' },
+      { label: 'Coba', value: 'coba', isCorrect: false, note: 'Omissão do /r/ em encontro consonantal' },
+      { label: 'Corra', value: 'corra', isCorrect: false, note: 'Troca do /b/ medial' },
+    ],
   },
   {
-    min: 0,
-    label: 'Risco elevado',
-    tone: 'warning',
-    text: 'Muitas palavras não foram nomeadas. Recomenda-se avaliação profissional.',
-    advice: 'Procure avaliação fonoaudiológica o quanto antes e leve este resumo à consulta.',
+    id: 'flor',
+    name: 'FLOR',
+    emoji: '🌸',
+    phonemes: '/f/ + /l/ + /o/ + /r/',
+    target: 'flor',
+    quickOptions: [
+      { label: 'Flor', value: 'flor', isCorrect: true, note: 'Pronúncia correta' },
+      { label: 'For', value: 'for', isCorrect: false, note: 'Redução de encontro consonantal /fl/ → /f/' },
+      { label: 'Fror', value: 'fror', isCorrect: false, note: 'Troca de líquida /fl/ → /fr/' },
+    ],
+  },
+  {
+    id: 'trem',
+    name: 'TREM',
+    emoji: '🚂',
+    phonemes: '/t/ + /r/ + /e/ + /m/',
+    target: 'trem',
+    quickOptions: [
+      { label: 'Trem', value: 'trem', isCorrect: true, note: 'Pronúncia correta' },
+      { label: 'Tem', value: 'tem', isCorrect: false, note: 'Redução do encontro /tr/' },
+      { label: 'Crem', value: 'crem', isCorrect: false, note: 'Troca de /t/ → /k/' },
+    ],
+  },
+  {
+    id: 'pato',
+    name: 'PATO',
+    emoji: '🦆',
+    phonemes: '/p/ + /a/ + /t/ + /u/',
+    target: 'pato',
+    quickOptions: [
+      { label: 'Pato', value: 'pato', isCorrect: true, note: 'Pronúncia correta' },
+      { label: 'Bato', value: 'bato', isCorrect: false, note: 'Troca de /p/ → /b/ (Sonorização de oclusiva)' },
+      { label: 'Tato', value: 'tato', isCorrect: false, note: 'Troca de /p/ → /t/ (Anteriorização)' },
+    ],
   },
 ];
 
-const toneStyles = {
-  success: { box: 'border-success bg-success/10', text: 'text-success', icon: CheckCircle2 },
-  warning: { box: 'border-warning bg-warning/10', text: 'text-warning', icon: TriangleAlert },
-};
-
-const historyColumns = [
-  { key: 'date', label: 'Data' },
-  { key: 'modality', label: 'Modalidade' },
-  { key: 'spontaneous', label: 'Nomeação espontânea' },
-  { key: 'risk', label: 'Classificação' },
+// Banco de pares para o Jogo da Rima (4 a 5 anos) conforme especificação
+const rimaPairs = [
+  { w1: 'GATO', e1: '🐱', w2: 'PATO', e2: '🦆', rima: true },
+  { w1: 'BOLA', e1: '⚽', w2: 'MOLA', e2: '🌀', rima: true },
+  { w1: 'CASA', e1: '🏠', w2: 'PEIXE', e2: '🐟', rima: false },
+  { w1: 'CARRO', e1: '🚗', w2: 'JARRO', e2: '🏺', rima: true },
+  { w1: 'PATO', e1: '🦆', w2: 'ELEFANTE', e2: '🐘', rima: false },
 ];
 
+// Perguntas dos Marcos de Desenvolvimento (0 a 2 anos)
 const formQuestions = [
   { id: 1, category: 'Comunicação Verbal', question: 'A criança fala pelo menos 10 palavras reconhecíveis (ex.: mamãe, água, não, dá)?', options: [
     { value: 'sim', label: '✅ Sim, claramente' },
@@ -117,22 +130,7 @@ const formQuestions = [
   ]},
 ];
 
-const animals = [
-  { emoji: '🐄', name: 'VACA', phonemes: '/v/ + /a/ + /k/ + /a/', target: 'vaca', alts: { faca: 'Troca de /v/ → /f/ (Ensurdecimento de fricativa labiodental)', baca: 'Troca de /v/ → /b/ (Sonorização incorreta)', vaka: 'Escrita fonética — pronúncia correta do fonema', vaa: 'Omissão do /k/ medial' } },
-  { emoji: '🐍', name: 'COBRA', phonemes: '/k/ + /o/ + /b/ + /r/ + /a/', target: 'cobra', alts: { coba: 'Omissão do /r/ em encontro consonantal (processo comum até 4a)', corra: 'Troca de /b/ → /r/', cobla: 'Metátese do encontro consonantal' } },
-  { emoji: '🌸', name: 'FLOR', phonemes: '/f/ + /l/ + /o/ + /r/', target: 'flor', alts: { for: 'Redução do encontro consonantal /fl/ → /f/ (processo fonológico típico)', fror: 'Metátese /fl/ → /fr/ (variação no encontro consonantal)', flô: 'Omissão do /r/ final (regionalismo ou processo fonológico)' } },
-  { emoji: '🚂', name: 'TREM', phonemes: '/t/ + /r/ + /e/ + /m/', target: 'trem', alts: { tem: 'Redução do encontro consonantal /tr/ (muito comum até 5a)', telen: 'Múltiplos processos fonológicos simultâneos', crem: 'Troca de /t/ → /k/ (assimilação velar)' } },
-  { emoji: '🦆', name: 'PATO', phonemes: '/p/ + /a/ + /t/ + /u/', target: 'pato', alts: { bato: 'Troca de /p/ → /b/ (Sonorização incorreta)', tato: 'Troca de /p/ → /t/ (Anteriorização de fonema)', patu: 'Escrita fonética — pronúncia padrão com vogal átona', pao: 'Omissão de sílaba final' } },
-];
-
-const rimaPairs = [
-  { w1: 'GATO', e1: '🐱', w2: 'PATO', e2: '🦆', rima: true },
-  { w1: 'BOLA', e1: '⚽', w2: 'MOLA', e2: '🌀', rima: true },
-  { w1: 'CASA', e1: '🏠', w2: 'PEIXE', e2: '🐟', rima: false },
-  { w1: 'CARRO', e1: '🚗', w2: 'JARRO', e2: '🏺', rima: true },
-  { w1: 'PATO', e1: '🦆', w2: 'ELEFANTE', e2: '🐘', rima: false },
-];
-
+// Checklist Escolar (6+ anos)
 const checklistItems = [
   'A criança evita falar em voz alta ou participar de atividades orais',
   'Troca sons que colegas da mesma faixa etária não trocam',
@@ -142,44 +140,34 @@ const checklistItems = [
   'Apresenta desempenho muito abaixo dos colegas na alfabetização',
 ];
 
-function summarize(answers) {
-  const total = answers.length;
-  const spontaneous = answers.filter((answer) => answer === 'espontanea').length;
-  const assisted = answers.filter((answer) => answer === 'ajuda').length;
-  const spontaneousPct = Math.round((spontaneous / total) * 100);
-  const helpedPct = Math.round(((spontaneous + assisted) / total) * 100);
-  const risk = RISK_LEVELS.find((level) => spontaneousPct >= level.min) ?? RISK_LEVELS[RISK_LEVELS.length - 1];
-  return { spontaneous, assisted, spontaneousPct, helpedPct, risk };
-}
-
-function StepProgress({ value }) {
-  return (
-    <div role="progressbar" aria-label="Progresso da triagem" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value} className="h-1.5 w-full bg-line">
-      <div className="h-full bg-primary transition-all duration-300" style={{ width: `${value}%` }} />
-    </div>
-  );
-}
-
-function ResultBar({ label, caption, value }) {
-  return (
-    <div className="flex flex-col gap-2 bg-mist p-4">
-      <p className="text-xs font-bold text-navy">{label}</p>
-      <div className="flex items-center justify-between text-xs text-muted">
-        <span>{caption}</span>
-        <span className="font-bold text-navy">{value}%</span>
-      </div>
-      <div className="h-2 rounded-full bg-line" aria-hidden="true">
-        <div className="h-2 rounded-full bg-primary" style={{ width: `${value}%` }} />
-      </div>
-    </div>
-  );
-}
-
 export default function TriagemGame() {
   const [screenStack, setScreenStack] = useState(['home']);
-  const [wordIndex, setWordIndex] = useState(0);
-  const [answers, setAnswers] = useState(() => Array(words.length).fill(null));
-  const [result, setResult] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
+  // Etapa 1: LGPD e Dados Mínimos da Criança
+  const [hasConsent, setHasConsent] = useState(false);
+  const [childNickname, setChildNickname] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [ageWarning, setAgeWarning] = useState('');
+
+  // Etapa 2: Jogo Fonético (2-4 anos)
+  const [phoneticIndex, setPhoneticIndex] = useState(0);
+  const [customWordInput, setCustomWordInput] = useState('');
+  const [isTypingCustom, setIsTypingCustom] = useState(false);
+  const [phoneticAnswers, setPhoneticAnswers] = useState([]);
+  const [phoneticFeedback, setPhoneticFeedback] = useState(null);
+
+  // Etapa 3: Jogo da Rima (4-5 anos)
+  const [rimaExampleFinished, setRimaExampleFinished] = useState(false);
+  const [rimaIndex, setRimaIndex] = useState(0);
+  const [rimaAnswers, setRimaAnswers] = useState([]);
+  const [rimaFeedback, setRimaFeedback] = useState('');
+
+  // Formulário 0-2 e Checklist 6+
+  const [formAnswers, setFormAnswers] = useState({});
+  const [checkListState, setCheckListState] = useState({});
+
+  // Histórico persistido
   const [history, setHistory] = useState(() => {
     try {
       const stored = window.localStorage.getItem('fonosync:triagem_history');
@@ -188,625 +176,502 @@ export default function TriagemGame() {
       return [];
     }
   });
-  const [downloaded, setDownloaded] = useState(false);
+
+  // Acessibilidade e Modal
   const [showA11y, setShowA11y] = useState(false);
-  const [formAnswers, setFormAnswers] = useState({});
-  const [formResultVisible, setFormResultVisible] = useState(false);
-  const [formWarningVisible, setFormWarningVisible] = useState(false);
-  const [gameAnimalIndex, setGameAnimalIndex] = useState(0);
-  const [gameResponse, setGameResponse] = useState('');
-  const [gameAnalysis, setGameAnalysis] = useState('');
-  const [gameComparison, setGameComparison] = useState([]);
-  const [gameEvaluated, setGameEvaluated] = useState(false);
-  const [gameRoundsHistory, setGameRoundsHistory] = useState([]);
-  const [acertos, setAcertos] = useState(0);
-  const [trocas, setTrocas] = useState(0);
-  const [game24Finished, setGame24Finished] = useState(false);
-  const [rimaIndex, setRimaIndex] = useState(0);
-  const [rimaAcertos, setRimaAcertos] = useState(0);
-  const [rimaErros, setRimaErros] = useState(0);
-  const [rimaFeedback, setRimaFeedback] = useState('');
-  const [rimaRoundsHistory, setRimaRoundsHistory] = useState([]);
-  const [rimaFinished, setRimaFinished] = useState(false);
-  const [checkListState, setCheckListState] = useState({});
-  const [checkResultVisible, setCheckResultVisible] = useState(false);
   const { isPlayerOpen, speakPageContent, stopSpeaking, speakText } = useA11y();
 
   const activeScreen = screenStack[screenStack.length - 1];
-  const total = words.length;
-  const currentWord = words[wordIndex];
-  const currentAnswer = answers[wordIndex];
-  const modality = modalities[1];
 
-  const currentAnimal = animals[gameAnimalIndex];
-  const rimaPair = rimaPairs[rimaIndex];
+  // Cálculo da idade em meses a partir da data de nascimento
+  const childAgeMonths = useMemo(() => {
+    if (!birthDate) return null;
+    const parts = birthDate.split('-');
+    if (parts.length !== 3) return null;
+    const birth = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    const now = new Date();
+    const years = now.getFullYear() - birth.getFullYear();
+    const months = now.getMonth() - birth.getMonth();
+    const total = years * 12 + months;
+    return Math.max(0, total);
+  }, [birthDate]);
 
-  const completedForms = useMemo(() => Object.keys(formAnswers).length, [formAnswers]);
-  const formTotal = formQuestions.length;
-  const riskTone = result ? toneStyles[result.risk.tone] : null;
+  const childAgeLabel = useMemo(() => {
+    if (childAgeMonths === null) return '';
+    if (childAgeMonths < 24) return `${childAgeMonths} meses`;
+    const years = Math.floor(childAgeMonths / 12);
+    const remMonths = childAgeMonths % 12;
+    return remMonths > 0 ? `${years} anos e ${remMonths} meses` : `${years} anos`;
+  }, [childAgeMonths]);
 
   const showScreen = (screenId) => {
-    setScreenStack((prev) => {
-      if (prev[prev.length - 1] === screenId) return prev;
-      return [...prev, screenId];
-    });
+    setScreenStack((prev) => (prev[prev.length - 1] === screenId ? prev : [...prev, screenId]));
   };
 
   const goBack = () => {
     setScreenStack((prev) => (prev.length <= 1 ? ['home'] : prev.slice(0, -1)));
   };
 
-  const answer = (id) => setAnswers((list) => list.map((value, index) => (index === wordIndex ? id : value)));
+  // Iniciar fluxo escolhendo o jogo
+  const handleSelectActivity = (activityId) => {
+    setSelectedActivity(activityId);
+    showScreen('consent_data');
+  };
 
-  const goNext = () => {
-    if (wordIndex < total - 1) {
-      setWordIndex((value) => value + 1);
-      return;
+  // Validar consentimento e ir para o jogo selecionado
+  const handleConfirmConsentAndStart = (e) => {
+    e.preventDefault();
+    if (!hasConsent) return;
+
+    // Verificar se faixa etária confere
+    if (childAgeMonths !== null) {
+      if (selectedActivity === 'form02' && childAgeMonths > 24) {
+        setAgeWarning('A idade indicada é maior que 2 anos. Recomendamos o Jogo Fonético (2 a 4 anos).');
+      } else if (selectedActivity === 'game24' && (childAgeMonths < 24 || childAgeMonths > 48)) {
+        setAgeWarning('A idade indicada está fora de 24 a 48 meses. Você ainda pode realizar o jogo como triagem lúdica.');
+      } else if (selectedActivity === 'rima45' && childAgeMonths < 48) {
+        setAgeWarning('Para crianças menores de 4 anos, a percepção de rimas ainda pode ser desafiadora.');
+      } else {
+        setAgeWarning('');
+      }
     }
 
-    const summary = summarize(answers);
-    const record = {
+    if (selectedActivity === 'form02') showScreen('form02');
+    else if (selectedActivity === 'game24') {
+      setPhoneticIndex(0);
+      setPhoneticAnswers([]);
+      setPhoneticFeedback(null);
+      setIsTypingCustom(false);
+      setCustomWordInput('');
+      showScreen('game24');
+    } else if (selectedActivity === 'rima45') {
+      setRimaExampleFinished(false);
+      setRimaIndex(0);
+      setRimaAnswers([]);
+      setRimaFeedback('');
+      showScreen('rima45');
+    } else if (selectedActivity === 'check6') {
+      showScreen('check6');
+    }
+  };
+
+  // Jogo Fonético: registrar opção rápida ou digitação
+  const handlePhoneticSelection = (option, didNotAnswer = false) => {
+    const currentWord = phoneticWords[phoneticIndex];
+    let record;
+
+    if (didNotAnswer) {
+      record = {
+        word: currentWord.name,
+        target: currentWord.target,
+        spoken: 'Não respondeu',
+        isCorrect: false,
+        note: 'A criança não verbalizou (omissão total da resposta)',
+      };
+    } else if (typeof option === 'string') {
+      // Texto digitado
+      const cleaned = option.trim().toLowerCase();
+      const isCorrect = cleaned === currentWord.target;
+      record = {
+        word: currentWord.name,
+        target: currentWord.target,
+        spoken: cleaned,
+        isCorrect,
+        note: isCorrect ? 'Pronúncia correta identificada' : `Produção registrada: "${cleaned}"`,
+      };
+    } else {
+      record = {
+        word: currentWord.name,
+        target: currentWord.target,
+        spoken: option.value,
+        isCorrect: option.isCorrect,
+        note: option.note,
+      };
+    }
+
+    const nextAnswers = [...phoneticAnswers, record];
+    setPhoneticAnswers(nextAnswers);
+    setPhoneticFeedback(record);
+
+    window.setTimeout(() => {
+      setPhoneticFeedback(null);
+      setIsTypingCustom(false);
+      setCustomWordInput('');
+      if (phoneticIndex + 1 >= phoneticWords.length) {
+        finishPhoneticGame(nextAnswers);
+      } else {
+        setPhoneticIndex((prev) => prev + 1);
+      }
+    }, 1200);
+  };
+
+  const finishPhoneticGame = (answers) => {
+    const trocas = answers.filter((a) => !a.isCorrect).length;
+    let nivel = 'ESPERADO';
+    if (trocas >= 3) nivel = 'ENCAMINHAR';
+    else if (trocas >= 1) nivel = 'ATENCAO';
+
+    const sessionRecord = {
       id: Date.now(),
-      date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
-      modality: `${modality.title} (${modality.age})`,
+      date: new Date().toLocaleDateString('pt-BR'),
+      nickname: childNickname || 'Criança',
+      age: childAgeLabel || '2-4 anos',
+      activity: 'Jogo Fonético',
       answers,
-      ...summary,
+      score: `${answers.length - trocas}/${answers.length}`,
+      nivel,
     };
 
-    setResult(record);
-    setHistory((list) => {
-      const updated = [record, ...list];
+    saveSessionResult(sessionRecord);
+    showScreen('unified_result');
+  };
+
+  // Jogo da Rima: registrar resposta
+  const handleRimaAnswer = (childSaidRimes) => {
+    if (rimaFeedback) return;
+    const currentPair = rimaPairs[rimaIndex];
+    const isCorrect = childSaidRimes === currentPair.rima;
+
+    const feedbackText = isCorrect
+      ? `✅ Resposta correta! ${currentPair.w1} e ${currentPair.w2} ${currentPair.rima ? 'rimam' : 'não rimam'}.`
+      : `❌ Resposta registrada. ${currentPair.w1} e ${currentPair.w2} ${currentPair.rima ? 'rimam' : 'não rimam'}.`;
+
+    setRimaFeedback(feedbackText);
+
+    const record = {
+      pair: `${currentPair.w1} e ${currentPair.w2}`,
+      childSaidRimes,
+      expectedRimes: currentPair.rima,
+      isCorrect,
+    };
+
+    const nextAnswers = [...rimaAnswers, record];
+    setRimaAnswers(nextAnswers);
+
+    window.setTimeout(() => {
+      setRimaFeedback('');
+      if (rimaIndex + 1 >= rimaPairs.length) {
+        finishRimaGame(nextAnswers);
+      } else {
+        setRimaIndex((prev) => prev + 1);
+      }
+    }, 1200);
+  };
+
+  const finishRimaGame = (answers) => {
+    const acertos = answers.filter((a) => a.isCorrect).length;
+    let nivel = 'ESPERADO';
+    if (acertos <= 2) nivel = 'ENCAMINHAR';
+    else if (acertos === 3) nivel = 'ATENCAO';
+
+    const sessionRecord = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('pt-BR'),
+      nickname: childNickname || 'Criança',
+      age: childAgeLabel || '4-5 anos',
+      activity: 'Jogo da Rima',
+      answers,
+      score: `${acertos}/${answers.length}`,
+      nivel,
+    };
+
+    saveSessionResult(sessionRecord);
+    showScreen('unified_result');
+  };
+
+  const saveSessionResult = (record) => {
+    setHistory((prev) => {
+      const updated = [record, ...prev];
       try {
         window.localStorage.setItem('fonosync:triagem_history', JSON.stringify(updated));
       } catch (e) {
-        console.error('Erro ao persistir historico de triagem:', e);
+        console.error('Erro ao salvar histórico:', e);
       }
       return updated;
     });
-    setDownloaded(false);
-    setScreenStack((prev) => [...prev, 'result']);
   };
 
-  const downloadResult = () => {
-    if (!result) return;
-    const answerLabel = Object.fromEntries(responses.map((response) => [response.id, response.label]));
+  // Download do relatório da triagem
+  const downloadReportTxt = (rec) => {
+    if (!rec) return;
     const lines = [
-      'FonoSync · Resultado da triagem',
-      `Data: ${result.date}`,
-      `Modalidade: ${result.modality}`,
+      'FONOSYNC — RESUMO DE RASTREIO FONOAUDIOLÓGICO',
+      `Data: ${rec.date}`,
+      `Identificação: ${rec.nickname} (${rec.age})`,
+      `Atividade: ${rec.activity}`,
+      `Resultado: ${rec.nivel === 'ESPERADO' ? 'Dentro do esperado' : rec.nivel === 'ATENCAO' ? 'Pontos de Atenção' : 'Encaminhar para Avaliação'}`,
+      `Desempenho: ${rec.score}`,
       '',
-      `Classificação: ${result.risk.label}`,
-      result.risk.text,
+      'DETALHAMENTO:',
+      ...rec.answers.map((a, i) => `${i + 1}. ${a.word || a.pair}: ${a.spoken || (a.childSaidRimes ? 'Rimam' : 'Não rimam')} — ${a.isCorrect ? 'Correto' : 'Troca/Dificuldade'}`),
       '',
-      'Desempenho',
-      `- Nomeação espontânea: ${result.spontaneous} de ${total} palavras (${result.spontaneousPct}%)`,
-      `- Nomeação com ou sem ajuda: ${result.spontaneous + result.assisted} de ${total} palavras (${result.helpedPct}%)`,
-      '',
-      'Registro por palavra',
-      ...words.map((item, index) => `${index + 1}. ${item.word}: ${answerLabel[result.answers[index]]}`),
-      '',
-      'Recomendação',
-      result.risk.advice,
-      '',
-      'Importante: esta triagem não substitui avaliação profissional e não produz diagnóstico.',
+      'ORIENTAÇÃO CLÍNICA:',
+      'Este rastreio não é um diagnóstico. Ele apenas indica se vale a pena procurar um fonoaudiólogo para avaliação do desenvolvimento.',
     ];
 
     const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'resultado-triagem-fonosync.txt';
-    document.body.appendChild(link);
+    link.download = `rastreio-fonosync-${rec.nickname || 'crianca'}.txt`;
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-    setDownloaded(true);
   };
 
-  const historyRows = history.map((record) => ({
-    id: record.id,
-    date: record.date,
-    modality: record.modality,
-    spontaneous: `${record.spontaneous} de ${total}`,
-    risk: record.risk.label,
-  }));
+  const currentResult = history[0] || null;
 
-  const selectFormOption = (questionId, value) => setFormAnswers((prev) => ({ ...prev, [questionId]: value }));
-
-  const showFormResult = () => {
-    const isComplete = Object.keys(formAnswers).length === formTotal;
-    if (!isComplete) {
-      setFormWarningVisible(true);
-      return;
-    }
-    setFormWarningVisible(false);
-    setFormResultVisible(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const evaluateWordGuess = (guess) => {
-    const normalizedGuess = (guess || gameResponse).trim().toLowerCase();
-    if (!normalizedGuess) return;
-
-    const target = currentAnimal.target;
-    const maxLen = Math.max(target.length, normalizedGuess.length);
-    const comparison = Array.from({ length: maxLen }, (_, index) => {
-      const targetLetter = target[index] ?? '';
-      const typedLetter = normalizedGuess[index] ?? '';
-      return {
-        char: typedLetter || '–',
-        matched: targetLetter === typedLetter,
-      };
-    });
-
-    setGameComparison(comparison);
-
-    let isCorrect = false;
-    let analysisText = '';
-
-    if (normalizedGuess === target) {
-      isCorrect = true;
-      analysisText = '✅ Pronúncia correta! A criança reproduziu a palavra-alvo sem trocas fonéticas. Nenhum processo fonológico identificado nesta rodada.';
-      setAcertos((prev) => prev + 1);
-    } else if (currentAnimal.alts[normalizedGuess]) {
-      analysisText = `⚠️ Processo fonológico identificado: ${currentAnimal.alts[normalizedGuess]}`;
-      setTrocas((prev) => prev + 1);
-    } else {
-      const diff = [...normalizedGuess].filter((letter, index) => letter !== (target[index] || '')).length;
-      analysisText = `⚠️ ${diff} diferença(s) detectada(s) entre a palavra-alvo "${target}" e o que foi dito "${normalizedGuess}". Possível troca ou omissão de fonemas.`;
-      setTrocas((prev) => prev + 1);
-    }
-
-    setGameAnalysis(analysisText);
-    setGameEvaluated(true);
-
-    setGameRoundsHistory((prev) => [
-      ...prev,
-      {
-        rodada: gameAnimalIndex + 1,
-        animal: currentAnimal.name,
-        emoji: currentAnimal.emoji,
-        alvo: target,
-        falou: normalizedGuess,
-        isCorrect,
-        analysis: analysisText,
-      },
-    ]);
-  };
-
-  const nextAnimal = () => {
-    if (gameAnimalIndex + 1 >= animals.length) {
-      setGame24Finished(true);
-      return;
-    }
-    setGameAnimalIndex((previous) => previous + 1);
-    setGameResponse('');
-    setGameAnalysis('');
-    setGameComparison([]);
-    setGameEvaluated(false);
-  };
-
-  const restartGame24 = () => {
-    setGameAnimalIndex(0);
-    setGameResponse('');
-    setGameAnalysis('');
-    setGameComparison([]);
-    setGameEvaluated(false);
-    setGameRoundsHistory([]);
-    setAcertos(0);
-    setTrocas(0);
-    setGame24Finished(false);
-  };
-
-  const answerRima = (answer) => {
-    if (rimaFeedback) return; // Evita duplo clique
-    const isCorrect = answer === rimaPair.rima;
-    const feedbackText = isCorrect
-      ? `✅ Resposta correta! ${rimaPair.w1} e ${rimaPair.w2} ${rimaPair.rima ? 'rimam' : 'não rimam'}.`
-      : `❌ Não foi dessa vez! ${rimaPair.w1} e ${rimaPair.w2} ${rimaPair.rima ? 'rimam' : 'não rimam'}.`;
-
-    if (isCorrect) {
-      setRimaAcertos((value) => value + 1);
-    } else {
-      setRimaErros((value) => value + 1);
-    }
-    setRimaFeedback(feedbackText);
-
-    setRimaRoundsHistory((prev) => [
-      ...prev,
-      {
-        rodada: rimaIndex + 1,
-        par: `${rimaPair.w1} (${rimaPair.e1}) e ${rimaPair.w2} (${rimaPair.e2})`,
-        respostaCriança: answer ? 'Sim, rimam' : 'Não rimam',
-        gabarito: rimaPair.rima ? 'Rimam' : 'Não rimam',
-        isCorrect,
-      },
-    ]);
-
-    window.setTimeout(() => {
-      if (rimaIndex + 1 >= rimaPairs.length) {
-        setRimaFinished(true);
-        setRimaFeedback('');
-      } else {
-        setRimaIndex((value) => value + 1);
-        setRimaFeedback('');
-      }
-    }, 1500);
-  };
-
-  const restartRima = () => {
-    setRimaIndex(0);
-    setRimaAcertos(0);
-    setRimaErros(0);
-    setRimaFeedback('');
-    setRimaRoundsHistory([]);
-    setRimaFinished(false);
-  };
-
-  const toggleCheckItem = (index) => {
-    setCheckListState((previous) => ({ ...previous, [index]: !previous[index] }));
-  };
-
+  // ==========================================
+  // TELA 1: HOME (ESCOLHA DA FAIXA ETÁRIA)
+  // ==========================================
   const renderHomeScreen = () => (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-extrabold text-navy md:text-4xl">Selecione a faixa etária da criança</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-base text-muted">Cada jogo foi desenvolvido para o estágio de desenvolvimento fonológico da criança. Escolha abaixo para iniciar a triagem.</p>
+        <h2 className="font-serif text-3xl font-extrabold text-navy md:text-4xl">
+          Rastreio Fonoaudiológico Precoce
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-base text-muted">
+          Atividades lúdicas sem áudio para apoio a pais, familiares e educadores.
+          Quem escuta a criança é você! Selecione a faixa etária para iniciar.
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {[
-          { id: 'form02', emoji: '👶', title: '0 – 2 anos', subtitle: 'Primeira Infância', game: '📋 Formulário de Marcos', desc: 'Respondido pelo responsável. Avalia marcos do desenvolvimento como balbucio, primeiras palavras e reação a sons.' },
-          { id: 'game24', emoji: '🐄', title: '2 – 4 anos', subtitle: 'Pré-Escolar Inicial', game: '🎮 Jogo da Palavra', desc: 'Responsável digita o que a criança disse ao ver uma imagem. O sistema identifica trocas de fonemas automaticamente.' },
-          { id: 'rima45', emoji: '🎵', title: '4 – 5 anos', subtitle: 'Pré-Escolar Avançado', game: '🎵 Jogo da Rima', desc: 'Avalia consciência fonológica — a criança identifica se duas palavras rimam, preditor de dislexia e dificuldades de leitura.' },
-          { id: 'check6', emoji: '🏫', title: '6+ anos', subtitle: 'Ensino Fundamental I', game: '✅ Checklist do Professor', desc: 'Respondido pelo professor em sala. Identifica comportamentos de risco persistentes que merecem encaminhamento.' },
+          { id: 'form02', emoji: '👶', title: '0 – 2 anos', subtitle: 'Primeira Infância', game: '📋 Formulário de Marcos', desc: 'Verifica marcos de comunicação como balbucio, primeiras palavras e resposta a sons.' },
+          { id: 'game24', emoji: '🐄', title: '2 – 4 anos', subtitle: 'Pré-Escolar Inicial', game: '🎮 Jogo Fonético', desc: 'Identifica trocas e simplificações comuns na fala através de opções rápidas ou digitação.' },
+          { id: 'rima45', emoji: '🎵', title: '4 – 5 anos', subtitle: 'Pré-Escolar Avançado', game: '🎵 Jogo da Rima', desc: 'Avalia percepção de rimas e consciência fonológica com instruções narradas pelo adulto.' },
+          { id: 'check6', emoji: '🏫', title: '6+ anos', subtitle: 'Ensino Fundamental', game: '✅ Checklist Escolar', desc: 'Observação de dificuldades persistentes na fala e no aprendizado em sala de aula.' },
         ].map((card, index) => (
-          <div key={card.id} className="relative overflow-hidden rounded-[20px] border border-line bg-white p-6 text-center shadow-[0_8px_32px_rgba(0,0,0,0.13)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.16)]">
+          <div key={card.id} className="relative overflow-hidden rounded-[20px] border border-line bg-white p-6 text-center shadow-[0_8px_32px_rgba(0,0,0,0.13)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.16)] flex flex-col justify-between">
             <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: ['linear-gradient(90deg, #74b9ff, #0984e3)', 'linear-gradient(90deg, #fd79a8, #e84393)', 'linear-gradient(90deg, #55efc4, #00b894)', 'linear-gradient(90deg, #fdcb6e, #e17055)'][index] }} />
-            <span className="mb-4 block text-5xl">{card.emoji}</span>
-            <div className="font-serif text-2xl font-extrabold text-navy">{card.title}</div>
-            <div className="mt-1 text-sm font-semibold text-muted">{card.subtitle}</div>
-            <div className="mt-4 rounded-xl bg-surface px-3 py-2 text-xs font-bold text-ink">{card.game}</div>
-            <div className="mt-4 text-sm leading-relaxed text-muted">{card.desc}</div>
-            <button type="button" onClick={() => showScreen(card.id)} className="mt-5 rounded-full bg-navy px-5 py-2.5 text-sm font-extrabold text-white transition hover:bg-primary">Iniciar {index === 0 ? 'Triagem' : 'Jogo'} →</button>
+            <div>
+              <span className="mb-4 block text-5xl">{card.emoji}</span>
+              <div className="font-serif text-2xl font-extrabold text-navy">{card.title}</div>
+              <div className="mt-1 text-sm font-semibold text-muted">{card.subtitle}</div>
+              <div className="mt-4 rounded-xl bg-surface px-3 py-2 text-xs font-bold text-ink">{card.game}</div>
+              <div className="mt-4 text-sm leading-relaxed text-muted">{card.desc}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleSelectActivity(card.id)}
+              className="mt-6 w-full rounded-xl bg-[#0284C7] py-3 text-sm font-extrabold text-white transition hover:bg-sky-700 shadow-sm cursor-pointer"
+            >
+              Iniciar Atividade →
+            </button>
           </div>
         ))}
       </div>
     </div>
   );
 
-  const renderFormScreen = () => (
-    <div className="space-y-6">
+  // ==========================================
+  // TELA 2: CONSENTIMENTO LGPD E DADOS MÍNIMOS
+  // ==========================================
+  const renderConsentDataScreen = () => (
+    <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center gap-4">
-        <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
-        <h2 className="font-serif text-2xl font-extrabold text-navy">Formulário de Marcos</h2>
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">0 – 2 anos</span>
+        <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+          <ArrowLeft size={16} aria-hidden="true" /> Voltar
+        </button>
+        <h2 className="font-serif text-2xl font-extrabold text-navy">Consentimento e Identificação</h2>
       </div>
 
-      <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-        <div className="bg-gradient-to-r from-sky-400 to-blue-600 p-7 text-white">
-          <h3 className="font-serif text-2xl font-extrabold">📋 Questionário de Desenvolvimento da Linguagem</h3>
-          <p className="mt-2 text-sm text-white/90">Responda com base no comportamento habitual da criança nas últimas semanas</p>
-          <p className="mt-5 rounded-xl bg-white/15 p-4 text-sm">
-            Questionário geral. Nenhum dado pessoal é solicitado ou armazenado nesta triagem.
-          </p>
+      <div className="rounded-2xl border border-line bg-white p-6 md:p-8 shadow-sm space-y-6">
+        <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 flex items-start gap-3">
+          <ShieldCheck className="size-6 text-[#0284C7] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <strong>Privacidade em primeiro lugar (LGPD):</strong> Não solicitamos CPF, endereço ou nome completo. 
+            Os dados servem apenas para calcular a idade em meses e contextualizar a atividade.
+          </div>
         </div>
 
-        <div className="p-8">
-          <div className="mb-6">
-            <div className="mb-2 flex items-center justify-between text-xs font-bold text-muted">
-              <span>Progresso do questionário</span>
-              <span>{completedForms} / {formTotal} respondidas</span>
-            </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-line">
-              <div className="h-full rounded-full bg-gradient-to-r from-sky-400 to-blue-600 transition-all duration-300" style={{ width: `${(completedForms / formTotal) * 100}%` }} />
-            </div>
+        <form onSubmit={handleConfirmConsentAndStart} className="space-y-5">
+          <div>
+            <label htmlFor="child-nick" className="block text-sm font-bold text-navy mb-1">
+              Apelido ou Iniciais da Criança:
+            </label>
+            <input
+              id="child-nick"
+              type="text"
+              required
+              value={childNickname}
+              onChange={(e) => setChildNickname(e.target.value)}
+              placeholder="Ex.: Dani, Léo, M. S."
+              className="w-full rounded-xl border border-line px-4 py-3 text-base text-ink focus:border-[#0284C7] outline-none"
+            />
           </div>
 
-          {formWarningVisible && (
-            <div className="mb-4 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm font-bold text-danger" role="alert">Responda todas as 6 perguntas antes de visualizar o resultado da triagem.</div>
+          <div>
+            <label htmlFor="birth-date" className="block text-sm font-bold text-navy mb-1">
+              Data de Nascimento:
+            </label>
+            <input
+              id="birth-date"
+              type="date"
+              required
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              className="w-full rounded-xl border border-line px-4 py-3 text-base text-ink focus:border-[#0284C7] outline-none"
+            />
+            {childAgeMonths !== null && (
+              <span className="mt-1 block text-xs font-semibold text-sky-700">
+                Idade estimada: {childAgeLabel} ({childAgeMonths} meses)
+              </span>
+            )}
+          </div>
+
+          <div className="pt-2 border-t border-line">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                required
+                checked={hasConsent}
+                onChange={(e) => setHasConsent(e.target.checked)}
+                className="mt-1 size-4 rounded border-gray-300 text-[#0284C7] focus:ring-[#0284C7]"
+              />
+              <span className="text-xs text-slate-600 leading-relaxed">
+                Sou responsável pela criança e concordo em responder a esta triagem lúdica de desenvolvimento fonoaudiológico. 
+                Estou ciente de que <strong>este sistema não fornece diagnóstico médico</strong> e serve como rastreio inicial.
+              </span>
+            </label>
+          </div>
+
+          {ageWarning && (
+            <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-bold text-amber-800">
+              ⚠️ {ageWarning}
+            </div>
           )}
 
-          <div className="space-y-5">
-            {formQuestions.map((item) => {
-              const isSelected = formAnswers[item.id];
-              return (
-                <div key={item.id} className="rounded-xl border border-line bg-surface px-3 py-4">
-                  <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary">Pergunta {String(item.id).padStart(2, '0')} · {item.category}</div>
-                  <div className="mb-4 text-lg font-bold text-ink">{item.question}</div>
-                  <div className="flex flex-wrap gap-3">
-                    {item.options.map((option) => {
-                      const selectedClass = option.value === 'sim' ? 'border-success bg-success/10 text-success' : option.value === 'parcial' ? 'border-warning bg-warning/10 text-warning' : 'border-danger bg-danger/10 text-danger';
-                      return (
-                        <button key={option.value} type="button" aria-pressed={isSelected === option.value} onClick={() => selectFormOption(item.id, option.value)} className={`rounded-xl border-2 px-4 py-2.5 text-sm font-bold transition ${isSelected === option.value ? selectedClass : 'border-line bg-white text-ink hover:border-primary hover:text-primary'}`}>
-                          {option.label}
-                        </button>
-                      );
-
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-8 flex items-center justify-between border-t border-line pt-6">
-            <button type="button" onClick={() => setScreenStack(['home'])} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Cancelar</button>
-            <button type="button" onClick={showFormResult} className={buttonClass('primary')}>Ver Resultado da Triagem <ArrowRight size={16} aria-hidden="true" /></button>
-          </div>
-        </div>
+          <button
+            type="submit"
+            disabled={!hasConsent || !childNickname.trim() || !birthDate}
+            className="w-full rounded-xl bg-[#0284C7] hover:bg-sky-700 disabled:opacity-50 text-white py-3.5 text-base font-bold transition shadow-sm cursor-pointer"
+          >
+            Avançar para a Atividade →
+          </button>
+        </form>
       </div>
-
-      {formResultVisible && (() => {
-        const answers = Object.values(formAnswers);
-        const naoCount = answers.filter((a) => a === 'nao').length;
-        const parcialCount = answers.filter((a) => a === 'parcial').length;
-        const hasSigns = naoCount >= 2 || (naoCount >= 1 && parcialCount >= 2);
-
-        return (
-          <section aria-labelledby="triagem-marcos-resultado" className="mt-6 rounded-2xl border border-line bg-surface p-5 shadow-sm md:p-8 space-y-6">
-            <div>
-              <h3 id="triagem-marcos-resultado" className="font-serif text-2xl font-bold text-navy">Respostas da triagem</h3>
-              <p className="mt-1 text-sm text-muted">Este resumo registra as respostas informadas e não constitui diagnóstico ou avaliação clínica.</p>
-            </div>
-
-            {hasSigns ? (
-              <div className="rounded-2xl border-2 border-amber-300 bg-amber-50/80 p-5 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-amber-200 text-amber-800 shrink-0">
-                    <HeartHandshake size={22} />
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-base font-bold text-amber-950">Atenção e Cuidado no Desenvolvimento da Fala</h4>
-                    <p className="text-xs sm:text-sm text-amber-900 leading-relaxed">
-                      Identificamos que alguns marcos esperados para esta faixa etária podem estar levando um pouco mais de tempo para se desenvolver. 
-                      <strong> Fique tranquilo(a):</strong> cada criança possui seu próprio ritmo, e a estimulação precoce com um fonoaudiólogo faz toda a diferença para que ela se comunique com segurança e alegria.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-amber-200/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                  <span className="text-xs font-semibold text-amber-800">
-                    Recomendação: Realizar uma avaliação clínica fonoaudiológica acolhedora.
-                  </span>
-                  <a
-                    href="#/acesso"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
-                  >
-                    <Search size={14} /> Buscar Fonoaudiólogo
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50/80 p-5 space-y-2">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 size={22} className="text-emerald-700 shrink-0" />
-                  <h4 className="text-base font-bold text-emerald-950">Desenvolvimento Dentro do Esperado</h4>
-                </div>
-                <p className="text-xs sm:text-sm text-emerald-900 leading-relaxed">
-                  Os marcos relatados estão progredindo bem! Continue conversando bastante, cantando e lendo historinhas juntos no dia a dia.
-                </p>
-              </div>
-            )}
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[32rem] text-left text-sm">
-                <thead className="bg-mist text-navy">
-                  <tr>
-                    <th scope="col" className="px-4 py-3">Área observada</th>
-                    <th scope="col" className="px-4 py-3">Resposta</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {formQuestions.map((item) => {
-                    const response = item.options.find((option) => option.value === formAnswers[item.id]);
-                    return (
-                      <tr key={item.id} className="border-t border-line">
-                        <th scope="row" className="px-4 py-3 font-semibold text-ink">{item.category}</th>
-                        <td className="px-4 py-3 text-ink">{response?.label ?? 'Não respondida'}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        );
-      })()}
     </div>
   );
 
-  const renderHistoryScreen = () => (
-    <section className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="font-serif text-2xl font-bold text-navy">Histórico de Triagens</h2>
-          <p className="mt-1 text-sm text-muted">Resultados salvos das triagens realizadas neste navegador.</p>
-        </div>
-        <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
-          <ArrowLeft size={16} aria-hidden="true" /> Voltar à triagem
-        </button>
-      </div>
-      {historyRows.length ? (
-        <DataTable caption="Resultados de triagem desta sessão" columns={historyColumns} rows={historyRows} />
-      ) : (
-        <p className="rounded-xl border border-line bg-surface p-5 text-sm text-muted">Nenhuma triagem foi concluída nesta sessão.</p>
-      )}
-    </section>
-  );
-
+  // ==========================================
+  // TELA 3: JOGO FONÉTICO (2 A 4 ANOS - BOTÕES RÁPIDOS)
+  // ==========================================
   const renderGame24Screen = () => {
-    if (game24Finished) {
-      return (
-        <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
-            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Palavra — Conclusão</h2>
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">2 – 4 anos</span>
-          </div>
-
-          <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-            <div className="flex items-center gap-4 bg-gradient-to-r from-pink-500 to-rose-600 p-6 text-white">
-              <div className="text-4xl">🎉</div>
-              <div>
-                <h3 className="font-serif text-2xl font-extrabold">Parabéns! Jogo Concluído!</h3>
-                <p className="mt-1 text-sm text-white/90">A criança completou as 5 rodadas da triagem lúdica de trocas fonéticas.</p>
-              </div>
-            </div>
-
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
-                  <span className="text-4xl">🌟</span>
-                  <div className="mt-2 text-3xl font-black text-emerald-800">{acertos} / 5</div>
-                  <div className="text-sm font-bold text-emerald-700">Pronúncias Corretas</div>
-                </div>
-                <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6">
-                  <span className="text-4xl">🔍</span>
-                  <div className="mt-2 text-3xl font-black text-amber-800">{trocas} / 5</div>
-                  <div className="text-sm font-bold text-amber-700">Trocas / Processos Observados</div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-sky-200 bg-sky-50 p-6">
-                <h4 className="font-serif text-lg font-bold text-navy flex items-center gap-2">
-                  <span>💡</span> Orientação ao Responsável
-                </h4>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                  {trocas > 1
-                    ? 'Identificamos algumas trocas e simplificações comuns no processo de aquisição da fala. Para entender se são variações típicas da idade ou se necessitam de estímulo fonoterápico precoce, recomendamos uma avaliação detalhada com um profissional de fonoaudiologia.'
-                    : 'Excelente desempenho! A criança demonstrou boa correspondência fonética para a idade. Continue estimulando com conversas, leituras de histórias e brincadeiras orais.'}
-                </p>
-                <p className="mt-3 text-xs text-muted">
-                  ⚠️ Esta é uma atividade de triagem lúdica e preventiva. Não substitui consulta e diagnóstico fonoaudiológico.
-                </p>
-              </div>
-
-              {gameRoundsHistory.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="font-serif text-base font-bold text-navy">📋 Detalhamento das 5 Rodadas Realizadas</h4>
-                  <div className="space-y-2">
-                    {gameRoundsHistory.map((item, idx) => (
-                      <div key={idx} className={`p-4 rounded-xl border ${item.isCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'} flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl">{item.emoji}</span>
-                          <div>
-                            <span className="font-bold text-slate-800">Rodada {item.rodada}: {item.animal}</span>
-                            <span className="text-slate-500 block">Alvo: <strong>{item.alvo}</strong> · Criança disse: <strong>"{item.falou}"</strong></span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold ${item.isCorrect ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'}`}>
-                            {item.isCorrect ? 'Correto' : 'Troca / Processo'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-line">
-                <button type="button" onClick={restartGame24} className={buttonClass('secondary')}>
-                  🔁 Jogar Novamente
-                </button>
-                <div className="flex flex-wrap gap-3">
-                  <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
-                    Voltar ao Menu
-                  </button>
-                  <a
-                    href="#/profissional/pacientes"
-                    className="inline-flex items-center gap-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-white px-5 py-3 text-sm font-bold shadow-md transition"
-                  >
-                    <span>🩺</span> Buscar Fonoaudiólogo
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
+    const currentWord = phoneticWords[phoneticIndex];
 
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
-          <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Palavra</h2>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">2 – 4 anos</span>
+          <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+            <ArrowLeft size={16} aria-hidden="true" /> Voltar
+          </button>
+          <div>
+            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo Fonético (2 a 4 anos)</h2>
+            <span className="text-xs text-muted">Avaliando {childNickname || 'a criança'} · {childAgeLabel}</span>
+          </div>
         </div>
 
         <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-          <div className="flex items-center gap-4 bg-gradient-to-r from-pink-400 to-pink-600 p-6 text-white">
+          <div className="flex items-center gap-4 bg-gradient-to-r from-pink-500 to-rose-600 p-6 text-white">
             <div className="text-4xl">🎮</div>
             <div>
               <h3 className="font-serif text-2xl font-extrabold">Identificação de Trocas Fonéticas</h3>
-              <p className="mt-1 text-sm text-white/90">Mostre a imagem para a criança, peça que diga o nome do animal e digite abaixo o que ela falou</p>
+              <p className="mt-1 text-sm text-white/90">
+                Mostre a imagem para a criança e pergunte: <strong>"O que é isso?"</strong>. Registre abaixo o que ela falou.
+              </p>
             </div>
           </div>
 
           <div className="p-8">
-            <div className="mb-8 flex flex-wrap items-center justify-center gap-3 text-center">
-              <div className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-extrabold text-navy ring-2 ring-yellow-300">Rodada {gameAnimalIndex + 1}/{animals.length}</div>
-              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">🎯 Trocas: {trocas}</div>
-              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">✅ Corretas: {acertos}</div>
+            <div className="mb-6 flex justify-between items-center text-xs font-bold text-muted">
+              <span>Palavra {phoneticIndex + 1} de {phoneticWords.length}</span>
+              <span className="rounded-full bg-pink-100 px-3 py-1 text-pink-700">Opções Rápidas sem Áudio</span>
             </div>
 
+            {/* Imagem e Alvo */}
             <div className="mb-8 text-center">
-              <div className="inline-block rounded-[24px] border-4 border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100 px-8 py-7 shadow-[0_8px_24px_rgba(253,203,110,0.3)]">
-                <div className="text-7xl">{currentAnimal.emoji}</div>
-                <div className="mt-3 font-serif text-4xl font-black tracking-[0.2em] text-navy">{currentAnimal.name}</div>
-                <div className="mt-2 text-lg font-semibold text-muted">{currentAnimal.phonemes}</div>
+              <div className="inline-block rounded-[24px] border-4 border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100 px-10 py-8 shadow-sm">
+                <div className="text-8xl">{currentWord.emoji}</div>
+                <div className="mt-3 font-serif text-3xl font-black text-navy">{currentWord.name}</div>
+                <div className="mt-1 text-xs font-semibold text-muted">Som-alvo: {currentWord.phonemes}</div>
               </div>
             </div>
 
-            <div className="mb-8 rounded-2xl border-2 border-sky-200 bg-sky-50 p-4 text-center text-base font-bold text-sky-700">👆 Aponte para o animal e pergunte à criança: <strong>"O que é isso?"</strong><br />Digite abaixo exatamente como ela disse:</div>
-
-            <div className="mb-5 space-y-3">
-              <label htmlFor="fns-child-word" className="block text-base font-extrabold text-ink">O que a criança disse:</label>
-              <div className="flex gap-3">
-                <input
-                  id="fns-child-word"
-                  type="text"
-                  value={gameResponse}
-                  disabled={gameEvaluated}
-                  onChange={(event) => setGameResponse(event.target.value.toLowerCase())}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && !gameEvaluated && gameResponse.trim()) {
-                      evaluateWordGuess(gameResponse);
-                    }
-                  }}
-                  className="flex-1 rounded-2xl border-4 border-line bg-white px-5 py-4 text-xl font-bold text-ink outline-none transition focus:border-pink-400 disabled:bg-slate-100 disabled:cursor-not-allowed"
-                  placeholder="ex: faca, baca, vaka, pato..."
-                  style={{ textTransform: 'lowercase' }}
-                />
-                {!gameEvaluated && (
-                  <button
-                    type="button"
-                    onClick={() => evaluateWordGuess(gameResponse)}
-                    disabled={!gameResponse.trim()}
-                    className="rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-50 text-white px-6 py-4 font-bold text-base shadow-sm transition"
-                  >
-                    Confirmar Fala
-                  </button>
-                )}
+            {/* Feedback da rodada */}
+            {phoneticFeedback && (
+              <div className={`mb-6 p-4 rounded-xl text-center text-sm font-bold border ${phoneticFeedback.isCorrect ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-amber-50 border-amber-300 text-amber-800'}`}>
+                {phoneticFeedback.isCorrect ? '✅ Pronúncia padrão registrada!' : `⚠️ Registrado: "${phoneticFeedback.spoken}" — ${phoneticFeedback.note}`}
               </div>
-            </div>
+            )}
 
-            {gameComparison.length > 0 && (
-              <div className="rounded-2xl border-2 border-yellow-200 bg-yellow-50 p-5">
-                <div className="mb-3 text-sm font-extrabold uppercase tracking-[0.12em] text-slate-600">Análise fonema a fonema:</div>
-                <div className="mb-4 flex flex-wrap gap-3">
-                  {gameComparison.map((item, index) => (
-                    <span key={`${item.char}-${index}`} className={`rounded-xl px-3 py-2 text-2xl font-black ${item.matched ? 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300' : 'bg-red-100 text-red-800 border-2 border-red-300'}`}>
-                      {item.char}
-                    </span>
+            {/* Botões Rápidos recomendados pela especificação */}
+            {!isTypingCustom ? (
+              <div className="space-y-4">
+                <p className="text-sm font-bold text-slate-700 text-center">
+                  O que a criança disse? (Toque na opção mais próxima):
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {currentWord.quickOptions.map((opt, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handlePhoneticSelection(opt)}
+                      className="rounded-2xl border-2 border-line bg-surface hover:border-pink-500 hover:bg-pink-50/50 p-4 text-center transition font-bold text-lg text-ink shadow-xs"
+                    >
+                      "{opt.label}"
+                      <span className="block text-[11px] font-normal text-muted mt-1">{opt.note}</span>
+                    </button>
                   ))}
                 </div>
-                <div className="rounded-xl border border-yellow-200 bg-yellow-100 p-4 text-sm font-semibold leading-6 text-amber-900">{gameAnalysis}</div>
-                <div className="mt-5 flex justify-end">
-                  <button type="button" onClick={nextAnimal} className={buttonClass('primary')}>
-                    {gameAnimalIndex + 1 >= animals.length ? 'Finalizar Jogo' : 'Próximo animal'} <ArrowRight size={16} aria-hidden="true" />
+
+                <div className="flex flex-wrap justify-center gap-3 pt-4 border-t border-line">
+                  <button
+                    type="button"
+                    onClick={() => handlePhoneticSelection(null, true)}
+                    className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
+                  >
+                    A criança não respondeu
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsTypingCustom(true)}
+                    className="rounded-xl border border-pink-300 bg-pink-50 px-4 py-2 text-xs font-bold text-pink-700 hover:bg-pink-100"
+                  >
+                    Outra pronúncia... (Digitar)
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 max-w-md mx-auto">
+                <label className="block text-sm font-bold text-slate-700 text-center">
+                  Digite exatamente como a criança pronunciou:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customWordInput}
+                    onChange={(e) => setCustomWordInput(e.target.value)}
+                    placeholder="Ex.: faca, baca, tata..."
+                    className="flex-1 rounded-xl border-2 border-line px-4 py-3 text-base font-bold outline-none focus:border-pink-500"
+                  />
+                  <button
+                    type="button"
+                    disabled={!customWordInput.trim()}
+                    onClick={() => handlePhoneticSelection(customWordInput)}
+                    className="rounded-xl bg-pink-600 disabled:opacity-50 text-white px-5 py-3 font-bold text-sm"
+                  >
+                    Confirmar
+                  </button>
+                </div>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setIsTypingCustom(false)}
+                    className="text-xs font-bold text-muted hover:underline"
+                  >
+                    ← Voltar para opções rápidas
                   </button>
                 </div>
               </div>
@@ -817,142 +682,112 @@ export default function TriagemGame() {
     );
   };
 
+  // ==========================================
+  // TELA 4: JOGO DA RIMA (4 A 5 ANOS - COM EXEMPLO INICIAL)
+  // ==========================================
   const renderRimaScreen = () => {
-    if (rimaFinished) {
+    // 1. Exemplo inicial explicativo sem pontuar conforme a especificação
+    if (!rimaExampleFinished) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-2xl mx-auto">
           <div className="flex items-center gap-4">
-            <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
-            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima — Conclusão</h2>
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">4 – 5 anos</span>
+            <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+              <ArrowLeft size={16} aria-hidden="true" /> Voltar
+            </button>
+            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima (4 a 5 anos)</h2>
           </div>
 
-          <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-            <div className="flex items-center gap-4 bg-gradient-to-r from-emerald-500 to-teal-600 p-6 text-white">
-              <div className="text-4xl">🎵</div>
-              <div>
-                <h3 className="font-serif text-2xl font-extrabold">Parabéns! Rodadas de Rima Finalizadas!</h3>
-                <p className="mt-1 text-sm text-white/90">A criança completou a triagem lúdica de consciência fonológica e percepção de rimas.</p>
+          <div className="rounded-[20px] border border-line bg-white p-8 shadow-sm space-y-6 text-center">
+            <div className="size-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-3xl mx-auto">
+              🎵
+            </div>
+            <h3 className="font-serif text-2xl font-bold text-navy">Como funciona a brincadeira?</h3>
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+              Vamos testar a percepção sonora da criança. Palavras rimam quando terminam com o mesmo som!
+            </p>
+
+            <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6 space-y-3">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800">Exemplo para treinar</span>
+              <div className="flex items-center justify-center gap-6 text-2xl font-black text-navy">
+                <span>🐱 GATO</span>
+                <span className="text-muted">e</span>
+                <span>🦆 PATO</span>
               </div>
+              <p className="text-xs text-emerald-900">
+                Terminam com o mesmo som (<strong>-ATO</strong>), então <strong>SIM, elas rimam!</strong>
+              </p>
             </div>
 
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
-                  <span className="text-4xl">🎯</span>
-                  <div className="mt-2 text-3xl font-black text-emerald-800">{rimaAcertos} / {rimaPairs.length}</div>
-                  <div className="text-sm font-bold text-emerald-700">Rimas Identificadas com Precisão</div>
-                </div>
-                <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6">
-                  <span className="text-4xl">🔄</span>
-                  <div className="mt-2 text-3xl font-black text-amber-800">{rimaErros} / {rimaPairs.length}</div>
-                  <div className="text-sm font-bold text-amber-700">Dificuldades / Hesitações</div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-teal-200 bg-teal-50 p-6">
-                <h4 className="font-serif text-lg font-bold text-navy flex items-center gap-2">
-                  <span>💡</span> Orientação Fonoaudiológica & Pedagógica
-                </h4>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                  {rimaAcertos >= 4
-                    ? 'Excelente percepção auditiva e consciência fonológica! A habilidade de reconhecer padrões sonoros é um dos principais preditores positivos para o processo de alfabetização.'
-                    : 'A percepção de rimas e sons semelhantes ainda está em desenvolvimento. Brincadeiras com cantigas, parlendas e poemas rimados em família ajudam bastante. Se a dificuldade persistir, um fonoaudiólogo pode orientar exercícios específicos.'}
-                </p>
-                <p className="mt-3 text-xs text-muted">
-                  ⚠️ Esta é uma ferramenta lúdica educativa. Não substitui avaliações clínicas ou testes psicométricos padronizados.
-                </p>
-              </div>
-
-              {rimaRoundsHistory.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="font-serif text-base font-bold text-navy">📋 Detalhamento das 5 Rodadas Realizadas</h4>
-                  <div className="space-y-2">
-                    {rimaRoundsHistory.map((item, idx) => (
-                      <div key={idx} className={`p-4 rounded-xl border ${item.isCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-amber-50/60 border-amber-200'} flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
-                        <div>
-                          <span className="font-bold text-slate-800">Par {item.rodada}: {item.par}</span>
-                          <span className="text-slate-500 block">Resposta: <strong>{item.respostaCriança}</strong> (Gabarito: <strong>{item.gabarito}</strong>)</span>
-                        </div>
-                        <div className="text-right">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold ${item.isCorrect ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'}`}>
-                            {item.isCorrect ? 'Acertou' : 'Errou'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-line">
-                <button type="button" onClick={restartRima} className={buttonClass('secondary')}>
-                  🔁 Jogar Novamente
-                </button>
-                <div className="flex flex-wrap gap-3">
-                  <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
-                    Voltar ao Menu
-                  </button>
-                  <a
-                    href="#/profissional/pacientes"
-                    className="inline-flex items-center gap-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white px-5 py-3 text-sm font-bold shadow-md transition"
-                  >
-                    <span>🩺</span> Buscar Fonoaudiólogo
-                  </a>
-                </div>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setRimaExampleFinished(true)}
+              className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 text-base font-bold transition shadow-sm cursor-pointer"
+            >
+              Entendi! Começar as Rodadas →
+            </button>
           </div>
         </div>
       );
     }
 
+    // 2. Rodadas valendo
+    const currentPair = rimaPairs[rimaIndex];
+
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
+          <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+            <ArrowLeft size={16} aria-hidden="true" /> Voltar
+          </button>
           <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima</h2>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">4 – 5 anos</span>
+          <span className="text-xs text-muted">Rodada {rimaIndex + 1} de {rimaPairs.length}</span>
         </div>
 
         <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-          <div className="flex items-center gap-4 bg-gradient-to-r from-emerald-400 to-teal-500 p-6 text-white">
-            <div className="text-4xl">🎵</div>
-            <div>
-              <h3 className="font-serif text-2xl font-extrabold">Consciência Fonológica</h3>
-              <p className="mt-1 text-sm text-white/90">Mostre as imagens para a criança e pergunte: "essas duas palavras rimam?"</p>
-            </div>
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-6 text-white text-center">
+            <h3 className="font-serif text-2xl font-extrabold">Essas palavras rimam?</h3>
+            <p className="mt-1 text-sm text-white/90">Leia em voz alta para a criança e pergunte o que ela acha:</p>
           </div>
 
           <div className="p-8">
-            <div className="mb-8 flex flex-wrap justify-center gap-3">
-              <div className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-extrabold text-navy ring-2 ring-emerald-300">Par {rimaIndex + 1}/{rimaPairs.length}</div>
-              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">✅ Acertos: {rimaAcertos}</div>
-              <div className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-navy">❌ Erros: {rimaErros}</div>
-            </div>
-
             <div className="mb-8 flex flex-wrap items-center justify-center gap-5">
-              <div className="min-w-[160px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
-                <span className="mb-3 block text-6xl">{rimaPair.e1}</span>
-                <div className="font-serif text-3xl font-extrabold text-navy">{rimaPair.w1}</div>
+              <div className="min-w-[150px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-xs">
+                <span className="mb-3 block text-6xl">{currentPair.e1}</span>
+                <div className="font-serif text-3xl font-extrabold text-navy">{currentPair.w1}</div>
               </div>
               <div className="text-3xl font-black text-muted">VS</div>
-              <div className="min-w-[160px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
-                <span className="mb-3 block text-6xl">{rimaPair.e2}</span>
-                <div className="font-serif text-3xl font-extrabold text-navy">{rimaPair.w2}</div>
+              <div className="min-w-[150px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-xs">
+                <span className="mb-3 block text-6xl">{currentPair.e2}</span>
+                <div className="font-serif text-3xl font-extrabold text-navy">{currentPair.w2}</div>
               </div>
             </div>
 
             <div className="mb-6 text-center">
-              <p className="text-2xl font-bold text-ink">🎤 Pergunte à criança: <strong>"{rimaPair.w1} e {rimaPair.w2} rimam?"</strong></p>
+              <p className="text-xl font-bold text-ink">
+                🎤 A criança respondeu que:
+              </p>
               <div className="mt-5 flex flex-wrap justify-center gap-4">
-                <button type="button" onClick={() => answerRima(true)} className="rounded-2xl bg-green-500 px-8 py-4 text-lg font-extrabold text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:scale-[1.03] transition">👍 SIM, rimam!</button>
-                <button type="button" onClick={() => answerRima(false)} className="rounded-2xl bg-orange-500 px-8 py-4 text-lg font-extrabold text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:scale-[1.03] transition">👎 NÃO rimam</button>
+                <button
+                  type="button"
+                  onClick={() => handleRimaAnswer(true)}
+                  className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 px-8 py-4 text-lg font-extrabold text-white shadow-sm transition"
+                >
+                  👍 SIM, rimam!
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRimaAnswer(false)}
+                  className="rounded-2xl bg-orange-600 hover:bg-orange-700 px-8 py-4 text-lg font-extrabold text-white shadow-sm transition"
+                >
+                  👎 NÃO rimam
+                </button>
               </div>
             </div>
 
             {rimaFeedback && (
-              <div className="rounded-2xl border-2 bg-[#f0fdf4] p-5 text-center text-lg font-bold text-green-700">{rimaFeedback}</div>
+              <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-center text-sm font-bold text-emerald-800">
+                {rimaFeedback}
+              </div>
             )}
           </div>
         </div>
@@ -960,91 +795,238 @@ export default function TriagemGame() {
     );
   };
 
+  // ==========================================
+  // TELA 5: RESULTADO UNIFICADO E ACOLHEDOR (SEÇÃO 7 DO MD)
+  // ==========================================
+  const renderUnifiedResultScreen = () => {
+    if (!currentResult) {
+      return (
+        <div className="p-8 text-center">
+          <p className="text-sm text-muted">Nenhum resultado de rastreio encontrado.</p>
+          <button type="button" onClick={() => showScreen('home')} className="mt-4 text-sm font-bold text-[#0284C7]">
+            Voltar ao início
+          </button>
+        </div>
+      );
+    }
+
+    const isEsperado = currentResult.nivel === 'ESPERADO';
+    const isAtencao = currentResult.nivel === 'ATENCAO';
+
+    return (
+      <div className="mx-auto max-w-3xl space-y-6">
+        <div className="flex items-center gap-4">
+          <button type="button" onClick={() => showScreen('home')} className={buttonClass('tertiary')}>
+            <ArrowLeft size={16} aria-hidden="true" /> Início
+          </button>
+          <h2 className="font-serif text-2xl font-extrabold text-navy">Resultado do Rastreio</h2>
+        </div>
+
+        <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-sm">
+          {/* Header por nível de atenção */}
+          <div className={`p-6 text-white ${isEsperado ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : isAtencao ? 'bg-gradient-to-r from-amber-500 to-orange-600' : 'bg-gradient-to-r from-rose-500 to-pink-600'}`}>
+            <span className="text-xs font-bold uppercase tracking-wider text-white/90">
+              {currentResult.activity} · {currentResult.nickname} ({currentResult.age})
+            </span>
+            <h3 className="font-serif text-2xl sm:text-3xl font-extrabold mt-1">
+              {isEsperado ? 'Desenvolvimento Dentro do Esperado' : isAtencao ? 'Pontos que Merecem Atenção' : 'Recomendamos Conversar com Fonoaudiólogo'}
+            </h3>
+          </div>
+
+          <div className="p-6 md:p-8 space-y-6">
+            {/* Texto Acolhedor conforme especificação */}
+            <div className="text-sm sm:text-base leading-relaxed text-slate-700 space-y-3">
+              {isEsperado && (
+                <p>
+                  Com a idade de <strong>{currentResult.age}</strong>, o desempenho de <strong>{currentResult.nickname}</strong> ficou dentro do esperado para a faixa etária. 
+                  Continue conversando, lendo historinhas e brincando com cantigas no dia a dia. Se notar mudanças, você sempre pode fazer uma nova triagem.
+                </p>
+              )}
+              {isAtencao && (
+                <p>
+                  Identificamos alguns pontos que merecem atenção para uma criança de <strong>{currentResult.age}</strong>. 
+                  Isso nem sempre significa um problema; muitas vezes faz parte do ritmo próprio do desenvolvimento. 
+                  Sugerimos observar nas próximas semanas e, se continuar, procurar um fonoaudiólogo para uma conversa tranquila.
+                </p>
+              )}
+              {!isEsperado && !isAtencao && (
+                <p>
+                  Para uma criança de <strong>{currentResult.age}</strong>, alguns padrões observados indicam que seria muito benéfico conversar com um fonoaudiólogo. 
+                  Procurar apoio cedo costuma facilitar muito o desenvolvimento da comunicação e a segurança da criança.
+                </p>
+              )}
+            </div>
+
+            {/* Aviso fixo obrigatório */}
+            <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-xs font-bold text-sky-900 text-center">
+              ⚠️ Este resultado não é um diagnóstico. Ele apenas indica se vale a pena procurar um fonoaudiólogo para avaliação.
+            </div>
+
+            {/* Detalhamento das rodadas */}
+            {currentResult.answers && currentResult.answers.length > 0 && (
+              <div className="space-y-3 pt-2">
+                <h4 className="font-serif text-base font-bold text-navy">O que foi observado nesta atividade:</h4>
+                <div className="space-y-2">
+                  {currentResult.answers.map((ans, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-line bg-surface text-xs">
+                      <div>
+                        <strong className="text-navy">{ans.word || ans.pair}</strong>
+                        <span className="text-muted block">{ans.spoken ? `Registrado: "${ans.spoken}"` : ans.childSaidRimes ? 'Criança disse que rima' : 'Criança disse que não rima'}</span>
+                      </div>
+                      <span className={`px-2.5 py-0.5 rounded-full font-bold ${ans.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                        {ans.isCorrect ? 'Dentro do padrão' : 'Atenção / Variação'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Ações */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-line">
+              <button
+                type="button"
+                onClick={() => showScreen('home')}
+                className={buttonClass('secondary')}
+              >
+                <RotateCcw size={16} /> Fazer Outra Atividade
+              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => downloadReportTxt(currentResult)}
+                  className={buttonClass('tertiary')}
+                >
+                  <Download size={16} /> Baixar Relatório (TXT)
+                </button>
+                <a
+                  href="#/profissional/pacientes"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0284C7] hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition"
+                >
+                  <Search size={14} /> Buscar Fonoaudiólogo
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Formulário 0-2 anos (Marcos)
+  const renderFormScreen = () => (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+          <ArrowLeft size={16} aria-hidden="true" /> Voltar
+        </button>
+        <h2 className="font-serif text-2xl font-extrabold text-navy">Formulário de Marcos (0 a 2 anos)</h2>
+      </div>
+
+      <div className="rounded-[20px] border border-line bg-white p-6 md:p-8 space-y-6 shadow-sm">
+        <div className="space-y-4">
+          {formQuestions.map((item) => (
+            <div key={item.id} className="p-4 rounded-xl border border-line bg-surface space-y-3">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#0284C7]">{item.category}</span>
+              <p className="text-base font-bold text-ink">{item.question}</p>
+              <div className="flex flex-wrap gap-2">
+                {item.options.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setFormAnswers((prev) => ({ ...prev, [item.id]: opt.value }))}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition ${formAnswers[item.id] === opt.value ? 'bg-[#0284C7] text-white border-[#0284C7]' : 'bg-white text-slate-700 border-line hover:border-slate-400'}`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            const answersCount = Object.keys(formAnswers).length;
+            if (answersCount < formQuestions.length) {
+              alert('Por favor, responda todas as perguntas.');
+              return;
+            }
+            const naos = Object.values(formAnswers).filter((v) => v === 'nao').length;
+            const nivel = naos >= 2 ? 'ENCAMINHAR' : naos === 1 ? 'ATENCAO' : 'ESPERADO';
+            saveSessionResult({
+              id: Date.now(),
+              date: new Date().toLocaleDateString('pt-BR'),
+              nickname: childNickname || 'Bebê',
+              age: childAgeLabel || '0-2 anos',
+              activity: 'Formulário de Marcos',
+              answers: formQuestions.map((q) => ({ word: q.category, spoken: formAnswers[q.id], isCorrect: formAnswers[q.id] === 'sim' })),
+              score: `${formQuestions.length - naos}/${formQuestions.length}`,
+              nivel,
+            });
+            showScreen('unified_result');
+          }}
+          className="w-full rounded-xl bg-[#0284C7] text-white font-bold py-3 hover:bg-sky-700 transition"
+        >
+          Finalizar Formulário e Ver Parecer →
+        </button>
+      </div>
+    </div>
+  );
+
+  // Checklist 6+ anos (Professor)
   const renderCheckScreen = () => (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button type="button" onClick={goBack} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Voltar</button>
-        <h2 className="font-serif text-2xl font-extrabold text-navy">Checklist do Professor</h2>
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">6+ anos</span>
+        <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
+          <ArrowLeft size={16} aria-hidden="true" /> Voltar
+        </button>
+        <h2 className="font-serif text-2xl font-extrabold text-navy">Checklist Escolar (6+ anos)</h2>
       </div>
 
-      <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-        <div className="flex items-center gap-4 bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
-          <div className="text-4xl">✅</div>
-          <div>
-            <h3 className="font-serif text-2xl font-extrabold">Triagem em Sala de Aula</h3>
-            <p className="mt-1 text-sm text-white/90">Marque os comportamentos observados regularmente na criança nas últimas 3 semanas</p>
-          </div>
-        </div>
-
-        <div className="p-8">
-          <div className="space-y-4">
-            {checklistItems.map((item, index) => {
-              const isChecked = !!checkListState[index];
-              return (
-                <button key={index} type="button" onClick={() => toggleCheckItem(index)} className={`flex w-full items-start gap-4 rounded-2xl border-2 p-4 text-left transition ${isChecked ? 'border-yellow-300 bg-yellow-50' : 'border-line bg-surface hover:border-yellow-300'}`}>
-                  <div className={`mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg border-2 ${isChecked ? 'border-orange-500 bg-yellow-300 text-orange-900' : 'border-line bg-white text-transparent'}`}>{isChecked ? '✓' : ''}</div>
-                  <div>
-                    <div className="text-base font-bold text-ink">{item}</div>
-                    <div className="mt-1 text-sm text-muted">{index === 0 ? 'Vergonha, recusa a ler em voz alta, não responde quando chamada' : index === 1 ? 'Ex: "cacholo" por "cachorro", "telefone" por "telefone"' : index === 2 ? 'Atividades de consciência fonológica claramente abaixo dos colegas' : index === 3 ? 'Repetição de sílabas, prolongamentos, bloqueios ao falar' : index === 4 ? 'Precisa de repetição constante, perde o fio da explicação oral' : 'Dificuldade persistente em relacionar letra com som'}</div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <button type="button" onClick={() => setCheckResultVisible(true)} className={`${buttonClass('primary')} mt-6 w-full`}>Ver Análise da Triagem <ArrowRight size={16} aria-hidden="true" /></button>
-
-          {checkResultVisible && (() => {
-            const markedCount = Object.values(checkListState).filter(Boolean).length;
-            const hasRisk = markedCount >= 2;
-
+      <div className="rounded-[20px] border border-line bg-white p-6 md:p-8 space-y-6 shadow-sm">
+        <p className="text-xs text-muted">Marque os comportamentos observados nas últimas 3 semanas em sala:</p>
+        <div className="space-y-3">
+          {checklistItems.map((item, idx) => {
+            const isChecked = !!checkListState[idx];
             return (
-              <div className="mt-6 space-y-4">
-                <div className="rounded-2xl border-2 border-yellow-200 bg-yellow-50 p-5">
-                  <div className="mb-2 text-lg font-extrabold text-orange-600">
-                    {markedCount} de {checklistItems.length} indicadores marcados
-                  </div>
-                  <p className="text-base leading-7 text-muted">
-                    {markedCount <= 1
-                      ? '✅ Perfil dentro do esperado para a idade escolar. Recomenda-se continuar estimulando a leitura e a conversação.'
-                      : markedCount <= 3
-                      ? '⚠️ Indicadores de atenção identificados. A criança pode se beneficiar de uma avaliação fonoaudiológica para prevenir dificuldades futuras na leitura e escrita.'
-                      : '🚨 Múltiplos sinais observados em sala de aula. Recomenda-se encaminhamento fonoaudiológico especializado para avaliação completa.'}
-                  </p>
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setCheckListState((prev) => ({ ...prev, [idx]: !prev[idx] }))}
+                className={`w-full text-left p-4 rounded-xl border flex items-start gap-3 transition ${isChecked ? 'bg-amber-50 border-amber-300' : 'bg-surface border-line'}`}
+              >
+                <div className={`size-5 rounded border flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold ${isChecked ? 'bg-amber-500 text-white border-amber-500' : 'bg-white border-slate-300'}`}>
+                  {isChecked ? '✓' : ''}
                 </div>
-
-                {hasRisk && (
-                  <div className="rounded-2xl border-2 border-[#0284C7]/40 bg-sky-50/80 p-5 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="flex size-10 items-center justify-center rounded-xl bg-[#0284C7] text-white shrink-0">
-                        <HeartHandshake size={22} />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-base font-bold text-[#172C3A]">Orientação Acolhedora para a Família e Escola</h4>
-                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                          Identificar essas características precocemente é o primeiro passo para apoiar o desenvolvimento da criança sem cobranças. 
-                          O acompanhamento fonoaudiológico ajuda a superar trocas na fala e dificuldades na alfabetização de forma leve e motivadora.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-sky-200/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                      <span className="text-xs font-semibold text-sky-900">
-                        Encontre profissionais especializados cadastrados na plataforma:
-                      </span>
-                      <a
-                        href="#/acesso"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
-                      >
-                        <Search size={14} /> Buscar Fonoaudiólogos
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
+                <span className="text-sm font-semibold text-slate-800">{item}</span>
+              </button>
             );
-          })()}
+          })}
         </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            const marked = Object.values(checkListState).filter(Boolean).length;
+            const nivel = marked >= 3 ? 'ENCAMINHAR' : marked >= 1 ? 'ATENCAO' : 'ESPERADO';
+            saveSessionResult({
+              id: Date.now(),
+              date: new Date().toLocaleDateString('pt-BR'),
+              nickname: childNickname || 'Aluno',
+              age: childAgeLabel || '6+ anos',
+              activity: 'Checklist Escolar',
+              answers: checklistItems.map((item, i) => ({ word: item, spoken: checkListState[i] ? 'Observado' : 'Não observado', isCorrect: !checkListState[i] })),
+              score: `${checklistItems.length - marked}/${checklistItems.length}`,
+              nivel,
+            });
+            showScreen('unified_result');
+          }}
+          className="w-full rounded-xl bg-[#0284C7] text-white font-bold py-3 hover:bg-sky-700 transition"
+        >
+          Finalizar Checklist e Ver Parecer →
+        </button>
       </div>
     </div>
   );
@@ -1056,7 +1038,7 @@ export default function TriagemGame() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-white/10 text-2xl">🎙️</div>
           <div>
             <div className="font-serif text-2xl font-extrabold leading-none">FonoSync</div>
-            <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/80">Triagem Fonoaudiológica Precoce</div>
+            <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/80">Módulo de Rastreio Fonoaudiológico</div>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -1072,97 +1054,39 @@ export default function TriagemGame() {
       <nav className="flex gap-1 overflow-x-auto border-b-2 border-line bg-white px-6" aria-label="Navegação por faixa etária">
         {[
           { id: 'home', title: 'Início', badge: null },
-          { id: 'form02', title: 'Formulário', badge: '0–2 anos' },
+          { id: 'form02', title: 'Marcos', badge: '0–2 anos' },
           { id: 'game24', title: 'Jogo Fonético', badge: '2–4 anos' },
           { id: 'rima45', title: 'Jogo da Rima', badge: '4–5 anos' },
           { id: 'check6', title: 'Checklist', badge: '6+ anos' },
         ].map((tab) => (
-          <button key={tab.id} type="button" onClick={() => showScreen(tab.id)} className={`flex items-center gap-2 whitespace-nowrap border-b-[3px] px-5 py-4 text-sm font-extrabold transition ${activeScreen === tab.id ? 'border-primary text-primary' : 'border-transparent text-muted hover:text-navy'}`}>
-            <span>{tab.id === 'home' ? '🏠' : tab.id === 'form02' ? '📋' : tab.id === 'game24' ? '🎮' : tab.id === 'rima45' ? '🎵' : '✅'}</span>
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => {
+              if (tab.id === 'home') showScreen('home');
+              else handleSelectActivity(tab.id);
+            }}
+            className={`flex items-center gap-2 whitespace-nowrap border-b-[3px] px-5 py-4 text-sm font-extrabold transition ${activeScreen === tab.id ? 'border-[#0284C7] text-[#0284C7]' : 'border-transparent text-muted hover:text-navy'}`}
+          >
+            <span>{tab.id === 'home' ? '🏠' : tab.id === 'form02' ? '👶' : tab.id === 'game24' ? '🎮' : tab.id === 'rima45' ? '🎵' : '🏫'}</span>
             {tab.title}
-            {tab.badge && <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${activeScreen === tab.id ? 'bg-primary text-white' : 'bg-surface text-muted'}`}>{tab.badge}</span>}
+            {tab.badge && <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${activeScreen === tab.id ? 'bg-[#0284C7] text-white' : 'bg-surface text-muted'}`}>{tab.badge}</span>}
           </button>
         ))}
       </nav>
 
       <main className="bg-canvas p-4 md:p-8">
         {activeScreen === 'home' && renderHomeScreen()}
-        {activeScreen === 'form02' && renderFormScreen()}
-        {activeScreen === 'history' && renderHistoryScreen()}
+        {activeScreen === 'consent_data' && renderConsentDataScreen()}
         {activeScreen === 'game24' && renderGame24Screen()}
         {activeScreen === 'rima45' && renderRimaScreen()}
+        {activeScreen === 'form02' && renderFormScreen()}
         {activeScreen === 'check6' && renderCheckScreen()}
-
-        {activeScreen === 'execution' && (
-          <div className="mx-auto max-w-3xl space-y-6 rounded-2xl border border-line bg-white p-6">
-            <StepProgress value={((wordIndex + 1) / total) * 100} />
-            <div>
-              <h1 className="mb-1 font-serif text-2xl text-navy">Peça para a criança nomear o desenho.</h1>
-              <p className="text-sm text-muted">Você pode ouvir a instrução e registrar se a palavra foi produzida espontaneamente ou com ajuda.</p>
-            </div>
-            <div className="flex flex-col items-center justify-center border border-line bg-mist px-6 py-12 text-center">
-              <div className="mb-4 flex size-24 items-center justify-center rounded-full bg-surface shadow-sm"><span className="text-5xl" aria-hidden="true">{currentWord.emoji}</span></div>
-              <span className="text-xs text-muted">Ilustração simples de {currentWord.article} {currentWord.word}</span>
-              <button type="button" onClick={() => speakText(currentWord.word)} className={`${buttonClass('tertiary')} mt-3`}><Volume2 size={16} aria-hidden="true" /> Ouvir pronúncia esperada</button>
-            </div>
-            <div role="group" aria-label="Como a criança respondeu" className="flex flex-wrap gap-3">
-              {responses.map((response) => {
-                const isSelected = currentAnswer === response.id;
-                return (
-                  <button key={response.id} type="button" aria-pressed={isSelected} onClick={() => answer(response.id)} className={buttonClass(isSelected ? 'primary' : 'secondary')}>
-                    {isSelected && <CheckCircle2 size={16} aria-hidden="true" />}
-                    {response.label}
-                  </button>
-                );
-              })}
-            </div>
-            <Notice tone="info" title="Registro clínico">Palavra-alvo: <em>{currentWord.word}</em>. Observe nomeação, simplificações e inteligibilidade.</Notice>
-            <div className="flex items-center justify-between gap-3 pt-4">
-              <button type="button" onClick={() => setWordIndex((value) => Math.max(0, value - 1))} disabled={wordIndex === 0} className={buttonClass('tertiary')}><ArrowLeft size={16} aria-hidden="true" /> Anterior</button>
-              <button type="button" onClick={goNext} disabled={!currentAnswer} className={buttonClass('primary')}>{wordIndex < total - 1 ? 'Próxima palavra' : 'Finalizar triagem'} <ArrowRight size={16} aria-hidden="true" /></button>
-            </div>
-          </div>
-        )}
-
-        {activeScreen === 'result' && result && (
-          <div className="mx-auto max-w-3xl space-y-6 rounded-2xl border border-line bg-white p-6">
-            <div className={`flex items-start justify-between gap-4 border-l-4 p-6 ${riskTone.box}`}>
-              <div>
-                <span className={`mb-1 block text-xs font-bold uppercase tracking-wider ${riskTone.text}`}>Resultado da triagem</span>
-                <h1 className="font-serif text-3xl text-navy">{result.risk.label}</h1>
-                <p className="mt-1 text-sm text-muted">{result.risk.text}</p>
-              </div>
-              <riskTone.icon size={32} className={`shrink-0 ${riskTone.text}`} aria-hidden="true" />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <ResultBar label="Nomeação espontânea" caption={`${result.spontaneous} de ${total} palavras`} value={result.spontaneousPct} />
-              <ResultBar label="Nomeação com ou sem ajuda" caption={`${result.spontaneous + result.assisted} de ${total} palavras`} value={result.helpedPct} />
-            </div>
-
-            <div className="space-y-3">
-              <Notice tone={result.risk.tone} title="Recomendação">{result.risk.advice}</Notice>
-              <Notice tone="info" title="Importante">Esta triagem não substitui avaliação profissional e não produz diagnóstico.</Notice>
-            </div>
-
-            <div role="status">
-              {downloaded && (
-                <Notice tone="success" title="Arquivo gerado">O resultado foi salvo em texto simples (resultado-triagem-fonosync.txt), que leitores de tela leem sem dificuldade.</Notice>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 pt-4">
-              <a href="#/acesso" className={buttonClass('primary')}><Search size={16} aria-hidden="true" /> Encontrar profissional</a>
-              <button type="button" onClick={downloadResult} className={buttonClass('secondary')}><Download size={16} aria-hidden="true" /> Baixar resultado acessível</button>
-              <button type="button" onClick={() => showScreen('history')} className={buttonClass('tertiary')}><History size={16} aria-hidden="true" /> Ver histórico</button>
-              <button type="button" onClick={() => setScreenStack(['home'])} className={`${buttonClass('tertiary')} ml-auto`}>Refazer triagem</button>
-            </div>
-          </div>
-        )}
+        {activeScreen === 'unified_result' && renderUnifiedResultScreen()}
       </main>
 
       <footer className="bg-band px-4 py-4 text-center text-xs font-semibold text-white/80">
-        <strong className="text-white">FonoSync</strong> — Triagem fonoaudiológica. Não substitui avaliação clínica profissional.
+        <strong className="text-white">FonoSync</strong> — Triagem e rastreio fonoaudiológico. Não substitui avaliação clínica profissional.
       </footer>
 
       <A11yModal isOpen={showA11y} onClose={() => setShowA11y(false)} />
