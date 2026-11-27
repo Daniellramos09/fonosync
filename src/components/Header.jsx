@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ChevronDown, Menu, PersonStanding, Volume2, X } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Menu, PersonStanding, X } from 'lucide-react';
 import consultorioImg from '../assets/images/care/consultorio-familia-atendimento.jpg';
 import brincarImg from '../assets/images/photos/brincar-clinica.jpg';
 import silabasImg from '../assets/images/care/silabas-girafa-ludico.jpg';
 import A11yModal from './A11yModal';
 import Logo from './Logo';
 import { buttonClass } from './buttonStyles';
-import { useA11y } from '../hooks/useA11y';
 import { iniciarTriagem } from '../utils/triagemInicio';
 
 const scrollToId = (id, onComplete) => (e) => {
@@ -70,7 +69,6 @@ export default function Header() {
   const [solid, setSolid] = useState(false);
   const navRef = useRef(null);
   const closeTimeoutRef = useRef(null);
-  const { speakPageContent, isPlayerOpen } = useA11y();
 
   // Sobre a foto do hero o cabeçalho é vidro escuro; depois vira faixa clara.
   useEffect(() => {
@@ -140,7 +138,7 @@ export default function Header() {
           }`}
         >
           <a href="#/" aria-label="FonoSync, página inicial" className="shrink-0">
-            <Logo tone={dark ? 'claro' : 'ocean'} markClassName="size-9" />
+            <Logo tone={dark ? 'claro' : 'ocean'} markClassName="size-9" nameClassName="hidden sm:inline" />
           </a>
 
           <nav aria-label="Principal" className="hidden lg:block">
@@ -170,31 +168,19 @@ export default function Header() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
             <button
               type="button"
               onClick={() => setShowA11y(true)}
-              className={`inline-flex size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors xl:w-auto xl:gap-2 xl:px-3 ${chipClass}`}
+              className={`inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors sm:size-10 xl:w-auto xl:gap-2 xl:px-3 ${chipClass}`}
               title="Acessibilidade"
             >
               <PersonStanding size={17} aria-hidden="true" />
               <span className="sr-only xl:not-sr-only xl:text-[14px] xl:font-semibold">Acessibilidade</span>
             </button>
-            <button
-              type="button"
-              aria-pressed={isPlayerOpen}
-              onClick={() => speakPageContent()}
-              className={`hidden size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors md:inline-flex ${
-                isPlayerOpen ? 'border-mel bg-mel text-on-pastel' : chipClass
-              }`}
-              title="Ouvir página"
-            >
-              <Volume2 size={17} aria-hidden="true" />
-              <span className="sr-only">Ouvir página</span>
-            </button>
             <a
               href="#/acesso"
-              className={`hidden min-h-10 items-center px-3 text-[15px] font-semibold underline-offset-[6px] hover:underline sm:inline-flex ${
+              className={`inline-flex min-h-9 shrink-0 items-center px-1.5 text-[13.5px] font-semibold underline-offset-[6px] hover:underline sm:min-h-10 sm:px-3 sm:text-[15px] ${
                 dark ? 'text-white' : 'text-navy'
               }`}
             >
@@ -203,16 +189,18 @@ export default function Header() {
             <a
               href="#/triagem"
               onClick={() => iniciarTriagem()}
-              className={`${buttonClass(dark ? 'mel' : 'primary')} hidden min-h-10 py-2 md:inline-flex`}
+              className={`${buttonClass(dark ? 'mel' : 'primary')} min-h-9! shrink-0 whitespace-nowrap px-3! py-1.5! text-[13px]! sm:min-h-10! sm:px-5! sm:py-2! sm:text-[15px]!`}
             >
-              Começar o rastreio
+              <span className="min-[380px]:hidden">Rastreio</span>
+              <span className="hidden min-[380px]:inline sm:hidden">Começar rastreio</span>
+              <span className="hidden sm:inline">Começar o rastreio</span>
             </a>
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-expanded={mobileOpen}
               aria-controls="menu-movel"
-              className={`inline-flex size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border lg:hidden ${chipClass}`}
+              className={`inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border sm:size-10 lg:hidden ${chipClass}`}
             >
               <Menu size={20} aria-hidden="true" />
               <span className="sr-only">Abrir menu</span>
@@ -336,19 +324,19 @@ export default function Header() {
             </ul>
           </nav>
           <div className="mt-8 grid gap-3">
-            <a href="#/acesso" className={`${buttonClass('claro', 'lg')} w-full`}>
+            <a
+              href="#/triagem"
+              onClick={() => {
+                iniciarTriagem();
+                setMobileOpen(false);
+              }}
+              className={`${buttonClass('mel', 'lg')} w-full`}
+            >
+              Começar o rastreio
+            </a>
+            <a href="#/acesso" onClick={() => setMobileOpen(false)} className={`${buttonClass('claro', 'lg')} w-full`}>
               Entrar na plataforma
             </a>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileOpen(false);
-                speakPageContent();
-              }}
-              className={`${buttonClass('claro', 'lg')} w-full`}
-            >
-              <Volume2 size={18} aria-hidden="true" /> Ouvir página
-            </button>
           </div>
         </div>
       )}

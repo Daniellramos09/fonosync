@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LogOut, Menu, PersonStanding, Volume2, VolumeX, X } from 'lucide-react';
+import { LogOut, Menu, PersonStanding, X } from 'lucide-react';
 import Logo from '../Logo';
 import OndaSonora from '../OndaSonora';
 import { Capivara } from '../Personagens';
@@ -46,7 +46,7 @@ const VARIANTES = {
   },
 };
 
-function ConteudoNav({ v, variante, rotulo, itens, ativo, onSelecionar, usuario, onSair, onA11y, onOuvir, ouvindo }) {
+function ConteudoNav({ v, variante, rotulo, itens, ativo, onSelecionar, usuario, onSair, onA11y }) {
   const paciente = variante === 'paciente';
   return (
     <div className="flex h-full flex-col">
@@ -106,15 +106,6 @@ function ConteudoNav({ v, variante, rotulo, itens, ativo, onSelecionar, usuario,
             className={`flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-[12px] rounded-bl-[3px] border px-2 text-[12.5px] font-semibold transition ${v.botao}`}
           >
             <PersonStanding size={15} aria-hidden="true" /> Acessibilidade
-          </button>
-          <button
-            type="button"
-            onClick={onOuvir}
-            aria-pressed={ouvindo}
-            className={`flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-[12px] rounded-bl-[3px] border px-2 text-[12.5px] font-semibold transition ${v.botao}`}
-          >
-            {ouvindo ? <VolumeX size={15} aria-hidden="true" /> : <Volume2 size={15} aria-hidden="true" />}
-            Ouvir página
           </button>
         </div>
 

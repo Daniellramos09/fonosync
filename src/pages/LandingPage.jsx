@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, ArrowUpRight, PersonStanding, Volume2 } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, PersonStanding } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import About from '../components/About';
 import A11yModal from '../components/A11yModal';
 import { Capivara, Sagui, Tartaruga, Tucano } from '../components/Personagens';
 import { buttonClass } from '../components/buttonStyles';
-import { useA11y } from '../hooks/useA11y';
 import { iniciarTriagem } from '../utils/triagemInicio';
 
 import heroImg from '../assets/images/photos/hero-fono-gesto.jpg';
@@ -500,7 +499,6 @@ function Familias() {
 /* ------------------------------------------------- Acessibilidade e cuidado */
 function Cuidado() {
   const [showA11y, setShowA11y] = useState(false);
-  const { speakPageContent } = useA11y();
 
   const grupos = [
     {
@@ -535,9 +533,6 @@ function Cuidado() {
           <div className="mt-8 flex flex-wrap gap-3">
             <button type="button" onClick={() => setShowA11y(true)} className={buttonClass('primary', 'lg')}>
               <PersonStanding size={18} aria-hidden="true" /> Ajustar acessibilidade
-            </button>
-            <button type="button" onClick={() => speakPageContent()} className={buttonClass('secondary', 'lg')}>
-              <Volume2 size={18} aria-hidden="true" /> Ouvir esta página
             </button>
           </div>
         </div>

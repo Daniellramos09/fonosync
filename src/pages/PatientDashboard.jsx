@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Check, PersonStanding, RefreshCw, Sparkles, Volume2 } from 'lucide-react';
+import { ArrowRight, Check, PersonStanding, RefreshCw, Sparkles } from 'lucide-react';
 import AreaLayout from '../components/area/AreaLayout';
 import { IconeAtividades, IconeConta, IconeInicio } from '../components/area/IconesFono';
 import A11yModal from '../components/A11yModal';
@@ -7,7 +7,6 @@ import { buttonClass } from '../components/buttonStyles';
 import { Capivara, Sagui, Tartaruga, Tucano } from '../components/Personagens';
 import { ATIVIDADES, atividadePorHistorico, lerHistoricoTriagem } from '../components/atividades';
 import fotoCasa from '../assets/images/photos/tablet-casa.jpg';
-import { useA11y } from '../hooks/useA11y';
 import { useAuth } from '../hooks/useAuth';
 import { iniciarTriagem } from '../utils/triagemInicio';
 
@@ -68,7 +67,7 @@ function saudacaoPara(data) {
 
 /* ------------------------------------------------------------------ início */
 
-function BoasVindas({ primeiroNome, agora, onAtividades, onOuvir }) {
+function BoasVindas({ primeiroNome, agora, onAtividades }) {
   const dataLonga = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   return (
     <section
@@ -97,9 +96,6 @@ function BoasVindas({ primeiroNome, agora, onAtividades, onOuvir }) {
         <div className="flex flex-wrap gap-3">
           <button type="button" onClick={onAtividades} className={buttonClass('mel', 'lg')}>
             Escolher uma atividade <ArrowRight size={18} aria-hidden="true" />
-          </button>
-          <button type="button" onClick={onOuvir} className={buttonClass('claro')}>
-            <Volume2 size={17} aria-hidden="true" /> Ouvir esta página
           </button>
         </div>
       </div>
@@ -295,7 +291,7 @@ function Jornada({ historico, concluidas, onAtividades }) {
   );
 }
 
-function DoSeuJeito({ onA11y, onOuvir }) {
+function DoSeuJeito({ onA11y }) {
   return (
     <section
       className="surge relative overflow-hidden rounded-[30px] rounded-bl-[8px] bg-salvia p-6 text-on-pastel sm:p-8"
@@ -314,9 +310,6 @@ function DoSeuJeito({ onA11y, onOuvir }) {
           <div className="mt-5 flex flex-wrap gap-3">
             <button type="button" onClick={onA11y} className={buttonClass('azul')}>
               <PersonStanding size={17} aria-hidden="true" /> Abrir acessibilidade
-            </button>
-            <button type="button" onClick={onOuvir} className={buttonClass('suave')}>
-              <Volume2 size={17} aria-hidden="true" /> Ouvir página
             </button>
           </div>
         </div>
@@ -483,12 +476,10 @@ export default function PatientDashboard() {
   const [agora] = useState(() => new Date());
   const [historico] = useState(lerHistoricoTriagem);
   const { session, logout } = useAuth();
-  const { isPlayerOpen, speakPageContent, stopSpeaking } = useA11y();
 
   const name = session?.name || session?.email || '';
   const firstName = session?.name?.split(' ')[0];
   const concluidas = historico.reduce((acc, r) => ({ ...acc, [r.activity]: (acc[r.activity] ?? 0) + 1 }), {});
-  const ouvir = () => (isPlayerOpen ? stopSpeaking() : speakPageContent());
 
   return (
     <AreaLayout
@@ -500,8 +491,6 @@ export default function PatientDashboard() {
       usuario={{ nome: name, papel: 'Paciente', iniciais: name.slice(0, 2).toUpperCase() }}
       onSair={logout}
       onA11y={() => setShowA11y(true)}
-      onOuvir={ouvir}
-      ouvindo={isPlayerOpen}
     >
       <div key={activeTab} className="space-y-6">
         {activeTab === 'inicio' && (
@@ -511,13 +500,12 @@ export default function PatientDashboard() {
                 primeiroNome={firstName}
                 agora={agora}
                 onAtividades={() => setActiveTab('atividades')}
-                onOuvir={ouvir}
               />
               <DicaDoDia agora={agora} />
             </div>
             <PortasAtividades concluidas={concluidas} />
             <Jornada historico={historico} concluidas={concluidas} onAtividades={() => setActiveTab('atividades')} />
-            <DoSeuJeito onA11y={() => setShowA11y(true)} onOuvir={ouvir} />
+            <DoSeuJeito onA11y={() => setShowA11y(true)} />
           </>
         )}
 

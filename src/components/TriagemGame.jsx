@@ -10,7 +10,6 @@ import {
   Search,
   ThumbsDown,
   ThumbsUp,
-  Volume2,
 } from 'lucide-react';
 import Logo from './Logo';
 import { ATIVIDADES } from './atividades';
@@ -20,7 +19,6 @@ import A11yModal from './A11yModal';
 import DataTable from './DataTable';
 import Notice from './Notice';
 import { buttonClass } from './buttonStyles';
-import { useA11y } from '../hooks/useA11y';
 
 // Banco de palavras para o Jogo Fonético (2 a 4 anos) com opções rápidas baseadas no MD
 const phoneticWords = [
@@ -178,7 +176,6 @@ export default function TriagemGame() {
 
   // Acessibilidade e Modal
   const [showA11y, setShowA11y] = useState(false);
-  const { isPlayerOpen, speakPageContent, stopSpeaking, speakText } = useA11y();
 
   const activeScreen = screenStack[screenStack.length - 1];
 
@@ -931,9 +928,6 @@ export default function TriagemGame() {
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={() => setShowA11y(true)} className={buttonClass('claro')}>
               <PersonStanding size={17} aria-hidden="true" /> Acessibilidade
-            </button>
-            <button type="button" onClick={() => (isPlayerOpen ? stopSpeaking() : speakPageContent())} className={buttonClass('claro')}>
-              <Volume2 size={17} aria-hidden="true" /> {isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}
             </button>
           </div>
         </div>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useA11y } from '../hooks/useA11y';
 import { useAuth } from '../hooks/useAuth';
 import A11yModal from '../components/A11yModal';
 import AreaLayout from '../components/area/AreaLayout';
@@ -46,7 +45,6 @@ function authenticatedName(session) {
 export default function ProfessionalDashboard({ section = 'dashboard', recordId }) {
   const activeSection = section;
   const [showA11y, setShowA11y] = useState(false);
-  const { isPlayerOpen, speakPageContent, stopSpeaking } = useA11y();
   const { logout, session } = useAuth();
   const [patients, setPatients] = useState([]);
   const [patientsLoading, setPatientsLoading] = useState(true);
@@ -89,8 +87,6 @@ export default function ProfessionalDashboard({ section = 'dashboard', recordId 
       }}
       onSair={logout}
       onA11y={() => setShowA11y(true)}
-      onOuvir={() => (isPlayerOpen ? stopSpeaking() : speakPageContent())}
-      ouvindo={isPlayerOpen}
     >
       <div key={activeSection} className="space-y-6">
         {/* Agenda e Relatórios trazem o próprio título com ações */}

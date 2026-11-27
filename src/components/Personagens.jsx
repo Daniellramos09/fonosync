@@ -35,15 +35,15 @@ export function Capivara({ title, className, animated = true, acenando = false }
   const peloEscuro = '#93623D';
   const peloClaro = '#CB966B';
   return (
-    <svg {...svgProps({ title, className, viewBox: '0 0 220 180', animated })}>
+    <svg {...svgProps({ title, className, viewBox: `0 0 ${acenando ? 230 : 220} 180`, animated })}>
       <ellipse cx="112" cy="170" rx="74" ry="6" fill={INK} opacity="0.12" />
       <g className="char-respira">
         {/* corpo */}
         <path d="M38 148C28 108 46 70 96 62c46-7 82 18 84 58 1 26-12 42-40 42H70c-18 0-28-4-32-14z" fill={pelo} />
         <ellipse cx="72" cy="150" rx="24" ry="14" fill={peloEscuro} />
         <ellipse cx="122" cy="130" rx="32" ry="26" fill={peloClaro} />
-        {/* pata da frente */}
-        <path d="M140 118v38a8 8 0 0 0 16 0v-40z" fill={peloEscuro} />
+        {/* pata da frente parada (some quando a capivara está acenando) */}
+        {!acenando && <path d="M140 118v38a8 8 0 0 0 16 0v-40z" fill={peloEscuro} />}
         {/* cabeça */}
         <path d="M121 30c30-8 69 0 75 32 4 22-8 36-28 38h-30c-20 0-30-14-30-34 0-18 3-32 13-36z" fill={pelo} />
         <ellipse cx="128" cy="35" rx="11" ry="9" fill={peloEscuro} />
@@ -56,12 +56,13 @@ export function Capivara({ title, className, animated = true, acenando = false }
         {/* broto na cabeça */}
         <path d="M146 30c-2-10 4-18 14-20-1 10-6 17-14 20z" fill="#5E9C8F" />
         <path d="M146 31c-1-6-4-10-9-12" stroke="#3F7A70" strokeWidth="2" strokeLinecap="round" fill="none" />
-        {/* patinha da frente que acena, na frente do peito */}
+        {/* patinha da frente que acena: sai do ombro e faz "joia" ao lado do focinho */}
         {acenando && (
           <g className="char-acena">
-            <path d="M150 124c14-6 28-14 40-26" stroke={peloEscuro} strokeWidth="14" strokeLinecap="round" fill="none" />
-            <ellipse cx="194" cy="94" rx="9" ry="8" fill={peloEscuro} />
-            <path d="M190 88v-5M195 87v-5M200 89l2-4" stroke={peloEscuro} strokeWidth="4" strokeLinecap="round" />
+            <path d="M150 114C172 116 198 114 209 98" stroke={peloEscuro} strokeWidth="13" strokeLinecap="round" fill="none" />
+            <rect x="201" y="84" width="20" height="17" rx="7" fill={peloEscuro} />
+            <path d="M205 86V76" stroke={peloEscuro} strokeWidth="7" strokeLinecap="round" />
+            <path d="M209 90h9M209 95h9" stroke="#7A4F30" strokeWidth="1.8" strokeLinecap="round" />
           </g>
         )}
       </g>

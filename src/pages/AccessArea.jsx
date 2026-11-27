@@ -18,15 +18,12 @@ import {
   User,
   UserCheck,
   Users,
-  Volume2,
-  VolumeX,
 } from 'lucide-react';
 import logoImg from '../assets/images/ModeloA_Semnome.jpg';
 import fotoProfissional from '../assets/images/photos/hero-fono-gesto.jpg';
 import fotoFamilia from '../assets/images/photos/leitura-chao.jpg';
 import { Capivara, Sapinho, Tucano } from '../components/Personagens';
 import OndaSonora from '../components/OndaSonora';
-import { useA11y } from '../hooks/useA11y';
 import A11yModal from '../components/A11yModal';
 import InfoDialog from '../components/InfoDialog';
 import Notice from '../components/Notice';
@@ -38,6 +35,12 @@ import { createGuardian, createPatient } from '../services/patientService';
 import { registerProfessional } from '../services/professionalService';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Contas de demonstração usadas pelos botões de acesso rápido.
+const CONTAS_DEMO = {
+  profissional: { email: 'renata.fono@fonosync.com.br', password: '123456', role: 'ROLE_FONO' },
+  paciente: { email: 'usuario@gmail.com', password: '123456', role: 'ROLE_PACIENTE' },
+};
 
 /* ------------------------------------------------------------------ estilos */
 
@@ -497,7 +500,6 @@ export default function AccessArea() {
   const [showA11y, setShowA11y] = useState(false);
   const [showGoogleModal, setShowGoogleModal] = useState(false);
 
-  const { isPlayerOpen, speakPageContent, stopSpeaking } = useA11y();
   const { login, register, updateSession } = useAuth();
 
   const changeMode = (newMode) => {
@@ -624,6 +626,34 @@ export default function AccessArea() {
         title: 'Não foi possível entrar',
         text: error.message,
       });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Acesso rápido com as contas de demonstração
+  const handleQuickLogin = async (perfil) => {
+    const conta = CONTAS_DEMO[perfil];
+    trocarPublico(perfil);
+    setLoginForm({ identifier: conta.email, password: conta.password });
+    setErrors({});
+    setLoading(true);
+    setNotice(null);
+    try {
+      let session;
+      try {
+        session = await login(conta.email, conta.password);
+      } catch (loginError) {
+        // Primeira vez no ambiente: cria a conta de demonstração
+        try {
+          session = await register(conta.email, conta.password, conta.role);
+        } catch {
+          throw loginError;
+        }
+      }
+      window.location.hash = homeFor(session.role);
+    } catch (error) {
+      setNotice({ tone: 'danger', title: 'Não foi possível entrar', text: error.message });
     } finally {
       setLoading(false);
     }
@@ -843,23 +873,6 @@ export default function AccessArea() {
               <span className="hidden sm:inline">Acessibilidade</span>
               <span className="sr-only sm:hidden">Acessibilidade</span>
             </button>
-            <button
-              type="button"
-              onClick={() => (isPlayerOpen ? stopSpeaking() : speakPageContent())}
-              className={`flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold backdrop-blur transition hover:-translate-y-px ${
-                isPlayerOpen
-                  ? 'border-danger/50 bg-danger/10 text-danger'
-                  : 'border-line bg-surface/80 text-ink hover:border-azul/40 hover:bg-gelo'
-              }`}
-            >
-              {isPlayerOpen ? (
-                <VolumeX size={16} aria-hidden="true" />
-              ) : (
-                <Volume2 size={16} aria-hidden="true" className="text-azul" />
-              )}
-              <span className="hidden sm:inline">{isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}</span>
-              <span className="sr-only sm:hidden">{isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}</span>
-            </button>
           </div>
         </header>
 
@@ -993,6 +1006,40 @@ export default function AccessArea() {
                     )}
                   </button>
                 </form>
+
+                {/* Acesso rápido: entra direto com as contas de demonstração */}
+                <div className="space-y-2.5 border-t border-line pt-4">
+                  <p className="text-center text-[11.5px] font-bold uppercase tracking-[0.08em] text-muted">
+                    Acesso rápido
+                  </p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {[
+                      {
+                        id: 'profissional',
+                        rotulo: 'Área profissional',
+                        icon: Stethoscope,
+                        estilo: 'border-azul/25 bg-gelo text-azul-petroleo hover:border-azul/50',
+                      },
+                      {
+                        id: 'paciente',
+                        rotulo: 'Paciente',
+                        icon: HeartHandshake,
+                        estilo: 'border-coral/60 bg-coral/25 text-on-pastel hover:border-coral',
+                      },
+                    ].map(({ id, rotulo, icon: Icon, estilo }) => (
+                      <button
+                        key={id}
+                        type="button"
+                        disabled={loading}
+                        onClick={() => handleQuickLogin(id)}
+                        className={`flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[12px] rounded-bl-[3px] border-[1.5px] px-3 text-[13.5px] font-bold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-60 ${estilo}`}
+                      >
+                        <Icon size={16} aria-hidden="true" />
+                        {rotulo}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 

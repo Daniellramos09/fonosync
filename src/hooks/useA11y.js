@@ -12,6 +12,8 @@ export const A11yContext = createContext({
   saveStatus: null,
   voiceGender: DEFAULT_VOICE.gender,
   setVoiceGender: noop,
+  testVoice: noop,
+  speechError: null,
   speechSupported: false,
   voiceInfo: { exact: false, hasPortuguese: false, name: null },
   speechRate: DEFAULT_VOICE.rate,

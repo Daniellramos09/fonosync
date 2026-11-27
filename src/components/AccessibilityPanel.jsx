@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { RotateCcw, Save, Volume2, VolumeX, X } from 'lucide-react';
+import { Play, RotateCcw, Save, Volume2, VolumeX, X } from 'lucide-react';
 import Button from './Button';
 import Notice from './Notice';
 import Switch from './Switch';
@@ -102,6 +102,9 @@ export default function AccessibilityPanel({
     stopSpeaking,
     voiceGender,
     setVoiceGender,
+    voiceInfo,
+    testVoice,
+    speechError,
     speechRate,
     setSpeechRate,
     speechSupported,
@@ -158,12 +161,24 @@ export default function AccessibilityPanel({
 
         <SelectField
           id={`${id}-voz`}
-          label="Voz"
+          label="Tipo de voz"
           value={voiceGender}
           options={VOICE_OPTIONS}
           onChange={setVoiceGender}
           className="w-full"
         />
+
+        {speechSupported && voiceInfo.hasPortuguese && !voiceInfo.exact && (
+          <p className="text-xs text-muted">
+            Este aparelho não tem voz {voiceGender === 'male' ? 'masculina' : 'feminina'} em português. Usamos a voz
+            disponível com o tom {voiceGender === 'male' ? 'mais grave' : 'mais agudo'}.
+          </p>
+        )}
+        {speechSupported && !voiceInfo.hasPortuguese && (
+          <p className="text-xs text-muted">
+            Nenhuma voz em português foi encontrada; o navegador usará a voz padrão do aparelho.
+          </p>
+        )}
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor={`${id}-velocidade`} className="text-sm font-bold text-ink">
@@ -182,8 +197,16 @@ export default function AccessibilityPanel({
           />
         </div>
 
+        <Button variant="secondary" onClick={testVoice} disabled={!speechSupported}>
+          <Play size={16} aria-hidden="true" />
+          Testar voz
+        </Button>
+
         <div role="status" className="text-xs text-muted">
           {!speechSupported && 'Este navegador não oferece leitura por voz.'}
+          {speechSupported && speechError === 'blocked' && 'O navegador bloqueou o áudio. Toque em “Ouvir página” novamente.'}
+          {speechSupported && speechError === 'unavailable' &&
+            'Não foi possível reproduzir a voz. Verifique se o aparelho não está no silencioso e tente outra voz.'}
           {speechSupported && playerStatus === 'playing' && 'Lendo a página…'}
           {speechSupported && playerStatus === 'paused' && 'Leitura pausada.'}
           {speechSupported && playerStatus === 'done' && 'Leitura concluída.'}
