@@ -4,6 +4,7 @@
 //   Tucano   — fala (instruções, espera, voz)
 //   Tartaruga — ritmo (progresso, jornada no tempo)
 //   Sagui    — curiosidade (brincadeira, descoberta)
+//   Sapinho  — som (o papo enche e solta ondas sonoras)
 // Animações são classes CSS em index.css e respeitam "reduzir movimento".
 
 const INK = '#283A43';
@@ -179,6 +180,54 @@ export function Sagui({ title, className, animated = true, letra = 'a' }) {
           <ellipse cx="78" cy="146" rx="8" ry="7" fill={peloEscuro} />
           <ellipse cx="122" cy="146" rx="8" ry="7" fill={peloEscuro} />
         </g>
+      </g>
+    </svg>
+  );
+}
+
+/* ----------------------------------------------------------------- Sapinho */
+// O papo enche e solta anéis de som: o personagem da voz em voz alta.
+export function Sapinho({ title, className, animated = true, coaxando = true }) {
+  const verde = '#6DB86B';
+  const verdeEscuro = '#4E9A57';
+  const barriga = '#E4F3C8';
+  return (
+    <svg {...svgProps({ title, className, viewBox: '0 0 210 170', animated })}>
+      <ellipse cx="96" cy="162" rx="70" ry="6" fill={INK} opacity="0.12" />
+      {coaxando && (
+        <g fill="none" stroke="#4C9BE8" strokeWidth="4" strokeLinecap="round">
+          <path className="char-anel" d="M164 92c8 8 8 22 0 30" />
+          <path className="char-anel" style={{ animationDelay: '0.5s' }} d="M178 84c13 13 13 33 0 46" />
+          <path className="char-anel" style={{ animationDelay: '1s' }} d="M192 76c18 18 18 44 0 62" />
+        </g>
+      )}
+      {/* patas de trás */}
+      <path d="M30 150c-10-24 4-46 26-44 10 20 6 38-6 50H34z" fill={verdeEscuro} />
+      <path d="M162 150c10-24-4-46-26-44-10 20-6 38 6 50h16z" fill={verdeEscuro} />
+      <g className="char-respira">
+        {/* corpo */}
+        <path d="M36 120c0-40 26-66 60-66s60 26 60 66c0 26-24 38-60 38s-60-12-60-38z" fill={verde} />
+        <ellipse cx="96" cy="128" rx="38" ry="26" fill={barriga} />
+        {/* papo que enche */}
+        <ellipse className="char-papo" cx="96" cy="108" rx="20" ry="11" fill="#F4D6A0" opacity="0.95" />
+        {/* olhos em cima da cabeça */}
+        <circle cx="66" cy="56" r="22" fill={verde} />
+        <circle cx="126" cy="56" r="22" fill={verde} />
+        <circle cx="66" cy="54" r="14" fill="#FFFCF7" />
+        <circle cx="126" cy="54" r="14" fill="#FFFCF7" />
+        <Olho cx={69} cy={55} rx={6.5} ry={7.5} />
+        <Olho cx={129} cy={55} rx={6.5} ry={7.5} />
+        {/* sorriso e bochechas */}
+        <path d="M70 92c14 10 38 10 52 0" stroke="#2F5F37" strokeWidth="3.2" strokeLinecap="round" fill="none" />
+        <ellipse cx="56" cy="90" rx="9" ry="5.5" fill={BOCHECHA} opacity="0.85" />
+        <ellipse cx="136" cy="90" rx="9" ry="5.5" fill={BOCHECHA} opacity="0.85" />
+        {/* pintinhas */}
+        <circle cx="50" cy="118" r="4" fill={verdeEscuro} />
+        <circle cx="142" cy="114" r="5" fill={verdeEscuro} />
+        <circle cx="132" cy="132" r="3" fill={verdeEscuro} />
+        {/* mãozinhas */}
+        <path d="M64 150c-4-8 0-16 8-16s10 10 6 16z" fill={verdeEscuro} />
+        <path d="M128 150c4-8 0-16-8-16s-10 10-6 16z" fill={verdeEscuro} />
       </g>
     </svg>
   );

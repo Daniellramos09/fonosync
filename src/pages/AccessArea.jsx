@@ -3,6 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import {
   ArrowRight,
   Baby,
+  ChevronDown,
   Eye,
   EyeOff,
   FileBadge,
@@ -20,9 +21,10 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import Logo from '../components/Logo';
-import { Tucano } from '../components/Personagens';
-import acessoImg from '../assets/images/photos/brincar-clinica.jpg';
+import logoImg from '../assets/images/ModeloA_Semnome.jpg';
+import fotoProfissional from '../assets/images/photos/hero-fono-gesto.jpg';
+import fotoFamilia from '../assets/images/photos/leitura-chao.jpg';
+import { Capivara, Sapinho, Tucano } from '../components/Personagens';
 import { useA11y } from '../hooks/useA11y';
 import A11yModal from '../components/A11yModal';
 import InfoDialog from '../components/InfoDialog';
@@ -35,6 +37,39 @@ import { createGuardian, createPatient } from '../services/patientService';
 import { registerProfessional } from '../services/professionalService';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* ------------------------------------------------------------------ estilos */
+
+const botaoPrincipal =
+  'botao-seta relative flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] rounded-bl-[4px] bg-azul-petroleo px-5 text-[15px] font-bold text-on-azul shadow-[0_14px_30px_-16px_rgba(29,78,104,0.9)] transition duration-200 hover:-translate-y-0.5 hover:bg-azul hover:shadow-[0_20px_36px_-16px_rgba(44,106,166,0.9)] active:translate-y-0 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60';
+
+const botaoGoogle =
+  'flex min-h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-[14px] rounded-bl-[4px] border-[1.5px] border-line bg-surface px-4 text-[14px] font-semibold text-ink transition duration-200 hover:-translate-y-0.5 hover:border-azul/40 hover:shadow-[0_14px_26px_-18px_rgba(19,48,74,0.55)] active:translate-y-0';
+
+const TEXTOS = {
+  profissional: {
+    login: {
+      titulo: ['Bom te ver ', 'de novo', '.'],
+      sub: 'Entre para acompanhar pacientes, sessões e relatórios.',
+    },
+    register: {
+      titulo: ['Seu consultório, ', 'organizado', '.'],
+      sub: 'Crie sua conta profissional. Leva poucos minutos.',
+    },
+  },
+  paciente: {
+    login: {
+      titulo: ['Que bom que ', 'voltaram', '!'],
+      sub: 'Entre para ver as atividades e o progresso da criança.',
+    },
+    register: {
+      titulo: ['Vamos começar ', 'juntos', '.'],
+      sub: 'Cadastre a família ou o próprio paciente.',
+    },
+  },
+};
+
+/* --------------------------------------------------------------- elementos */
 
 function GoogleIcon({ className = 'h-5 w-5' }) {
   return (
@@ -59,35 +94,140 @@ function GoogleIcon({ className = 'h-5 w-5' }) {
   );
 }
 
-function FormInput({ id, label, icon: Icon, error, hint, trailing, ...props }) {
+// Logo original do FonoSync (escudo com ondas sonoras), preservada como arquivo.
+function LogoOriginal() {
+  return (
+    <a
+      href="#/"
+      className="group inline-flex items-center gap-3 rounded-full pr-2"
+      aria-label="FonoSync — voltar para a página inicial"
+    >
+      <span className="grid size-11 place-items-center overflow-hidden rounded-full bg-white shadow-[0_8px_18px_-10px_rgba(19,48,74,0.6)] ring-1 ring-azul/15 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
+        <img src={logoImg} alt="" className="size-full scale-[1.12] object-cover" />
+      </span>
+      <span className="font-serif text-[22px] font-semibold tracking-[-0.02em] text-azul-petroleo">FonoSync</span>
+    </a>
+  );
+}
+
+// Barras de onda sonora, as mesmas da logo, respirando.
+function OndaSonora({ className, barras = [10, 20, 30, 42, 26, 46, 32, 20, 36, 22, 12] }) {
+  return (
+    <svg viewBox={`0 0 ${barras.length * 12} 50`} className={className} aria-hidden="true" focusable="false">
+      {barras.map((h, i) => (
+        <rect
+          key={i}
+          className="onda-barra"
+          style={{ animationDelay: `${(i % 5) * 0.16}s` }}
+          x={i * 12 + 3}
+          y={25 - h / 2}
+          width="6"
+          height={h}
+          rx="3"
+          fill="currentColor"
+        />
+      ))}
+    </svg>
+  );
+}
+
+// Título com a palavra de destaque grifada à mão.
+function Titulo({ partes, cor }) {
+  const [antes, destaque, depois] = partes;
+  return (
+    <h1 className="display text-[34px] text-azul-petroleo sm:text-[40px] xl:text-[46px]">
+      {antes}
+      <span className="relative inline-block whitespace-nowrap">
+        {destaque}
+        <svg
+          viewBox="0 0 200 16"
+          preserveAspectRatio="none"
+          className="risco absolute -bottom-1.5 left-0 h-3 w-full"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M3 11C40 4 92 3 140 6c20 1 38 3 56 5"
+            pathLength="1"
+            fill="none"
+            stroke={cor}
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
+        </svg>
+      </span>
+      {depois}
+    </h1>
+  );
+}
+
+function Silaba({ texto, cor }) {
+  const partes = texto.split('·');
+  return (
+    <span
+      className="inline-flex rounded-[14px] rounded-bl-[4px] px-3.5 py-1.5 font-serif text-[22px] font-semibold text-on-pastel shadow-[0_14px_30px_-14px_rgba(0,0,0,0.55)]"
+      style={{ background: cor }}
+    >
+      {partes.map((p, i) => (
+        <span key={i}>
+          {i > 0 && (
+            <span aria-hidden="true" className="px-[0.04em] font-normal" style={{ color: '#A8492C' }}>
+              ·
+            </span>
+          )}
+          {p}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function FormInput({ id, label, icon: Icon, error, hint, trailing, value, ...props }) {
   const describedBy = error ? `${id}-erro` : hint ? `${id}-dica` : undefined;
+  const preenchido = value !== undefined && value !== null && String(value).length > 0;
 
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-navy">
+    <div className="group/campo space-y-1.5">
+      <label
+        htmlFor={id}
+        className="block text-[13px] font-semibold text-ink transition-colors duration-200 group-focus-within/campo:text-azul"
+      >
         {label}
       </label>
       <div
-        className={`flex items-center gap-2.5 rounded-xl border bg-surface px-3.5 py-2.5 text-sm transition focus-within:ring-2 focus-within:ring-primary focus-within:border-primary ${
-          error ? 'border-rose-400 bg-rose-50/20' : 'border-line hover:border-primary/40'
+        className={`flex min-h-12 items-center gap-2.5 rounded-[12px] rounded-bl-[3px] border-[1.5px] px-3.5 transition-[border-color,background-color,box-shadow,transform] duration-200 focus-within:-translate-y-px focus-within:border-azul focus-within:bg-surface focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-azul)_16%,transparent)] ${
+          error
+            ? 'campo-erro border-danger bg-danger/5'
+            : preenchido
+            ? 'border-azul/30 bg-gelo/70'
+            : 'border-line bg-surface hover:border-azul/45'
         }`}
       >
-        {Icon && <Icon size={17} className="shrink-0 text-muted" aria-hidden="true" />}
+        {Icon && (
+          <Icon
+            size={18}
+            aria-hidden="true"
+            className={`shrink-0 transition duration-200 group-focus-within/campo:scale-110 group-focus-within/campo:text-azul ${
+              error ? 'text-danger' : preenchido ? 'text-azul' : 'text-muted'
+            }`}
+          />
+        )}
         <input
           id={id}
+          value={value}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
-          className="w-full bg-transparent font-medium text-ink placeholder:text-muted outline-none text-xs"
+          className="w-full min-w-0 bg-transparent py-2.5 text-[15px] font-medium text-ink outline-none placeholder:text-muted/70"
           {...props}
         />
         {trailing}
       </div>
       {error ? (
-        <p id={`${id}-erro`} className="text-[11px] font-bold text-rose-600">
+        <p id={`${id}-erro`} className="text-[12.5px] font-semibold text-danger">
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-dica`} className="text-[11px] text-muted">
+        <p id={`${id}-dica`} className="text-[12.5px] text-muted">
           {hint}
         </p>
       ) : null}
@@ -97,19 +237,28 @@ function FormInput({ id, label, icon: Icon, error, hint, trailing, ...props }) {
 
 function FormSelect({ id, label, icon: Icon, error, options = [], ...props }) {
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-navy">
+    <div className="group/campo space-y-1.5">
+      <label
+        htmlFor={id}
+        className="block text-[13px] font-semibold text-ink transition-colors duration-200 group-focus-within/campo:text-azul"
+      >
         {label}
       </label>
       <div
-        className={`flex items-center gap-2.5 rounded-xl border bg-surface px-3.5 py-2.5 text-sm transition focus-within:ring-2 focus-within:ring-primary focus-within:border-primary ${
-          error ? 'border-rose-400 bg-rose-50/20' : 'border-line hover:border-primary/40'
+        className={`relative flex min-h-12 items-center gap-2.5 rounded-[12px] rounded-bl-[3px] border-[1.5px] px-3.5 transition-[border-color,box-shadow,transform] duration-200 focus-within:-translate-y-px focus-within:border-azul focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-azul)_16%,transparent)] ${
+          error ? 'campo-erro border-danger bg-danger/5' : 'border-line bg-surface hover:border-azul/45'
         }`}
       >
-        {Icon && <Icon size={17} className="shrink-0 text-muted" aria-hidden="true" />}
+        {Icon && (
+          <Icon
+            size={18}
+            aria-hidden="true"
+            className="shrink-0 text-azul transition duration-200 group-focus-within/campo:scale-110"
+          />
+        )}
         <select
           id={id}
-          className="w-full bg-transparent font-medium text-ink outline-none text-xs cursor-pointer"
+          className="w-full min-w-0 cursor-pointer appearance-none bg-transparent py-2.5 pr-6 text-[15px] font-medium text-ink outline-none"
           {...props}
         >
           {options.map((opt) => (
@@ -118,9 +267,202 @@ function FormSelect({ id, label, icon: Icon, error, options = [], ...props }) {
             </option>
           ))}
         </select>
+        <ChevronDown
+          size={16}
+          aria-hidden="true"
+          className="pointer-events-none absolute right-3.5 text-muted transition-transform duration-200 group-focus-within/campo:rotate-180 group-focus-within/campo:text-azul"
+        />
       </div>
-      {error && <p className="text-[11px] font-bold text-rose-600">{error}</p>}
+      {error && <p className="text-[12.5px] font-semibold text-danger">{error}</p>}
     </div>
+  );
+}
+
+function BotaoSenha({ visivel, onToggle }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="-mr-1 grid size-9 shrink-0 cursor-pointer place-items-center rounded-[10px] text-muted transition hover:bg-gelo hover:text-azul"
+      aria-label={visivel ? 'Ocultar senha' : 'Exibir senha'}
+    >
+      {visivel ? <EyeOff size={17} /> : <Eye size={17} />}
+    </button>
+  );
+}
+
+function Divisor({ children }) {
+  return (
+    <div className="flex items-center gap-3 text-[12px] font-semibold text-muted">
+      <span className="h-px flex-1 bg-line" />
+      {children}
+      <span className="h-px flex-1 bg-line" />
+    </div>
+  );
+}
+
+function Carregando({ children }) {
+  return (
+    <>
+      <OndaSonora className="h-5 w-12" barras={[8, 16, 24, 16, 8]} />
+      <span>{children}</span>
+    </>
+  );
+}
+
+function Secao({ numero, titulo, icon: Icon, extra, children }) {
+  return (
+    <fieldset className="space-y-3">
+      <legend className="mb-3 flex w-full items-center gap-2.5 text-[14px] font-bold text-azul-petroleo">
+        <span className="grid size-7 place-items-center rounded-full bg-mel font-serif text-[14px] text-on-pastel">
+          {numero}
+        </span>
+        <span className="flex-1">{titulo}</span>
+        {extra}
+        {Icon && <Icon size={17} aria-hidden="true" className="text-azul" />}
+      </legend>
+      {children}
+    </fieldset>
+  );
+}
+
+/* ------------------------------------------------------- composição visual */
+
+// Formas e detalhes de fundo da coluna do formulário.
+function FundoAcesso({ publico }) {
+  const familia = publico === 'paciente';
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <svg viewBox="0 0 600 600" className="absolute -left-40 -top-48 w-[560px] text-gelo">
+        <path
+          fill="currentColor"
+          d="M421 92c64 52 104 140 82 222-22 84-104 158-196 170-92 13-192-36-236-112C27 296 38 192 95 124 152 56 256 25 323 38c38 7 68 26 98 54z"
+        />
+      </svg>
+      <svg viewBox="0 0 300 300" className="absolute -bottom-28 -left-24 w-[340px] text-azul opacity-[0.09]">
+        {[40, 75, 110, 145].map((r) => (
+          <circle key={r} cx="150" cy="150" r={r} fill="none" stroke="currentColor" strokeWidth="3" />
+        ))}
+      </svg>
+      <div className={`hidden transition-opacity duration-700 lg:block ${familia ? 'opacity-100' : 'opacity-0'}`}>
+        <svg viewBox="0 0 40 40" className="flutua absolute right-[9%] top-[14%] w-7 text-mel" style={{ '--d': '6s' }}>
+          <path fill="currentColor" d="M20 2l4.6 11.4L37 15l-9.5 8.2L30.5 36 20 29.3 9.5 36l3-12.8L3 15l12.4-1.6z" />
+        </svg>
+        <span className="flutua absolute right-[4%] top-[27%] size-3.5 rounded-full bg-coral" style={{ '--d': '8s', '--y': '-14px' }} />
+        <span className="flutua absolute bottom-[30%] right-[3%] size-5 rounded-[6px] rounded-bl-[2px] bg-lavanda" style={{ '--d': '9s', '--r': '12deg' }} />
+        <svg viewBox="0 0 60 20" className="flutua absolute bottom-[38%] left-[1%] w-10 text-salvia" style={{ '--d': '7s', '--atraso': '1s' }}>
+          <path d="M3 10c7-9 13-9 18 0s11 9 18 0 11-9 18 0" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+        </svg>
+        <span className="flutua absolute left-[3%] top-[56%] size-2.5 rounded-full bg-azul-vivo" style={{ '--d': '5s', '--atraso': '0.6s' }} />
+      </div>
+    </div>
+  );
+}
+
+function CamadaBanner({ ativo, children }) {
+  return (
+    <div
+      aria-hidden={!ativo}
+      className={`absolute inset-0 transition-[opacity,visibility] duration-700 ease-out ${
+        ativo ? 'visible opacity-100' : 'invisible opacity-0'
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function BannerProfissional({ ativo }) {
+  return (
+    <CamadaBanner ativo={ativo}>
+      <img
+        src={fotoProfissional}
+        alt=""
+        className={`absolute inset-0 size-full object-cover object-[30%_30%] ${ativo ? 'banner-foto' : ''}`}
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(195deg,rgba(19,48,74,0.10)_20%,rgba(19,48,74,0.55)_58%,rgba(11,30,48,0.95)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgba(76,155,232,0.35),transparent_55%)] mix-blend-soft-light" />
+
+      {/* nota de sessão flutuando: o tipo de registro que o profissional faz aqui */}
+      <div
+        className="flutua absolute right-[7%] top-[11%] hidden items-center gap-3 rounded-[18px] rounded-bl-[4px] bg-white/15 px-4 py-3 text-white ring-1 ring-white/30 backdrop-blur-md lg:flex"
+        style={{ '--d': '8s', '--y': '-8px' }}
+      >
+        <OndaSonora className="h-7 w-20 text-mel" />
+        <span className="text-[13px] font-semibold leading-tight">
+          Sessão 12
+          <span className="block font-medium text-white/80">/r/ em início de palavra</span>
+        </span>
+      </div>
+      <div
+        className="flutua absolute left-[8%] top-[36%] hidden lg:block"
+        style={{ '--d': '9s', '--r': '-6deg', '--atraso': '1.2s' }}
+      >
+        <Silaba texto="fo·ne·ma" cor="#F5D887" />
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 sm:p-8 lg:p-12">
+        <div className="max-w-md text-white">
+          <p className="display text-[26px] sm:text-[34px] xl:text-[46px]">Cada sessão conta uma parte da história.</p>
+          <p className="mt-3 hidden max-w-sm text-[15px] leading-relaxed text-white/85 lg:block">
+            Prontuário, rastreio fonológico e a evolução de cada criança, organizados para você.
+          </p>
+        </div>
+        <Tucano className="w-20 shrink-0 sm:w-28 xl:w-36" />
+      </div>
+    </CamadaBanner>
+  );
+}
+
+function BannerFamilia({ ativo }) {
+  return (
+    <CamadaBanner ativo={ativo}>
+      <img
+        src={fotoFamilia}
+        alt=""
+        className={`absolute inset-0 size-full object-cover object-[56%_center] ${ativo ? 'banner-foto' : ''}`}
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(190deg,rgba(19,48,74,0.05)_25%,rgba(19,48,74,0.45)_60%,rgba(11,30,48,0.93)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(90%_60%_at_0%_0%,rgba(245,216,135,0.35),transparent_60%)] mix-blend-soft-light" />
+
+      {/* sílabas soltas pelo ar, como numa brincadeira de leitura */}
+      <div className="flutua absolute left-[8%] top-[10%] hidden lg:block" style={{ '--d': '7s', '--r': '-8deg' }}>
+        <Silaba texto="bo·la" cor="#F4B7A3" />
+      </div>
+      <div
+        className="flutua absolute right-[10%] top-[16%] hidden lg:block"
+        style={{ '--d': '8.5s', '--r': '6deg', '--atraso': '0.8s', '--y': '-14px' }}
+      >
+        <Silaba texto="sa·po" cor="#D6EAE4" />
+      </div>
+      <div
+        className="flutua absolute right-[30%] top-[4%] hidden xl:block"
+        style={{ '--d': '9s', '--r': '-4deg', '--atraso': '1.6s' }}
+      >
+        <Silaba texto="ga·to" cor="#F5D887" />
+      </div>
+      <svg
+        viewBox="0 0 40 40"
+        aria-hidden="true"
+        className="flutua absolute left-[34%] top-[22%] hidden w-8 text-mel lg:block"
+        style={{ '--d': '5.5s' }}
+      >
+        <path fill="currentColor" d="M20 2l4.6 11.4L37 15l-9.5 8.2L30.5 36 20 29.3 9.5 36l3-12.8L3 15l12.4-1.6z" />
+      </svg>
+
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 sm:p-8 lg:p-12">
+        <div className="max-w-md text-white">
+          <p className="display text-[26px] sm:text-[34px] xl:text-[46px]">
+            Aqui, cada pa<span className="text-coral" aria-hidden="true">·</span>la<span className="text-coral" aria-hidden="true">·</span>vra vira
+            conquista.
+          </p>
+          <p className="mt-3 hidden max-w-sm text-[15px] leading-relaxed text-white/85 lg:block">
+            Atividades para fazer em casa, no ritmo da criança, junto com quem cuida dela.
+          </p>
+        </div>
+        <Sapinho className="w-24 shrink-0 sm:w-32 xl:w-40" />
+      </div>
+    </CamadaBanner>
   );
 }
 
@@ -477,691 +819,668 @@ export default function AccessArea() {
     }
   };
 
-  return (
-    <div className="flex min-h-screen flex-col justify-between bg-nevoa font-sans">
-      {/* Header com Acessibilidade e Logo */}
-      <header className="sticky top-0 z-40 border-b border-line bg-surface/95 px-4 py-3.5 backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <a href="#/" className="flex items-center gap-2.5 transition hover:opacity-85">
-            <Logo />
-          </a>
+  // Perfil da tela: o mesmo seletor vale para entrar e para cadastrar.
+  // Mantém loginRole e registerCategory em sincronia (as regras de cadastro não mudam).
+  const publico = loginRole;
+  const trocarPublico = (novo) => {
+    if (novo === publico) return;
+    setLoginRole(novo);
+    setRegisterCategory((atual) =>
+      novo === 'profissional' ? 'fonoaudiologo' : atual === 'fonoaudiologo' ? 'responsavel' : atual,
+    );
+    setErrors({});
+    setNotice(null);
+  };
+  const familia = publico === 'paciente';
+  const texto = TEXTOS[publico][mode];
+  const corGrifo = familia ? '#F4B7A3' : '#F5D887';
 
-          <div className="flex items-center gap-2 sm:gap-3">
+  const avisoAtual = notice && (
+    <Notice tone={notice.tone} title={notice.title}>
+      {notice.text}
+    </Notice>
+  );
+
+  const senhaTrailing = <BotaoSenha visivel={showPassword} onToggle={() => setShowPassword(!showPassword)} />;
+
+  return (
+    <div className="relative flex min-h-dvh flex-col bg-creme font-sans lg:grid lg:h-dvh lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:overflow-hidden">
+      {/* ============================================================ */}
+      {/* Coluna da autenticação (esquerda)                              */}
+      {/* ============================================================ */}
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col lg:overflow-y-auto">
+        <FundoAcesso publico={publico} />
+
+        <header className="auth-entra relative flex items-center justify-between gap-3 px-5 pt-5 sm:px-10 xl:px-16">
+          <LogoOriginal />
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowA11y(true)}
-              className="flex min-h-10 items-center gap-1.5 rounded-xl border border-line bg-surface px-3 text-xs font-bold text-navy hover:bg-nevoa shadow-xs transition"
+              className="flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface/80 px-3.5 text-[13px] font-semibold text-ink backdrop-blur transition hover:-translate-y-px hover:border-azul/40 hover:bg-gelo"
             >
-              <PersonStanding size={16} aria-hidden="true" /> Acessibilidade
+              <PersonStanding size={16} aria-hidden="true" className="text-azul" />
+              <span className="hidden sm:inline">Acessibilidade</span>
+              <span className="sr-only sm:hidden">Acessibilidade</span>
             </button>
             <button
               type="button"
               onClick={() => (isPlayerOpen ? stopSpeaking() : speakPageContent())}
-              className={`flex min-h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-bold transition shadow-xs ${
+              className={`flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold backdrop-blur transition hover:-translate-y-px ${
                 isPlayerOpen
-                  ? 'border-rose-300 bg-rose-50 text-rose-700'
-                  : 'border-line bg-surface text-navy hover:bg-nevoa'
+                  ? 'border-danger/50 bg-danger/10 text-danger'
+                  : 'border-line bg-surface/80 text-ink hover:border-azul/40 hover:bg-gelo'
               }`}
             >
-              {isPlayerOpen ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
-              {isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}
+              {isPlayerOpen ? (
+                <VolumeX size={16} aria-hidden="true" />
+              ) : (
+                <Volume2 size={16} aria-hidden="true" className="text-azul" />
+              )}
+              <span className="hidden sm:inline">{isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}</span>
+              <span className="sr-only sm:hidden">{isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}</span>
             </button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Conteúdo Principal */}
-      <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_minmax(0,560px)] lg:py-12">
-        <aside className="on-dark relative hidden min-h-[620px] overflow-hidden rounded-[28px] rounded-bl-[6px] bg-ocean text-white lg:block">
-          <img src={acessoImg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80" />
-          <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(23,67,74,0)_30%,rgba(23,67,74,0.92)_100%)]" />
-          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-8">
-            <p className="display max-w-[14ch] text-[40px]">Cada sessão conta uma parte da história.</p>
-            <Tucano className="w-28 shrink-0" />
-          </div>
-        </aside>
-        <div className="mx-auto w-full max-w-xl space-y-6 rounded-[24px] rounded-bl-[6px] border border-line bg-surface p-6 shadow-[0_30px_60px_-30px_rgba(23,67,74,0.35)] sm:p-8">
-          {/* Cabeçalho do Card */}
-          <div className="text-center space-y-1.5">
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-navy">
-              {mode === 'login' ? 'Acessar o FonoSync' : 'Criar Nova Conta'}
-            </h1>
-            <p className="text-xs text-muted">
-              {mode === 'login'
-                ? 'Entre com suas credenciais ou faça login direto com sua conta Google'
-                : 'Selecione o seu perfil para preencher os dados de acordo com as regras clínicas'}
-            </p>
-          </div>
-
-          {/* Toggle Modo: Login vs Cadastro */}
-          <div className="flex rounded-xl bg-salvia/50 p-1 border border-line">
-            <button
-              type="button"
-              onClick={() => changeMode('login')}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${
-                mode === 'login' ? 'bg-surface text-navy shadow-sm' : 'text-muted hover:text-ink'
-              }`}
-            >
-              Já tenho cadastro (Entrar)
-            </button>
-            <button
-              type="button"
-              onClick={() => changeMode('register')}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${
-                mode === 'register' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-ink'
-              }`}
-            >
-              Criar novo cadastro
-            </button>
-          </div>
-
-          {/* ============================================================== */}
-          {/* MODO LOGIN                                                     */}
-          {/* ============================================================== */}
-          {mode === 'login' && (
-            <div className="space-y-4">
-              {/* Seleção de tipo de login */}
-              <div className="grid grid-cols-2 gap-2 rounded-xl bg-nevoa p-1 border border-line">
-                <button
-                  type="button"
-                  onClick={() => setLoginRole('profissional')}
-                  className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition ${
-                    loginRole === 'profissional'
-                      ? 'bg-navy text-white shadow-xs'
-                      : 'text-muted hover:text-ink'
-                  }`}
-                >
-                  <Stethoscope size={16} /> Profissional (Fono)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLoginRole('paciente')}
-                  className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition ${
-                    loginRole === 'paciente'
-                      ? 'bg-navy text-white shadow-xs'
-                      : 'text-muted hover:text-ink'
-                  }`}
-                >
-                  <User size={16} /> Paciente / Família
-                </button>
-              </div>
-
-              {/* Botão Entrar com Google */}
-              <button
-                type="button"
-                onClick={() => loginWithGoogle()}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5 text-xs font-bold text-ink shadow-xs transition hover:bg-nevoa hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-              >
-                <GoogleIcon />
-                <span>Continuar com o Google</span>
-              </button>
-
-              <div className="relative flex items-center justify-center my-4">
-                <div className="w-full border-t border-line" />
-                <span className="absolute bg-surface px-3 text-[10px] font-bold uppercase tracking-wider text-muted">
-                  ou entre com e-mail
-                </span>
-              </div>
-
-              <form onSubmit={handleLoginSubmit} noValidate className="space-y-4">
-                <FormInput
-                  id="login-email"
-                  label={loginRole === 'profissional' ? 'E-mail profissional' : 'E-mail de acesso'}
-                  icon={Mail}
-                  type="email"
-                  autoComplete="username"
-                  placeholder={
-                    loginRole === 'profissional' ? 'dra.renata@fonosync.com.br' : 'paciente.familia@email.com'
-                  }
-                  value={loginForm.identifier}
-                  onChange={(e) => setLoginForm({ ...loginForm, identifier: e.target.value })}
-                  error={errors.identifier}
-                />
-
-                <FormInput
-                  id="login-password"
-                  label="Senha de acesso"
-                  icon={Lock}
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                  error={errors.password}
-                  trailing={
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-muted hover:text-ink p-1"
-                      aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  }
-                />
-
-                {notice && (
-                  <Notice tone={notice.tone} title={notice.title}>
-                    {notice.text}
-                  </Notice>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
-                >
-                  {loading ? (
-                    'Entrando...'
-                  ) : (
-                    <>
-                      <span>Entrar como {loginRole === 'profissional' ? 'Fonoaudiólogo(a)' : 'Paciente / Família'}</span>
-                      <ArrowRight size={16} />
-                    </>
-                  )}
-                </button>
-              </form>
+        <main className="relative flex flex-1 items-center px-5 py-7 sm:px-10 lg:py-6 xl:px-16">
+          <div className="mx-auto w-full max-w-[540px] space-y-5">
+            {/* Título que muda com o perfil e o modo */}
+            <div key={`titulo-${publico}-${mode}`} className="auth-troca space-y-2">
+              <Titulo partes={texto.titulo} cor={corGrifo} />
+              <p className="text-[16px] leading-relaxed text-muted">{texto.sub}</p>
             </div>
-          )}
 
-          {/* ============================================================== */}
-          {/* MODO CADASTRO (COM AS REGRAS DO BANCO DE DADOS)               */}
-          {/* ============================================================== */}
-          {mode === 'register' && (
-            <div className="space-y-5">
-              {/* Botão Cadastrar com Google */}
-              <button
-                type="button"
-                onClick={() => loginWithGoogle()}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5 text-xs font-bold text-ink shadow-xs transition hover:bg-nevoa hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-              >
-                <GoogleIcon />
-                <span>Cadastrar rapidamente com o Google</span>
-              </button>
-
-              <div className="relative flex items-center justify-center">
-                <div className="w-full border-t border-line" />
-                <span className="absolute bg-surface px-3 text-[10px] font-bold uppercase tracking-wider text-muted">
-                  ou selecione seu tipo de perfil
-                </span>
-              </div>
-
-              {/* Seleção do Perfil de Cadastro: 3 Categorias */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {[
-                  {
-                    id: 'fonoaudiologo',
-                    title: 'Fonoaudiólogo',
-                    subtitle: 'Profissional de Saúde',
-                    icon: Stethoscope,
-                  },
-                  {
-                    id: 'responsavel',
-                    title: 'Responsável',
-                    subtitle: 'Pais / Tutores de Menor',
-                    icon: Users,
-                  },
-                  {
-                    id: 'paciente_adulto',
-                    title: 'Paciente Adulto',
-                    subtitle: 'Maior de 18 anos',
-                    icon: User,
-                  },
-                ].map(({ id, title, subtitle, icon: Icon }) => {
-                  const selected = registerCategory === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => {
-                        setRegisterCategory(id);
-                        setErrors({});
-                        setNotice(null);
-                      }}
-                      className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
-                        selected
-                          ? 'border-primary bg-nevoa/50 text-primary shadow-xs'
-                          : 'border-line hover:border-line bg-surface text-ink'
-                      }`}
-                    >
-                      <Icon size={20} className={`mb-1.5 ${selected ? 'text-primary' : 'text-muted'}`} />
-                      <span className="text-xs font-bold leading-tight">{title}</span>
-                      <span className="text-[10px] text-muted mt-0.5">{subtitle}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* ---------------------------------------------------------- */}
-              {/* FORMULÁRIO 1: FONOAUDIÓLOGO                                */}
-              {/* ---------------------------------------------------------- */}
-              {registerCategory === 'fonoaudiologo' && (
-                <form onSubmit={handleProRegisterSubmit} noValidate className="space-y-3.5">
-                  <div className="p-3 rounded-xl bg-nevoa/60 border border-salvia flex items-start gap-2.5 text-xs text-navy">
-                    <Sparkles size={16} className="text-primary shrink-0 mt-0.5" />
-                    <p>
-                      Cadastro completo do profissional clínico. Seus dados de CRFa e especialidade serão exibidos nos
-                      laudos e prontuários dos pacientes.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormInput
-                      id="pro-name"
-                      label="Nome Completo *"
-                      icon={User}
-                      placeholder="Dra. Juliana Santos"
-                      value={proForm.name}
-                      onChange={(e) => setProForm({ ...proForm, name: e.target.value })}
-                      error={errors.name}
-                    />
-
-                    <FormInput
-                      id="pro-crfa"
-                      label="Registro CRFa *"
-                      icon={FileBadge}
-                      placeholder="CRFa 2-19842"
-                      value={proForm.crfa}
-                      onChange={(e) => setProForm({ ...proForm, crfa: e.target.value })}
-                      error={errors.crfa}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormInput
-                      id="pro-phone"
-                      label="Telefone / WhatsApp *"
-                      icon={Phone}
-                      placeholder="(11) 98765-4321"
-                      value={proForm.phone}
-                      onChange={(e) => setProForm({ ...proForm, phone: formatPhone(e.target.value) })}
-                      error={errors.phone}
-                    />
-
-                    <FormSelect
-                      id="pro-specialty"
-                      label="Especialidade *"
-                      icon={Stethoscope}
-                      value={proForm.specialty}
-                      onChange={(e) => setProForm({ ...proForm, specialty: e.target.value })}
-                      options={[
-                        { value: 'Fonoaudiologia Clínica Geral', label: 'Clínica Geral' },
-                        { value: 'Linguagem e Fala Infantil', label: 'Linguagem e Fala Infantil' },
-                        { value: 'Audiologia e Processamento Auditivo', label: 'Audiologia' },
-                        { value: 'Motricidade Orofacial e Disfagia', label: 'Motricidade Orofacial' },
-                        { value: 'Voz e Comunicação', label: 'Voz e Comunicação' },
-                        { value: 'Fonoaudiologia Educacional', label: 'Educacional' },
-                      ]}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormInput
-                      id="pro-email"
-                      label="E-mail Profissional *"
-                      icon={Mail}
-                      type="email"
-                      placeholder="dra.juliana@fonosync.com.br"
-                      value={proForm.email}
-                      onChange={(e) => setProForm({ ...proForm, email: e.target.value })}
-                      error={errors.email}
-                    />
-
-                    <FormInput
-                      id="pro-password"
-                      label="Senha de Acesso *"
-                      icon={Lock}
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Mínimo 6 dígitos"
-                      value={proForm.password}
-                      onChange={(e) => setProForm({ ...proForm, password: e.target.value })}
-                      error={errors.password}
-                      trailing={
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="text-muted hover:text-ink p-1"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      }
-                    />
-                  </div>
-
-                  {notice && (
-                    <Notice tone={notice.tone} title={notice.title}>
-                      {notice.text}
-                    </Notice>
-                  )}
-
+            {/* Perfil: profissional ou família */}
+            <div
+              role="group"
+              aria-label="Tipo de acesso"
+              className="auth-entra relative grid grid-cols-2 rounded-[16px] rounded-bl-[5px] bg-gelo p-1.5 ring-1 ring-azul/10"
+              style={{ '--i': 2 }}
+            >
+              <span
+                aria-hidden="true"
+                className={`absolute inset-y-1.5 left-1.5 w-[calc(50%-6px)] rounded-[12px] rounded-bl-[3px] bg-surface shadow-[0_10px_22px_-12px_rgba(19,48,74,0.55)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  familia ? 'translate-x-full' : ''
+                }`}
+              />
+              {[
+                { id: 'profissional', rotulo: 'Sou profissional', curto: 'Profissional', icon: Stethoscope },
+                { id: 'paciente', rotulo: 'Família ou paciente', curto: 'Família', icon: HeartHandshake },
+              ].map(({ id, rotulo, curto, icon: Icon }) => {
+                const ativo = publico === id;
+                return (
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
+                    key={id}
+                    type="button"
+                    aria-pressed={ativo}
+                    onClick={() => trocarPublico(id)}
+                    className={`relative z-10 flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-[12px] px-2 text-[14px] font-bold transition-colors duration-300 ${
+                      ativo ? 'text-azul-petroleo' : 'text-muted hover:text-ink'
+                    }`}
                   >
-                    {loading ? 'Criando conta profissional...' : 'Concluir Cadastro de Fonoaudiólogo(a)'}
-                    <ArrowRight size={16} />
+                    <Icon
+                      size={18}
+                      aria-hidden="true"
+                      className={`transition-transform duration-500 ${ativo ? 'scale-110 text-azul' : ''}`}
+                    />
+                    <span className="sm:hidden">{curto}</span>
+                    <span className="hidden sm:inline">{rotulo}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Entrar / Criar conta */}
+            <div className="auth-entra flex gap-7 border-b border-line" role="group" aria-label="Acesso" style={{ '--i': 3 }}>
+              {[
+                { id: 'login', rotulo: 'Entrar' },
+                { id: 'register', rotulo: 'Criar conta' },
+              ].map(({ id, rotulo }) => {
+                const ativo = mode === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-pressed={ativo}
+                    onClick={() => changeMode(id)}
+                    className={`relative cursor-pointer pb-3 text-[15px] font-bold transition-colors ${
+                      ativo ? 'text-azul-petroleo' : 'text-muted hover:text-ink'
+                    }`}
+                  >
+                    {rotulo}
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-x-0 -bottom-px h-[3px] origin-left rounded-full bg-azul transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                        ativo ? 'scale-x-100' : 'scale-x-0'
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* ========================================================== */}
+            {/* MODO LOGIN                                                  */}
+            {/* ========================================================== */}
+            {mode === 'login' && (
+              <div key={`login-${publico}`} className="auth-troca space-y-4">
+                <button type="button" onClick={() => loginWithGoogle()} className={botaoGoogle}>
+                  <GoogleIcon />
+                  <span>Continuar com o Google</span>
+                </button>
+
+                <Divisor>ou entre com e-mail</Divisor>
+
+                <form onSubmit={handleLoginSubmit} noValidate className="space-y-4">
+                  <FormInput
+                    id="login-email"
+                    label={loginRole === 'profissional' ? 'E-mail profissional' : 'E-mail de acesso'}
+                    icon={Mail}
+                    type="email"
+                    autoComplete="username"
+                    placeholder={
+                      loginRole === 'profissional' ? 'dra.renata@fonosync.com.br' : 'paciente.familia@email.com'
+                    }
+                    value={loginForm.identifier}
+                    onChange={(e) => setLoginForm({ ...loginForm, identifier: e.target.value })}
+                    error={errors.identifier}
+                  />
+
+                  <FormInput
+                    id="login-password"
+                    label="Senha de acesso"
+                    icon={Lock}
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    error={errors.password}
+                    trailing={senhaTrailing}
+                  />
+
+                  {avisoAtual}
+
+                  <button type="submit" disabled={loading} className={botaoPrincipal}>
+                    {loading ? (
+                      <Carregando>Entrando...</Carregando>
+                    ) : (
+                      <>
+                        <span>Entrar como {loginRole === 'profissional' ? 'Fonoaudiólogo(a)' : 'Paciente / Família'}</span>
+                        <ArrowRight size={18} aria-hidden="true" />
+                      </>
+                    )}
                   </button>
                 </form>
-              )}
+              </div>
+            )}
 
-              {/* ---------------------------------------------------------- */}
-              {/* FORMULÁRIO 2: RESPONSÁVEL FAMILIAR COM DEPENDENTE MENOR   */}
-              {/* ---------------------------------------------------------- */}
-              {registerCategory === 'responsavel' && (
-                <form onSubmit={handleGuardianRegisterSubmit} noValidate className="space-y-4">
-                  {/* Seção 1: Dados do Responsável */}
-                  <div className="rounded-xl border border-line bg-nevoa/60 p-3.5 space-y-3">
-                    <div className="flex items-center gap-2 border-b border-line pb-2">
-                      <HeartHandshake size={16} className="text-primary" />
-                      <span className="text-xs font-bold text-navy uppercase tracking-wide">
-                        1. Dados do Responsável Legal
-                      </span>
-                    </div>
+            {/* ========================================================== */}
+            {/* MODO CADASTRO (COM AS REGRAS DO BANCO DE DADOS)            */}
+            {/* ========================================================== */}
+            {mode === 'register' && (
+              <div key={`cadastro-${publico}`} className="auth-troca space-y-5">
+                {/* Família: quem está se cadastrando */}
+                {familia && (
+                  <div role="group" aria-label="Quem está se cadastrando" className="grid grid-cols-2 gap-2.5">
+                    {[
+                      {
+                        id: 'responsavel',
+                        title: 'Responsável',
+                        subtitle: 'Pais ou tutores de menor',
+                        icon: Users,
+                        fundo: 'bg-coral/45',
+                      },
+                      {
+                        id: 'paciente_adulto',
+                        title: 'Paciente adulto',
+                        subtitle: 'Maior de 18 anos',
+                        icon: User,
+                        fundo: 'bg-mel/50',
+                      },
+                    ].map(({ id, title, subtitle, icon: Icon, fundo }) => {
+                      const selected = registerCategory === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => {
+                            setRegisterCategory(id);
+                            setErrors({});
+                            setNotice(null);
+                          }}
+                          className={`flex cursor-pointer items-center gap-3 rounded-[14px] rounded-bl-[4px] border-[1.5px] p-3 text-left transition duration-200 hover:-translate-y-0.5 ${
+                            selected
+                              ? 'border-azul bg-surface shadow-[0_12px_24px_-16px_rgba(19,48,74,0.6)]'
+                              : 'border-line bg-surface/70 hover:border-azul/40'
+                          }`}
+                        >
+                          <span
+                            className={`grid size-10 shrink-0 place-items-center rounded-full text-on-pastel transition-transform duration-300 ${fundo} ${
+                              selected ? 'scale-110' : ''
+                            }`}
+                          >
+                            <Icon size={19} aria-hidden="true" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-[14px] font-bold leading-tight text-ink">{title}</span>
+                            <span className="block text-[12.5px] text-muted">{subtitle}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button type="button" onClick={() => loginWithGoogle()} className={botaoGoogle}>
+                  <GoogleIcon />
+                  <span>Cadastrar rapidamente com o Google</span>
+                </button>
+
+                <Divisor>ou preencha seus dados</Divisor>
+
+                {/* ------------------------------------------------------ */}
+                {/* FORMULÁRIO 1: FONOAUDIÓLOGO                            */}
+                {/* ------------------------------------------------------ */}
+                {registerCategory === 'fonoaudiologo' && (
+                  <form onSubmit={handleProRegisterSubmit} noValidate className="space-y-3.5">
+                    <p className="flex items-start gap-2.5 rounded-[12px] rounded-bl-[3px] bg-gelo px-3.5 py-3 text-[13px] leading-relaxed text-ink">
+                      <Sparkles size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-azul" />
+                      Seus dados de CRFa e especialidade serão exibidos nos laudos e prontuários dos pacientes.
+                    </p>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <FormInput
-                        id="guard-name"
-                        label="Nome do Responsável *"
+                        id="pro-name"
+                        label="Nome completo *"
                         icon={User}
-                        placeholder="Ex: Mariana Ferreira"
-                        value={guardianForm.guardianName}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, guardianName: e.target.value })}
-                        error={errors.guardianName}
+                        autoComplete="name"
+                        placeholder="Dra. Juliana Santos"
+                        value={proForm.name}
+                        onChange={(e) => setProForm({ ...proForm, name: e.target.value })}
+                        error={errors.name}
                       />
-
                       <FormInput
-                        id="guard-cpf"
-                        label="CPF do Responsável *"
+                        id="pro-crfa"
+                        label="Registro CRFa *"
                         icon={FileBadge}
-                        placeholder="000.000.000-00"
-                        value={guardianForm.guardianCpf}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, guardianCpf: formatCPF(e.target.value) })}
-                        error={errors.guardianCpf}
+                        placeholder="CRFa 2-19842"
+                        value={proForm.crfa}
+                        onChange={(e) => setProForm({ ...proForm, crfa: e.target.value })}
+                        error={errors.crfa}
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <FormInput
-                        id="guard-phone"
+                        id="pro-phone"
                         label="Telefone / WhatsApp *"
                         icon={Phone}
+                        autoComplete="tel"
                         placeholder="(11) 98765-4321"
-                        value={guardianForm.guardianPhone}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, guardianPhone: formatPhone(e.target.value) })}
-                        error={errors.guardianPhone}
+                        value={proForm.phone}
+                        onChange={(e) => setProForm({ ...proForm, phone: formatPhone(e.target.value) })}
+                        error={errors.phone}
                       />
-
                       <FormSelect
-                        id="guard-rel"
-                        label="Grau de Parentesco *"
-                        icon={Users}
-                        value={guardianForm.guardianRelationship}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, guardianRelationship: e.target.value })}
+                        id="pro-specialty"
+                        label="Especialidade *"
+                        icon={Stethoscope}
+                        value={proForm.specialty}
+                        onChange={(e) => setProForm({ ...proForm, specialty: e.target.value })}
                         options={[
-                          { value: 'Mãe', label: 'Mãe' },
-                          { value: 'Pai', label: 'Pai' },
-                          { value: 'Avó / Avô', label: 'Avó / Avô' },
-                          { value: 'Tutor(a) Legal', label: 'Tutor(a) Legal' },
-                          { value: 'Irmão(ã) Maior', label: 'Irmão(ã) Maior' },
-                          { value: 'Outro', label: 'Outro' },
+                          { value: 'Fonoaudiologia Clínica Geral', label: 'Clínica Geral' },
+                          { value: 'Linguagem e Fala Infantil', label: 'Linguagem e Fala Infantil' },
+                          { value: 'Audiologia e Processamento Auditivo', label: 'Audiologia' },
+                          { value: 'Motricidade Orofacial e Disfagia', label: 'Motricidade Orofacial' },
+                          { value: 'Voz e Comunicação', label: 'Voz e Comunicação' },
+                          { value: 'Fonoaudiologia Educacional', label: 'Educacional' },
                         ]}
                       />
                     </div>
-                  </div>
 
-                  {/* Seção 2: Dados do Dependente (Paciente) */}
-                  <div className="rounded-xl border border-line bg-nevoa/60 p-3.5 space-y-3">
-                    <div className="flex items-center justify-between border-b border-line pb-2">
-                      <div className="flex items-center gap-2">
-                        <Baby size={16} className="text-primary" />
-                        <span className="text-xs font-bold text-navy uppercase tracking-wide">
-                          2. Dados da Criança / Dependente (Paciente)
-                        </span>
-                      </div>
-                      {guardianForm.patientBirthDate && (
-                        <span className="text-[11px] font-bold text-primary bg-salvia px-2 py-0.5 rounded-md">
-                          {calculateAge(guardianForm.patientBirthDate)} anos
-                        </span>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <FormInput
+                        id="pro-email"
+                        label="E-mail profissional *"
+                        icon={Mail}
+                        type="email"
+                        autoComplete="email"
+                        placeholder="dra.juliana@fonosync.com.br"
+                        value={proForm.email}
+                        onChange={(e) => setProForm({ ...proForm, email: e.target.value })}
+                        error={errors.email}
+                      />
+                      <FormInput
+                        id="pro-password"
+                        label="Senha de acesso *"
+                        icon={Lock}
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        placeholder="Mínimo 6 dígitos"
+                        value={proForm.password}
+                        onChange={(e) => setProForm({ ...proForm, password: e.target.value })}
+                        error={errors.password}
+                        trailing={senhaTrailing}
+                      />
+                    </div>
+
+                    {avisoAtual}
+
+                    <button type="submit" disabled={loading} className={`${botaoPrincipal} mt-1`}>
+                      {loading ? (
+                        <Carregando>Criando conta profissional...</Carregando>
+                      ) : (
+                        <>
+                          Concluir cadastro de fonoaudiólogo(a)
+                          <ArrowRight size={18} aria-hidden="true" />
+                        </>
                       )}
-                    </div>
+                    </button>
+                  </form>
+                )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* ------------------------------------------------------ */}
+                {/* FORMULÁRIO 2: RESPONSÁVEL FAMILIAR COM DEPENDENTE MENOR */}
+                {/* ------------------------------------------------------ */}
+                {registerCategory === 'responsavel' && (
+                  <form onSubmit={handleGuardianRegisterSubmit} noValidate className="space-y-6">
+                    <Secao numero="1" titulo="Dados do responsável legal" icon={HeartHandshake}>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <FormInput
+                          id="guard-name"
+                          label="Nome do responsável *"
+                          icon={User}
+                          autoComplete="name"
+                          placeholder="Ex: Mariana Ferreira"
+                          value={guardianForm.guardianName}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, guardianName: e.target.value })}
+                          error={errors.guardianName}
+                        />
+                        <FormInput
+                          id="guard-cpf"
+                          label="CPF do responsável *"
+                          icon={FileBadge}
+                          placeholder="000.000.000-00"
+                          value={guardianForm.guardianCpf}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, guardianCpf: formatCPF(e.target.value) })}
+                          error={errors.guardianCpf}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <FormInput
+                          id="guard-phone"
+                          label="Telefone / WhatsApp *"
+                          icon={Phone}
+                          autoComplete="tel"
+                          placeholder="(11) 98765-4321"
+                          value={guardianForm.guardianPhone}
+                          onChange={(e) =>
+                            setGuardianForm({ ...guardianForm, guardianPhone: formatPhone(e.target.value) })
+                          }
+                          error={errors.guardianPhone}
+                        />
+                        <FormSelect
+                          id="guard-rel"
+                          label="Grau de parentesco *"
+                          icon={Users}
+                          value={guardianForm.guardianRelationship}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, guardianRelationship: e.target.value })}
+                          options={[
+                            { value: 'Mãe', label: 'Mãe' },
+                            { value: 'Pai', label: 'Pai' },
+                            { value: 'Avó / Avô', label: 'Avó / Avô' },
+                            { value: 'Tutor(a) Legal', label: 'Tutor(a) Legal' },
+                            { value: 'Irmão(ã) Maior', label: 'Irmão(ã) Maior' },
+                            { value: 'Outro', label: 'Outro' },
+                          ]}
+                        />
+                      </div>
+                    </Secao>
+
+                    <Secao
+                      numero="2"
+                      titulo="Dados da criança (paciente)"
+                      icon={Baby}
+                      extra={
+                        guardianForm.patientBirthDate && (
+                          <span className="rounded-full bg-salvia px-2.5 py-0.5 text-[12px] font-bold text-on-pastel">
+                            {calculateAge(guardianForm.patientBirthDate)} anos
+                          </span>
+                        )
+                      }
+                    >
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <FormInput
+                          id="pat-name"
+                          label="Nome da criança *"
+                          icon={User}
+                          placeholder="Ex: Lucas Ferreira"
+                          value={guardianForm.patientName}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, patientName: e.target.value })}
+                          error={errors.patientName}
+                        />
+                        <FormInput
+                          id="pat-birth"
+                          label="Data de nascimento *"
+                          type="date"
+                          value={guardianForm.patientBirthDate}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, patientBirthDate: e.target.value })}
+                          error={errors.patientBirthDate}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2">
+                        <FormSelect
+                          id="pat-sex"
+                          label="Sexo biológico *"
+                          value={guardianForm.patientSex}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, patientSex: e.target.value })}
+                          options={[
+                            { value: 'MASCULINO', label: 'Masculino' },
+                            { value: 'FEMININO', label: 'Feminino' },
+                            { value: 'OUTRO', label: 'Outro' },
+                          ]}
+                        />
+                        <p className="flex items-start gap-2 rounded-[12px] rounded-bl-[3px] bg-salvia/70 px-3 py-2.5 text-[12px] leading-snug text-on-pastel">
+                          <ShieldCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-success" />
+                          <span>
+                            <strong>Proteção de menores (LGPD):</strong> não coletamos CPF nem dados sensíveis da
+                            criança.
+                          </span>
+                        </p>
+                      </div>
+                    </Secao>
+
+                    <Secao numero="3" titulo="Acesso da família" icon={Lock}>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <FormInput
+                          id="family-email"
+                          label="E-mail de acesso da família *"
+                          icon={Mail}
+                          type="email"
+                          autoComplete="email"
+                          placeholder="mariana.familia@email.com"
+                          value={guardianForm.email}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, email: e.target.value })}
+                          error={errors.email}
+                        />
+                        <FormInput
+                          id="family-password"
+                          label="Senha de acesso *"
+                          icon={Lock}
+                          type={showPassword ? 'text' : 'password'}
+                          autoComplete="new-password"
+                          placeholder="Mínimo 6 dígitos"
+                          value={guardianForm.password}
+                          onChange={(e) => setGuardianForm({ ...guardianForm, password: e.target.value })}
+                          error={errors.password}
+                          trailing={senhaTrailing}
+                        />
+                      </div>
+                    </Secao>
+
+                    {avisoAtual}
+
+                    <button type="submit" disabled={loading} className={botaoPrincipal}>
+                      {loading ? (
+                        <Carregando>Cadastrando família e dependente...</Carregando>
+                      ) : (
+                        <>
+                          Concluir cadastro familiar
+                          <ArrowRight size={18} aria-hidden="true" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {/* ------------------------------------------------------ */}
+                {/* FORMULÁRIO 3: PACIENTE ADULTO (MAIOR DE 18 ANOS)       */}
+                {/* ------------------------------------------------------ */}
+                {registerCategory === 'paciente_adulto' && (
+                  <form onSubmit={handleAdultRegisterSubmit} noValidate className="space-y-3.5">
+                    <p className="flex items-start gap-2.5 rounded-[12px] rounded-bl-[3px] bg-mel/40 px-3.5 py-3 text-[13px] leading-relaxed text-on-pastel">
+                      <UserCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+                      Para quem tem 18 anos ou mais e cuida do próprio tratamento. O prontuário fica no seu nome.
+                    </p>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <FormInput
-                        id="pat-name"
-                        label="Nome da Criança *"
+                        id="adult-name"
+                        label="Nome completo *"
                         icon={User}
-                        placeholder="Ex: Lucas Ferreira"
-                        value={guardianForm.patientName}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, patientName: e.target.value })}
-                        error={errors.patientName}
+                        autoComplete="name"
+                        placeholder="Carlos Eduardo Mendes"
+                        value={adultPatientForm.name}
+                        onChange={(e) => setAdultPatientForm({ ...adultPatientForm, name: e.target.value })}
+                        error={errors.name}
                       />
-
                       <FormInput
-                        id="pat-birth"
-                        label="Data de Nascimento *"
+                        id="adult-birth"
+                        label="Data de nascimento *"
                         type="date"
-                        value={guardianForm.patientBirthDate}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, patientBirthDate: e.target.value })}
-                        error={errors.patientBirthDate}
+                        value={adultPatientForm.birthDate}
+                        onChange={(e) => setAdultPatientForm({ ...adultPatientForm, birthDate: e.target.value })}
+                        error={errors.birthDate}
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <FormInput
+                        id="adult-cpf"
+                        label="CPF *"
+                        icon={FileBadge}
+                        placeholder="000.000.000-00"
+                        value={adultPatientForm.cpf}
+                        onChange={(e) => setAdultPatientForm({ ...adultPatientForm, cpf: formatCPF(e.target.value) })}
+                        error={errors.cpf}
+                      />
+                      <FormInput
+                        id="adult-phone"
+                        label="Telefone *"
+                        icon={Phone}
+                        autoComplete="tel"
+                        placeholder="(11) 98765-4321"
+                        value={adultPatientForm.phone}
+                        onChange={(e) =>
+                          setAdultPatientForm({ ...adultPatientForm, phone: formatPhone(e.target.value) })
+                        }
+                        error={errors.phone}
+                      />
                       <FormSelect
-                        id="pat-sex"
-                        label="Sexo Biológico *"
-                        value={guardianForm.patientSex}
-                        onChange={(e) => setGuardianForm({ ...guardianForm, patientSex: e.target.value })}
+                        id="adult-sex"
+                        label="Sexo biológico *"
+                        value={adultPatientForm.sex}
+                        onChange={(e) => setAdultPatientForm({ ...adultPatientForm, sex: e.target.value })}
                         options={[
                           { value: 'MASCULINO', label: 'Masculino' },
                           { value: 'FEMININO', label: 'Feminino' },
                           { value: 'OUTRO', label: 'Outro' },
                         ]}
                       />
-
-                      <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800 flex items-start gap-2">
-                        <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
-                        <span>
-                          <strong>Proteção de Menores (LGPD):</strong> Por segurança e privacidade da criança, não
-                          coletamos CPF ou dados frágeis do menor de idade.
-                        </span>
-                      </div>
                     </div>
-                  </div>
 
-                  {/* Seção 3: Credenciais de Acesso da Família */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormInput
-                      id="family-email"
-                      label="E-mail de Acesso da Família *"
-                      icon={Mail}
-                      type="email"
-                      placeholder="mariana.familia@email.com"
-                      value={guardianForm.email}
-                      onChange={(e) => setGuardianForm({ ...guardianForm, email: e.target.value })}
-                      error={errors.email}
-                    />
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <FormInput
+                        id="adult-email"
+                        label="E-mail de acesso *"
+                        icon={Mail}
+                        type="email"
+                        autoComplete="email"
+                        placeholder="carlos.mendes@email.com"
+                        value={adultPatientForm.email}
+                        onChange={(e) => setAdultPatientForm({ ...adultPatientForm, email: e.target.value })}
+                        error={errors.email}
+                      />
+                      <FormInput
+                        id="adult-password"
+                        label="Senha de acesso *"
+                        icon={Lock}
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        placeholder="Mínimo 6 dígitos"
+                        value={adultPatientForm.password}
+                        onChange={(e) => setAdultPatientForm({ ...adultPatientForm, password: e.target.value })}
+                        error={errors.password}
+                        trailing={senhaTrailing}
+                      />
+                    </div>
 
-                    <FormInput
-                      id="family-password"
-                      label="Senha de Acesso *"
-                      icon={Lock}
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Mínimo 6 dígitos"
-                      value={guardianForm.password}
-                      onChange={(e) => setGuardianForm({ ...guardianForm, password: e.target.value })}
-                      error={errors.password}
-                      trailing={
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="text-muted hover:text-ink p-1"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      }
-                    />
-                  </div>
+                    {avisoAtual}
 
-                  {notice && (
-                    <Notice tone={notice.tone} title={notice.title}>
-                      {notice.text}
-                    </Notice>
-                  )}
+                    <button type="submit" disabled={loading} className={`${botaoPrincipal} mt-1`}>
+                      {loading ? (
+                        <Carregando>Criando cadastro de paciente...</Carregando>
+                      ) : (
+                        <>
+                          Concluir cadastro de paciente adulto
+                          <ArrowRight size={18} aria-hidden="true" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
+        </main>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
-                  >
-                    {loading ? 'Cadastrando família e dependente...' : 'Concluir Cadastro Familiar'}
-                    <ArrowRight size={16} />
-                  </button>
-                </form>
-              )}
-
-              {/* ---------------------------------------------------------- */}
-              {/* FORMULÁRIO 3: PACIENTE ADULTO (MAIOR DE 18 ANOS)          */}
-              {/* ---------------------------------------------------------- */}
-              {registerCategory === 'paciente_adulto' && (
-                <form onSubmit={handleAdultRegisterSubmit} noValidate className="space-y-3.5">
-                  <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-950">
-                    <UserCheck size={16} className="text-amber-600 shrink-0 mt-0.5" />
-                    <p>
-                      Para pacientes com 18 anos ou mais que são responsáveis pelo próprio tratamento. O prontuário
-                      clínico será gerado diretamente no seu nome.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormInput
-                      id="adult-name"
-                      label="Nome Completo *"
-                      icon={User}
-                      placeholder="Carlos Eduardo Mendes"
-                      value={adultPatientForm.name}
-                      onChange={(e) => setAdultPatientForm({ ...adultPatientForm, name: e.target.value })}
-                      error={errors.name}
-                    />
-
-                    <FormInput
-                      id="adult-birth"
-                      label="Data de Nascimento *"
-                      type="date"
-                      value={adultPatientForm.birthDate}
-                      onChange={(e) => setAdultPatientForm({ ...adultPatientForm, birthDate: e.target.value })}
-                      error={errors.birthDate}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <FormInput
-                      id="adult-cpf"
-                      label="CPF *"
-                      icon={FileBadge}
-                      placeholder="000.000.000-00"
-                      value={adultPatientForm.cpf}
-                      onChange={(e) => setAdultPatientForm({ ...adultPatientForm, cpf: formatCPF(e.target.value) })}
-                      error={errors.cpf}
-                    />
-
-                    <FormInput
-                      id="adult-phone"
-                      label="Telefone / Celular *"
-                      icon={Phone}
-                      placeholder="(11) 98765-4321"
-                      value={adultPatientForm.phone}
-                      onChange={(e) => setAdultPatientForm({ ...adultPatientForm, phone: formatPhone(e.target.value) })}
-                      error={errors.phone}
-                    />
-
-                    <FormSelect
-                      id="adult-sex"
-                      label="Sexo Biológico *"
-                      value={adultPatientForm.sex}
-                      onChange={(e) => setAdultPatientForm({ ...adultPatientForm, sex: e.target.value })}
-                      options={[
-                        { value: 'MASCULINO', label: 'Masculino' },
-                        { value: 'FEMININO', label: 'Feminino' },
-                        { value: 'OUTRO', label: 'Outro' },
-                      ]}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FormInput
-                      id="adult-email"
-                      label="E-mail de Acesso *"
-                      icon={Mail}
-                      type="email"
-                      placeholder="carlos.mendes@email.com"
-                      value={adultPatientForm.email}
-                      onChange={(e) => setAdultPatientForm({ ...adultPatientForm, email: e.target.value })}
-                      error={errors.email}
-                    />
-
-                    <FormInput
-                      id="adult-password"
-                      label="Senha de Acesso *"
-                      icon={Lock}
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Mínimo 6 dígitos"
-                      value={adultPatientForm.password}
-                      onChange={(e) => setAdultPatientForm({ ...adultPatientForm, password: e.target.value })}
-                      error={errors.password}
-                      trailing={
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="text-muted hover:text-ink p-1"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      }
-                    />
-                  </div>
-
-                  {notice && (
-                    <Notice tone={notice.tone} title={notice.title}>
-                      {notice.text}
-                    </Notice>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
-                  >
-                    {loading ? 'Criando cadastro de paciente...' : 'Concluir Cadastro de Paciente Adulto'}
-                    <ArrowRight size={16} />
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-
-          {/* Rodapé do Card com LGPD */}
-          <div className="flex flex-col items-center gap-1.5 border-t border-line pt-4 text-center text-xs text-muted">
-            <span className="flex items-center gap-1.5 font-medium">
-              <ShieldCheck size={16} className="text-emerald-600" aria-hidden="true" />
-              Ambiente clínico seguro e criptografado em conformidade com a LGPD
-            </span>
+        {/* Rodapé da coluna: LGPD, privacidade e créditos */}
+        <footer className={`relative flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 px-5 pb-5 text-[12.5px] text-muted sm:px-10 xl:px-16 ${familia ? 'lg:pr-36 xl:pr-40' : ''}`}>
+          <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            <ShieldCheck size={15} aria-hidden="true" className="text-success" />
+            Ambiente seguro e criptografado, em conformidade com a LGPD.
             <button
               type="button"
               onClick={() => setShowPrivacy(true)}
-              className="font-bold text-primary underline-offset-4 hover:underline cursor-pointer"
+              className="cursor-pointer whitespace-nowrap font-semibold text-azul underline decoration-azul/30 underline-offset-4 transition hover:decoration-azul"
             >
-              Política de Privacidade e Termos de Uso
+              Privacidade e termos
             </button>
-          </div>
-        </div>
-      </main>
+          </span>
+          <span>© 2026 FonoSync — Projeto Integrador Fatec Ferraz de Vasconcelos.</span>
+        </footer>
+      </div>
 
-      {/* Footer simples */}
-      <footer className="border-t border-line bg-surface py-4 text-center text-xs text-muted">
-        © 2026 FonoSync — Projeto Integrador Fatec Ferraz de Vasconcelos. Todos os direitos reservados.
-      </footer>
+      {/* ============================================================ */}
+      {/* Banner visual (direita no desktop, topo no celular)           */}
+      {/* ============================================================ */}
+      <aside className="on-dark relative order-first h-60 shrink-0 overflow-hidden bg-azul-profundo sm:h-80 lg:order-none lg:h-auto">
+        <BannerProfissional ativo={!familia} />
+        <BannerFamilia ativo={familia} />
+      </aside>
+
+      {/* A capivara da família senta na divisa entre o formulário e a foto */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute bottom-3 left-[48.1%] z-20 hidden w-36 -translate-x-[78%] transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block xl:w-40 ${
+          familia ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+        }`}
+      >
+        <Capivara acenando className="w-full drop-shadow-[0_18px_24px_rgba(11,30,48,0.35)]" />
+      </div>
 
       {/* Modal de Acessibilidade */}
       <A11yModal isOpen={showA11y} onClose={() => setShowA11y(false)} />
@@ -1175,60 +1494,66 @@ export default function AccessArea() {
 
       {/* Modal Interativo de Autenticação com Google */}
       {showGoogleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-2xl border border-line space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/55 p-4 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="google-modal-titulo"
+            className="auth-troca w-full max-w-sm space-y-4 rounded-[22px] rounded-bl-[6px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)]"
+          >
             <div className="flex items-center justify-between border-b border-line pb-3">
               <div className="flex items-center gap-2">
                 <GoogleIcon />
-                <span className="font-bold text-sm text-navy">FonoSync Google Auth</span>
+                <span id="google-modal-titulo" className="text-[15px] font-bold text-azul-petroleo">
+                  FonoSync Google Auth
+                </span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowGoogleModal(false)}
-                className="text-muted hover:text-muted text-xs font-bold"
+                aria-label="Fechar"
+                className="grid size-9 cursor-pointer place-items-center rounded-full text-sm font-bold text-muted transition hover:bg-gelo hover:text-ink"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-muted">
-              Escolha uma conta Google para entrar ou sincronizar com o FonoSync:
-            </p>
+            <p className="text-[13.5px] text-muted">Escolha uma conta Google para entrar ou sincronizar com o FonoSync:</p>
 
             <div className="space-y-2">
               <button
                 type="button"
                 onClick={() => handleSimulateGoogleLogin('ROLE_FONO')}
-                className="w-full flex items-center gap-3 p-3 rounded-xl border border-line hover:border-primary hover:bg-nevoa/40 text-left transition"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-[14px] rounded-bl-[4px] border-[1.5px] border-line p-3 text-left transition hover:-translate-y-0.5 hover:border-azul hover:bg-gelo/60"
               >
-                <div className="w-9 h-9 rounded-full bg-primary text-white font-bold text-xs flex items-center justify-center">
+                <span className="grid size-10 place-items-center rounded-full bg-azul-petroleo text-xs font-bold text-on-azul">
                   DR
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-ink truncate">Dra. Renata Lima (Fonoaudióloga)</p>
-                  <p className="text-[11px] text-muted truncate">renata.fono@fonosync.com.br</p>
-                </div>
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13.5px] font-bold text-ink">Dra. Renata Lima (Fonoaudióloga)</span>
+                  <span className="block truncate text-[12px] text-muted">renata.fono@fonosync.com.br</span>
+                </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSimulateGoogleLogin('ROLE_PACIENTE')}
-                className="w-full flex items-center gap-3 p-3 rounded-xl border border-line hover:border-primary hover:bg-nevoa/40 text-left transition"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-[14px] rounded-bl-[4px] border-[1.5px] border-line p-3 text-left transition hover:-translate-y-0.5 hover:border-azul hover:bg-gelo/60"
               >
-                <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">
+                <span className="grid size-10 place-items-center rounded-full bg-coral text-xs font-bold text-on-pastel">
                   CF
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-ink truncate">Clara Ferreira (Mãe / Paciente)</p>
-                  <p className="text-[11px] text-muted truncate">clara.mae@gmail.com</p>
-                </div>
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13.5px] font-bold text-ink">Clara Ferreira (Mãe / Paciente)</span>
+                  <span className="block truncate text-[12px] text-muted">clara.mae@gmail.com</span>
+                </span>
               </button>
             </div>
 
             <button
               type="button"
               onClick={() => setShowGoogleModal(false)}
-              className="w-full py-2 text-xs font-bold text-muted hover:text-ink"
+              className="w-full cursor-pointer py-2 text-[13px] font-bold text-muted transition hover:text-ink"
             >
               Cancelar
             </button>
