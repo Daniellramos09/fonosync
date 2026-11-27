@@ -11,6 +11,11 @@ const variants = {
   // Destaque sobre fotografias e faixas oceano
   mel:
     'border-mel bg-mel text-on-pastel hover:bg-[#f0cd6a] hover:border-[#f0cd6a] active:translate-y-px',
+  // Áreas internas: azul institucional e botão claro sobre fundo creme
+  azul:
+    'border-azul-petroleo bg-azul-petroleo text-on-azul shadow-[0_12px_26px_-16px_rgba(29,78,104,0.9)] hover:-translate-y-0.5 hover:border-azul hover:bg-azul active:translate-y-0',
+  suave:
+    'border-line bg-surface text-ink hover:-translate-y-0.5 hover:border-azul/40 hover:bg-gelo active:translate-y-0',
   claro:
     'border-white/45 bg-white/8 text-white backdrop-blur-sm hover:bg-white/16 hover:border-white/80 active:translate-y-px',
 };
