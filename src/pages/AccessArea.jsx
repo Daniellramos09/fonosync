@@ -25,6 +25,7 @@ import logoImg from '../assets/images/ModeloA_Semnome.jpg';
 import fotoProfissional from '../assets/images/photos/hero-fono-gesto.jpg';
 import fotoFamilia from '../assets/images/photos/leitura-chao.jpg';
 import { Capivara, Sapinho, Tucano } from '../components/Personagens';
+import OndaSonora from '../components/OndaSonora';
 import { useA11y } from '../hooks/useA11y';
 import A11yModal from '../components/A11yModal';
 import InfoDialog from '../components/InfoDialog';
@@ -107,27 +108,6 @@ function LogoOriginal() {
       </span>
       <span className="font-serif text-[22px] font-semibold tracking-[-0.02em] text-azul-petroleo">FonoSync</span>
     </a>
-  );
-}
-
-// Barras de onda sonora, as mesmas da logo, respirando.
-function OndaSonora({ className, barras = [10, 20, 30, 42, 26, 46, 32, 20, 36, 22, 12] }) {
-  return (
-    <svg viewBox={`0 0 ${barras.length * 12} 50`} className={className} aria-hidden="true" focusable="false">
-      {barras.map((h, i) => (
-        <rect
-          key={i}
-          className="onda-barra"
-          style={{ animationDelay: `${(i % 5) * 0.16}s` }}
-          x={i * 12 + 3}
-          y={25 - h / 2}
-          width="6"
-          height={h}
-          rx="3"
-          fill="currentColor"
-        />
-      ))}
-    </svg>
   );
 }
 

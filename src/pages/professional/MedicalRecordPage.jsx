@@ -5,6 +5,7 @@ import {
   CheckCircle,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   Clock,
   FileCheck2,
   FileEdit,
@@ -20,6 +21,11 @@ import {
   UploadCloud,
   X,
 } from 'lucide-react';
+import OndaSonora from '../../components/OndaSonora';
+import { buttonClass } from '../../components/buttonStyles';
+import Avatar from '../../components/area/Avatar';
+import { campo } from '../../components/area/campos';
+import { Tucano } from '../../components/Personagens';
 import { getGuardianById } from '../../services/guardianService';
 import { archivePatient, deletePatient, updatePatient } from '../../services/patientService';
 import {
@@ -42,6 +48,9 @@ import {
   uploadAttachment,
 } from '../../services/attachmentService';
 import { calculateAge, formatBytes, formatDateBR, formatPhone } from '../../utils/formatters';
+
+// Campos clínicos: leitura confortável quando bloqueados, foco azul na edição.
+const campoClinico = `${campo} leading-relaxed disabled:cursor-default disabled:border-transparent disabled:bg-canvas disabled:text-ink`;
 
 export default function MedicalRecordPage({
   patients = [],
@@ -240,8 +249,8 @@ export default function MedicalRecordPage({
 
   if (!patient) {
     return (
-      <div className="p-8 text-center bg-white rounded-2xl border border-slate-200">
-        <p className="text-sm font-bold text-slate-700">Nenhum paciente selecionado.</p>
+      <div className="p-8 text-center bg-surface rounded-[22px] rounded-bl-[6px] border border-line">
+        <p className="text-sm font-bold text-ink">Nenhum paciente selecionado.</p>
       </div>
     );
   }
@@ -433,269 +442,246 @@ export default function MedicalRecordPage({
     }
   };
 
+  const statusInfo = {
+    ATIVO: { rotulo: 'Em acompanhamento', ponto: 'bg-salvia' },
+    PRE_CADASTRO: { rotulo: 'Pré-cadastro', ponto: 'bg-mel' },
+    ARQUIVADO: { rotulo: 'Arquivado', ponto: 'bg-white/50' },
+  }[patient.patientStatus] ?? { rotulo: 'Em acompanhamento', ponto: 'bg-salvia' };
+  const sexoTexto =
+    patient.sex === 'FEMININO' ? 'Feminino' : patient.sex === 'MASCULINO' ? 'Masculino' : 'Sexo não informado';
+  const cidAtual = diagForm.cid10 || patient.cid10;
+  const objetivo = diagForm.treatmentGoal.split('\n')[0];
+  const abas = [
+    { id: 'historico', label: 'Histórico', icon: Clock, total: sessionsCount },
+    { id: 'avaliacoes', label: 'Avaliações', icon: Stethoscope, total: evaluations.length },
+    { id: 'diagnostico', label: 'Diagnóstico', icon: FileCheck2 },
+    { id: 'anamnese', label: 'Anamnese', icon: FileText },
+    { id: 'anexos', label: 'Anexos', icon: Paperclip, total: attachments.length },
+  ];
+  const abrirNovaSessao = () => setShowNewSessionModal(true);
+
   return (
     <div className="space-y-6 font-sans">
       {/* ============================================================== */}
-      {/* TOPO: TÍTULO DO PRONTUÁRIO E BOTÃO REGISTRAR SESSÃO             */}
+      {/* CAPA: PACIENTE, SITUAÇÃO E AÇÕES DO PRONTUÁRIO                  */}
       {/* ============================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <div>
-          <h1 className="text-2xl font-bold font-serif text-[#172C3A]">Prontuário</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {patient.name} · {sessionsCount} sessões registradas
+      <section className="surge on-dark relative isolate overflow-hidden rounded-[30px] rounded-bl-[8px] bg-azul-profundo text-white">
+        <div className="absolute -right-20 -top-28 -z-10 size-80 rounded-full bg-azul/35 blur-3xl" aria-hidden="true" />
+        <OndaSonora className="absolute -bottom-2 right-6 -z-10 hidden h-24 w-80 text-white/[0.06] lg:block" />
+
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-3 sm:px-8">
+          <p className="text-[13px] font-semibold text-white/65">
+            Prontuário · {sessionsCount} sessões registradas
           </p>
+          <label className="relative flex items-center gap-2 text-[13px] font-semibold text-white/70">
+            Paciente
+            <select
+              value={activePatientId}
+              onChange={handlePatientSelectChange}
+              aria-label="Selecionar Paciente para Prontuário"
+              className="min-h-10 cursor-pointer appearance-none rounded-full bg-white/10 py-2 pl-4 pr-9 text-[14px] font-semibold text-white outline-none ring-1 ring-white/20 transition hover:bg-white/15 focus:ring-2 focus:ring-mel [&>option]:text-ink"
+            >
+              {patients.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} {calculateAge(p.dateOfBirth) !== null ? `(${calculateAge(p.dateOfBirth)} anos)` : ''}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={16} className="pointer-events-none absolute right-3 text-white/70" aria-hidden="true" />
+          </label>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setShowNewSessionModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
-          >
-            <Plus size={16} /> Registrar Sessão
-          </button>
-        </div>
-      </div>
-
-      {/* FEEDBACK NOTICE */}
-      {notice && (
-        <div
-          className={`p-3.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs border ${
-            notice.tone === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-              : 'bg-rose-50 border-rose-200 text-rose-900'
-          }`}
-        >
-          {notice.tone === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-          <span>{notice.message}</span>
-        </div>
-      )}
-
-      {/* ============================================================== */}
-      {/* BARRA DE CONTROLE: SELETOR DE PACIENTE + AÇÕES RÁPIDAS         */}
-      {/* ============================================================== */}
-      <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
-        {/* Seletor Dropdown de Paciente */}
-        <div className="relative w-full sm:w-auto sm:min-w-[260px]">
-          <select
-            value={activePatientId}
-            onChange={handlePatientSelectChange}
-            aria-label="Selecionar Paciente para Prontuário"
-            className="w-full appearance-none bg-white border border-slate-300 hover:border-slate-400 rounded-xl px-4 py-2.5 text-xs font-bold text-[#172C3A] shadow-2xs pr-9 outline-none focus:ring-2 focus:ring-[#0284C7] cursor-pointer"
-          >
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} {calculateAge(p.dateOfBirth) !== null ? `(${calculateAge(p.dateOfBirth)} anos)` : ''}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            size={16}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={() => setShowNewSessionModal(true)}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
-          >
-            <Plus size={15} /> Registrar Sessão
-          </button>
-
-          <button
-            type="button"
-            onClick={handleToggleArchive}
-            className={`flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border shadow-2xs transition cursor-pointer ${
-              isArchived
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100'
-                : 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
-            }`}
-            title={isArchived ? 'Restaurar paciente para ativos' : 'Arquivar prontuário do paciente'}
-          >
-            {isArchived ? <RotateCcw size={15} /> : <Archive size={15} />}
-            {isArchived ? 'Restaurar' : 'Arquivar'}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDeletePatient}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-rose-50 border border-rose-300 hover:bg-rose-100 text-rose-800 rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer sm:ml-auto"
-            title="Excluir paciente permanentemente"
-          >
-            <Trash2 size={15} /> Excluir Paciente
-          </button>
-        </div>
-      </div>
-
-      {/* ============================================================== */}
-      {/* GRID PRINCIPAL: COLUNA ESQUERDA (FICHA) + COLUNA DIREITA (ABAS) */}
-      {/* ============================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* ------------------------------------------------------------ */}
-        {/* COLUNA ESQUERDA: FICHA E OBJETIVO TERAPÊUTICO                */}
-        {/* ------------------------------------------------------------ */}
-        <div className="lg:col-span-4 space-y-5">
-          {/* Cartão de Identificação do Paciente */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4 text-center">
-            {/* Avatar Circular com Iniciais */}
-            <div className="mx-auto w-16 h-16 rounded-full bg-sky-100 text-[#0284C7] font-serif font-bold text-xl flex items-center justify-center border-2 border-sky-200 shadow-inner">
-              {patient.name.slice(0, 2).toUpperCase()}
-            </div>
-
-            <div>
-              <h2 className="text-lg font-bold font-serif text-[#172C3A] leading-tight">
-                {patient.name}
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                {age !== null ? `${age} anos` : 'Idade não informada'} ·{' '}
-                {patient.sex === 'FEMININO' ? 'Feminino' : patient.sex === 'MASCULINO' ? 'Masculino' : 'Sexo não informado'}
-                {(diagForm.cid10 || patient.cid10) && ` · CID ${diagForm.cid10 || patient.cid10}`}
+        <div className="grid items-end gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto]">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <Avatar nome={patient.name} apagado={isArchived} className="size-20 text-[26px] ring-4 ring-white/10" />
+            <div className="min-w-0">
+              <h1 className="display text-[34px] sm:text-[42px]">{patient.name}</h1>
+              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14.5px] text-white/80">
+                <span>{age !== null ? `${age} anos` : 'Idade não informada'}</span>
+                <span aria-hidden="true">·</span>
+                <span>{sexoTexto}</span>
+                {cidAtual && (
+                  <span className="rounded-[8px] bg-white/12 px-2 py-0.5 font-mono text-[12.5px] font-semibold text-mel">
+                    CID {cidAtual}
+                  </span>
+                )}
+              </p>
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[13px] font-bold">
+                <span className={`size-2 rounded-full ${statusInfo.ponto}`} aria-hidden="true" />
+                {statusInfo.rotulo}
               </p>
             </div>
-
-            <div className="inline-block">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                {{ ATIVO: 'Em acompanhamento', PRE_CADASTRO: 'Pré-cadastro', ARQUIVADO: 'Arquivado' }[patient.patientStatus]}
-              </span>
-            </div>
-
-            {/* Tabela de Informações Cadastrais */}
-            <div className="pt-2 border-t border-slate-100 text-xs space-y-2.5 text-left">
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-slate-400 font-medium">Nasc.</span>
-                <span className="font-semibold text-slate-800">{formatDateBR(patient.dateOfBirth)}</span>
-              </div>
-
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-slate-400 font-medium">Responsável</span>
-                <span className="font-semibold text-slate-800">
-                  {guardian?.name || (isMinor ? '' : 'Próprio paciente')}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-slate-400 font-medium">Tel</span>
-                <span className="font-semibold text-slate-800">
-                  {formatPhone(patient.contactPatient || guardian?.phoneNumber)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-400 font-medium">Sessões</span>
-                <span className="font-semibold text-slate-800">{sessionsCount} realizadas</span>
-              </div>
-            </div>
           </div>
 
-          {/* Cartão de Objetivo Terapêutico */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2.5 text-left">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#172C3A]">
-              Objetivo Terapêutico
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              {diagForm.treatmentGoal.split('\n')[0]}
-            </p>
-          </div>
-
-          {/* Botões de Ação Rápida do Prontuário (Fiel à Imagem 6) */}
-          <div className="space-y-2.5">
-            <button
-              type="button"
-              onClick={() => setShowNewSessionModal(true)}
-              className="w-full py-2.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
-            >
-              <Plus size={15} /> Registrar Sessão
+          <div className="flex flex-wrap gap-2 lg:justify-end">
+            <button type="button" onClick={abrirNovaSessao} className={buttonClass('mel')}>
+              <Plus size={17} aria-hidden="true" /> Registrar sessão
             </button>
             <button
               type="button"
-              onClick={() => {
-                setActiveTab('diagnostico');
-                setIsEditingDiag(true);
-              }}
-              className="w-full py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
+              onClick={handleToggleArchive}
+              className={buttonClass('claro')}
+              title={isArchived ? 'Restaurar paciente para ativos' : 'Arquivar prontuário do paciente'}
             >
-              <FileEdit size={15} className="text-[#0284C7]" /> Editar Plano Terapêutico
+              {isArchived ? <RotateCcw size={16} aria-hidden="true" /> : <Archive size={16} aria-hidden="true" />}
+              {isArchived ? 'Restaurar' : 'Arquivar'}
             </button>
             <button
               type="button"
-              onClick={() => {
-                setActiveTab('anexos');
-                const el = document.getElementById('prontuario-tabs-anchor');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="w-full py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
+              onClick={handleDeletePatient}
+              className={`${buttonClass('claro')} hover:border-[#f08a82]! hover:bg-[#f08a82]/20!`}
+              title="Excluir paciente permanentemente"
             >
-              <Paperclip size={15} className="text-[#0284C7]" /> Ver Exames e Anexos ({attachments.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (onNavigate) onNavigate('relatorios');
-              }}
-              className="w-full py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
-            >
-              <FileText size={15} className="text-[#0284C7]" /> Gerar Relatório PDF
+              <Trash2 size={16} aria-hidden="true" /> Excluir
             </button>
           </div>
         </div>
+      </section>
+
+      {/* FEEDBACK NOTICE */}
+      <div role="status">
+        {notice && (
+          <div
+            className={`auth-troca flex items-center gap-2.5 rounded-[14px] rounded-bl-[4px] px-4 py-3 text-[14px] font-bold ${
+              notice.tone === 'success' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
+            }`}
+          >
+            {notice.tone === 'success' ? <CheckCircle2 size={18} aria-hidden="true" /> : <AlertCircle size={18} aria-hidden="true" />}
+            <span>{notice.message}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ============================================================== */}
+      {/* GRID PRINCIPAL: FICHA (ESQUERDA) + CONTEÚDO CLÍNICO (DIREITA)   */}
+      {/* ============================================================== */}
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="space-y-4 lg:sticky lg:top-6">
+          {/* Ficha cadastral */}
+          <section className="surge rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line" style={{ '--i': 1 }}>
+            <h2 className="font-serif text-[19px] font-semibold text-azul-petroleo">Ficha</h2>
+            <dl className="mt-3 text-[14px]">
+              {[
+                ['Nascimento', formatDateBR(patient.dateOfBirth)],
+                ['Responsável', guardian?.name || (isMinor ? '' : 'Próprio paciente')],
+                ['Telefone', formatPhone(patient.contactPatient || guardian?.phoneNumber)],
+                ['Sessões', `${sessionsCount} realizadas`],
+              ].map(([rotuloDado, valor]) => (
+                <div key={rotuloDado} className="flex items-baseline justify-between gap-3 border-b border-line py-2.5 last:border-0">
+                  <dt className="text-muted">{rotuloDado}</dt>
+                  <dd className="text-right font-semibold text-ink">{valor || '—'}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          {/* Objetivo terapêutico */}
+          <section className="surge rounded-[24px] rounded-bl-[7px] bg-mel/70 p-5 text-on-pastel" style={{ '--i': 2 }}>
+            <h2 className="font-serif text-[19px] font-semibold">Objetivo terapêutico</h2>
+            {objetivo ? (
+              <p className="mt-2 text-[14.5px] leading-relaxed">{objetivo}</p>
+            ) : (
+              <p className="mt-2 text-[14px] leading-relaxed opacity-80">Ainda não definido no plano terapêutico.</p>
+            )}
+          </section>
+
+          {/* Ações do prontuário */}
+          <nav aria-label="Ações do prontuário" className="surge overflow-hidden rounded-[24px] rounded-bl-[7px] bg-surface ring-1 ring-line" style={{ '--i': 3 }}>
+            {[
+              {
+                rotuloAcao: 'Editar plano terapêutico',
+                icon: FileEdit,
+                onClick: () => {
+                  setActiveTab('diagnostico');
+                  setIsEditingDiag(true);
+                },
+              },
+              {
+                rotuloAcao: `Ver exames e anexos (${attachments.length})`,
+                icon: Paperclip,
+                onClick: () => {
+                  setActiveTab('anexos');
+                  const el = document.getElementById('prontuario-tabs-anchor');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                },
+              },
+              {
+                rotuloAcao: 'Gerar relatório PDF',
+                icon: FileText,
+                onClick: () => {
+                  if (onNavigate) onNavigate('relatorios');
+                },
+              },
+            ].map(({ rotuloAcao, icon: Icon, onClick }) => (
+              <button
+                key={rotuloAcao}
+                type="button"
+                onClick={onClick}
+                className="group flex min-h-[52px] w-full cursor-pointer items-center gap-3 border-b border-line px-4 text-left text-[14.5px] font-semibold text-ink transition last:border-0 hover:bg-gelo"
+              >
+                <span className="grid size-8 place-items-center rounded-[10px] bg-gelo text-azul transition group-hover:bg-surface">
+                  <Icon size={16} aria-hidden="true" />
+                </span>
+                <span className="flex-1">{rotuloAcao}</span>
+                <ChevronRight size={17} aria-hidden="true" className="text-muted transition group-hover:translate-x-0.5 group-hover:text-azul" />
+              </button>
+            ))}
+          </nav>
+        </div>
 
         {/* ------------------------------------------------------------ */}
-        {/* COLUNA DIREITA: NAVEGAÇÃO DE ABAS E CONTEÚDOS CLÍNICOS       */}
+        {/* COLUNA DIREITA: ABAS E CONTEÚDOS CLÍNICOS                     */}
         {/* ------------------------------------------------------------ */}
-        <div id="prontuario-tabs-anchor" className="lg:col-span-8 space-y-4">
-          {/* Barra de Abas do Prontuário com rolagem e toque aprimorado */}
-          <div className="flex items-center gap-1 sm:gap-2 border-b border-slate-200 bg-white px-2 rounded-t-xl overflow-x-auto scrollbar-none py-1">
-            {[
-              { id: 'historico', label: 'Histórico', icon: Clock },
-              { id: 'avaliacoes', label: 'Avaliações', icon: Stethoscope },
-              { id: 'diagnostico', label: 'Diagnóstico', icon: FileCheck2 },
-              { id: 'anamnese', label: 'Anamnese', icon: FileText },
-              { id: 'anexos', label: `Anexos (${attachments.length})`, icon: Paperclip },
-            ].map(({ id, label, icon: Icon }) => {
+        <div id="prontuario-tabs-anchor" className="min-w-0 space-y-4">
+          <div
+            role="tablist"
+            aria-label="Seções do prontuário"
+            className="surge flex gap-1 overflow-x-auto rounded-[18px] rounded-bl-[5px] bg-surface p-1.5 ring-1 ring-line"
+            style={{ '--i': 2 }}
+          >
+            {abas.map(({ id, label, icon: Icon, total }) => {
               const active = activeTab === id;
               return (
                 <button
                   key={id}
                   type="button"
+                  role="tab"
+                  aria-selected={active}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-1.5 px-4 py-3 text-xs font-bold border-b-2 transition whitespace-nowrap cursor-pointer ${
-                    active
-                      ? 'border-[#0284C7] text-[#0284C7] bg-sky-50/20'
-                      : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                  className={`flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-[13px] rounded-bl-[4px] px-4 text-[14px] font-semibold transition duration-200 ${
+                    active ? 'bg-azul-petroleo text-on-azul shadow-[0_10px_20px_-14px_rgba(29,78,104,0.9)]' : 'text-muted hover:bg-gelo hover:text-ink'
                   }`}
                 >
-                  <Icon size={15} />
-                  <span>{label}</span>
+                  <Icon size={16} aria-hidden="true" />
+                  {label}
+                  {total !== undefined && (
+                    <span className={`rounded-full px-1.5 text-[12px] ${active ? 'bg-white/20' : 'bg-gelo'}`}>{total}</span>
+                  )}
                 </button>
               );
             })}
           </div>
 
           {(loadingAnamnese || loadingDiag || loadingEval || loadingAtt) && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 animate-pulse">
-              <div className="flex items-center gap-3">
-                <div className="size-4 rounded-full bg-slate-200" />
-                <div className="h-4 bg-slate-200 rounded w-48" />
-              </div>
-              <div className="space-y-2.5">
-                <div className="h-3.5 bg-slate-100 rounded w-full" />
-                <div className="h-3.5 bg-slate-100 rounded w-5/6" />
-                <div className="h-3.5 bg-slate-100 rounded w-2/3" />
-              </div>
+            <div className="space-y-3 rounded-[24px] rounded-bl-[7px] bg-surface p-6 ring-1 ring-line" aria-label="Carregando prontuário">
+              <span className="esqueleto block h-5 w-48 rounded-[8px]" />
+              <span className="esqueleto block h-3.5 w-full rounded-[6px]" />
+              <span className="esqueleto block h-3.5 w-5/6 rounded-[6px]" />
+              <span className="esqueleto block h-3.5 w-2/3 rounded-[6px]" />
             </div>
           )}
 
           {/* ========================================================== */}
-          {/* ABA 1: HISTÓRICO (TIMELINE DE SESSÕES)                     */}
+          {/* ABA 1: HISTÓRICO (LINHA DO TEMPO DE SESSÕES)                */}
           {/* ========================================================== */}
           {activeTab === 'historico' && (
-            <div className="space-y-4">
+            <div key="historico" className="auth-troca space-y-4">
               {sessions.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3">
-                  <p className="text-xs font-semibold text-slate-500">
-                    Nenhuma sessão clínica registrada para este paciente ainda.
+                <div className="flex flex-col items-center gap-3 rounded-[24px] rounded-bl-[7px] bg-surface p-8 text-center ring-1 ring-line">
+                  <Tucano className="w-24" />
+                  <p className="font-serif text-[20px] font-semibold text-azul-petroleo">Nenhuma sessão registrada ainda</p>
+                  <p className="max-w-[40ch] text-[14px] text-muted">
+                    Registre a primeira sessão para começar a linha do tempo de evolução deste paciente.
                   </p>
                   <button
                     type="button"
@@ -709,95 +695,96 @@ export default function MedicalRecordPage({
                       });
                       setShowNewSessionModal(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition shadow-2xs cursor-pointer"
+                    className={`${buttonClass('azul')} mt-2`}
                   >
-                    + Registrar Primeira Sessão
+                    <Plus size={16} aria-hidden="true" /> Registrar primeira sessão
                   </button>
                 </div>
               ) : (
-                sessions.map((sess, idx) => {
-                const isRealizada = sess.status === 'Realizada';
-                return (
-                  <div
-                    key={sess.id || idx}
-                    className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3 relative"
-                  >
-                    {/* Marcador lateral da Timeline */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        {isRealizada ? (
-                          <span className="w-3 h-3 rounded-full bg-[#0284C7] ring-4 ring-sky-100" />
-                        ) : (
-                          <span className="w-3 h-3 rounded-full border-2 border-slate-400 bg-white ring-4 ring-slate-100" />
-                        )}
-                        <span className="text-xs font-bold text-slate-800">
-                          {formatDateBR(sess.date)} · Sessão {sess.sessionNumber}
-                        </span>
-                      </div>
-                      <span
-                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${
-                          isRealizada
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800 border border-amber-200'
-                        }`}
-                      >
-                        {sess.status}
-                      </span>
-                    </div>
-
-                    {isRealizada ? (
-                      <div className="text-xs space-y-1.5 pl-4.5 border-l-2 border-slate-100">
-                        <p className="text-slate-700">
-                          <strong className="text-slate-900">Evolução:</strong> {sess.evolution}
-                        </p>
-                        {sess.improvementPoint && (
-                          <p className="text-slate-700">
-                            <strong className="text-slate-900">Ponto de melhora:</strong> {sess.improvementPoint}
-                          </p>
-                        )}
-
-                        {sess.tags && sess.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 pt-2">
-                            {sess.tags.map((tag, tIdx) => (
-                              <span
-                                key={tIdx}
-                                className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-sky-50 text-[#0284C7] border border-sky-100"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-xs space-y-2.5 pl-4.5 border-l-2 border-slate-100 py-1">
-                        <p className="text-slate-500 italic">
-                          Sessão agendada na clínica. Realize o atendimento para registrar a evolução clínica e os pontos de melhora.
-                        </p>
-                        <div className="pt-1">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSessionForm({
-                                sessionNumber: sess.sessionNumber,
-                                date: sess.date || new Date().toISOString().split('T')[0],
-                                evolution: '',
-                                improvementPoint: '',
-                                tags: 'Fluência, Linguagem, Respiração',
-                              });
-                              setShowNewSessionModal(true);
-                            }}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
-                          >
-                            <CheckCircle size={14} /> Realizar Atendimento (Registrar Evolução)
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line sm:p-6">
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <h2 className="font-serif text-[20px] font-semibold text-azul-petroleo">Evolução das sessões</h2>
+                    <button type="button" onClick={abrirNovaSessao} className={`${buttonClass('suave')} min-h-10 px-3.5 text-[13.5px]`}>
+                      <Plus size={15} aria-hidden="true" /> Nova sessão
+                    </button>
                   </div>
-                );
-              })
-            )}
+                  <ol className="relative space-y-6 before:absolute before:bottom-2 before:left-[7px] before:top-2 before:w-0.5 before:rounded-full before:bg-line">
+                    {sessions.map((sess, idx) => {
+                      const isRealizada = sess.status === 'Realizada';
+                      return (
+                        <li key={sess.id || idx} className="relative pl-9">
+                          <span
+                            className={`absolute left-0 top-1 size-4 rounded-full ring-4 ring-surface ${
+                              isRealizada ? 'bg-azul' : 'border-2 border-muted bg-surface'
+                            }`}
+                            aria-hidden="true"
+                          />
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="text-[15px] font-bold text-ink">
+                              Sessão {sess.sessionNumber}
+                              <span className="ml-2 font-semibold text-muted">{formatDateBR(sess.date)}</span>
+                            </p>
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold ${
+                                isRealizada ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+                              }`}
+                            >
+                              {sess.status}
+                            </span>
+                          </div>
+
+                          {isRealizada ? (
+                            <div className="mt-2 space-y-2.5 text-[14.5px] leading-relaxed">
+                              <p className="text-ink">
+                                <strong className="font-semibold text-muted">Evolução: </strong>
+                                {sess.evolution}
+                              </p>
+                              {sess.improvementPoint && (
+                                <p className="rounded-[12px] rounded-bl-[3px] bg-mel/35 px-3 py-2 text-on-pastel">
+                                  <strong className="font-semibold">Ponto de melhora: </strong>
+                                  {sess.improvementPoint}
+                                </p>
+                              )}
+                              {sess.tags && sess.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                  {sess.tags.map((tag, tIdx) => (
+                                    <span key={tIdx} className="rounded-full bg-gelo px-2.5 py-0.5 text-[12.5px] font-semibold text-azul-petroleo">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="mt-2 space-y-3 text-[14px]">
+                              <p className="italic text-muted">
+                                Sessão agendada na clínica. Realize o atendimento para registrar a evolução clínica e os pontos de
+                                melhora.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSessionForm({
+                                    sessionNumber: sess.sessionNumber,
+                                    date: sess.date || new Date().toISOString().split('T')[0],
+                                    evolution: '',
+                                    improvementPoint: '',
+                                    tags: 'Fluência, Linguagem, Respiração',
+                                  });
+                                  setShowNewSessionModal(true);
+                                }}
+                                className={buttonClass('azul')}
+                              >
+                                <CheckCircle size={15} aria-hidden="true" /> Realizar atendimento (registrar evolução)
+                              </button>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              )}
             </div>
           )}
 
@@ -805,24 +792,24 @@ export default function MedicalRecordPage({
           {/* ABA 2: AVALIAÇÕES (TABELA CLÍNICA)                         */}
           {/* ========================================================== */}
           {activeTab === 'avaliacoes' && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#172C3A]">
+            <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-line">
+                <h3 className="font-serif text-[20px] font-semibold text-azul-petroleo">
                   Avaliações Registradas
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowNewEvalModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-2xs transition cursor-pointer"
                 >
                   <Plus size={14} /> Nova Avaliação
                 </button>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-[13.5px]">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
+                    <tr className="border-b border-line text-[12.5px] font-semibold text-muted">
                       <th className="py-2.5">Data</th>
                       <th className="py-2.5">Tipo</th>
                       <th className="py-2.5">Resultado</th>
@@ -830,22 +817,22 @@ export default function MedicalRecordPage({
                       <th className="py-2.5 text-right">Ação</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-line">
                     {evaluations.map((ev) => (
-                      <tr key={ev.id} className="hover:bg-slate-50/60 transition">
-                        <td className="py-3 font-medium text-slate-800">{formatDateBR(ev.dataAvaliacao)}</td>
-                        <td className="py-3 font-semibold text-slate-900">{ev.tipoAvaliacao}</td>
+                      <tr key={ev.id} className="hover:bg-canvas transition">
+                        <td className="py-3 font-medium text-ink">{formatDateBR(ev.dataAvaliacao)}</td>
+                        <td className="py-3 font-semibold text-ink">{ev.tipoAvaliacao}</td>
                         <td className="py-3">
-                          <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-900">
+                          <span className="px-2.5 py-0.5 rounded-md text-[12px] font-bold bg-warning/10 text-warning">
                             {ev.resultados}
                           </span>
                         </td>
-                        <td className="py-3 text-slate-600">{ev.responsavelNome}</td>
+                        <td className="py-3 text-muted">{ev.responsavelNome}</td>
                         <td className="py-3 text-right">
                           <button
                             type="button"
                             onClick={() => setViewEvalDetail(ev)}
-                            className="px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-100 font-bold text-slate-700 text-[11px] transition cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg border border-line hover:bg-gelo font-bold text-ink text-[12.5px] transition cursor-pointer"
                           >
                             Ver
                           </button>
@@ -862,34 +849,34 @@ export default function MedicalRecordPage({
           {/* ABA 3: DIAGNÓSTICO & PLANO TERAPÊUTICO                     */}
           {/* ========================================================== */}
           {activeTab === 'diagnostico' && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="text-sm font-bold font-serif text-[#172C3A]">
+            <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-6 ring-1 ring-line space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-line">
+                <h3 className="font-serif text-[20px] font-semibold text-azul-petroleo">
                   Diagnóstico & Plano Terapêutico
                 </h3>
                 <button
                   type="button"
                   onClick={() => setIsEditingDiag(!isEditingDiag)}
-                  className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                  className="px-3 py-1.5 rounded-[12px] border border-line bg-surface hover:bg-canvas text-[13.5px] font-bold text-ink flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
                 >
                   <Pencil size={13} /> {isEditingDiag ? 'Cancelar' : 'Editar'}
                 </button>
               </div>
 
-              <form onSubmit={handleSaveDiagnostic} className="space-y-4 text-xs">
+              <form onSubmit={handleSaveDiagnostic} className="space-y-4 text-[13.5px]">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="sm:col-span-2 space-y-1">
-                    <label className="text-slate-500 font-bold block">Diagnóstico fonoaudiológico</label>
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Diagnóstico fonoaudiológico</label>
                     <input
                       type="text"
                       disabled={!isEditingDiag}
                       value={diagForm.speechDiagnosis}
                       onChange={(e) => setDiagForm({ ...diagForm, speechDiagnosis: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">CID-10 (Sugestão Clínica)</label>
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">CID-10 (Sugestão Clínica)</label>
                     <input
                       type="text"
                       list="cid10-prontuario-sugestoes"
@@ -897,7 +884,7 @@ export default function MedicalRecordPage({
                       disabled={!isEditingDiag}
                       value={diagForm.cid10}
                       onChange={(e) => setDiagForm({ ...diagForm, cid10: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-bold text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                     <datalist id="cid10-prontuario-sugestoes">
                       <option value="F80.0">F80.0 - Transtorno específico da articulação da fala</option>
@@ -915,7 +902,7 @@ export default function MedicalRecordPage({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">Área Terapêutica</label>
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Área Terapêutica</label>
                     <input
                       type="text"
                       list="areas-terapeuticas-sugestoes"
@@ -923,7 +910,7 @@ export default function MedicalRecordPage({
                       disabled={!isEditingDiag}
                       value={diagForm.therapeuticArea}
                       onChange={(e) => setDiagForm({ ...diagForm, therapeuticArea: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                     <datalist id="areas-terapeuticas-sugestoes">
                       <option value="Linguagem">Linguagem (Desenvolvimento infantil, fala e escrita)</option>
@@ -935,7 +922,7 @@ export default function MedicalRecordPage({
                     </datalist>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">Periodicidade / Frequência das Sessões</label>
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Periodicidade / Frequência das Sessões</label>
                     <input
                       type="text"
                       list="frequencia-sessoes-sugestoes"
@@ -943,7 +930,7 @@ export default function MedicalRecordPage({
                       disabled={!isEditingDiag}
                       value={diagForm.sessionFrequency}
                       onChange={(e) => setDiagForm({ ...diagForm, sessionFrequency: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                     <datalist id="frequencia-sessoes-sugestoes">
                       <option value="1x por semana · 45 min">1x por semana · 45 min</option>
@@ -956,24 +943,24 @@ export default function MedicalRecordPage({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-500 font-bold block">Objetivos do tratamento</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Objetivos do tratamento</label>
                   <textarea
                     rows={4}
                     disabled={!isEditingDiag}
                     value={diagForm.treatmentGoal}
                     onChange={(e) => setDiagForm({ ...diagForm, treatmentGoal: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7] leading-relaxed"
+                    className={campoClinico}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-500 font-bold block">Condutas terapêuticas</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Condutas terapêuticas</label>
                   <textarea
                     rows={3}
                     disabled={!isEditingDiag}
                     value={diagForm.treatmentPlan}
                     onChange={(e) => setDiagForm({ ...diagForm, treatmentPlan: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7] leading-relaxed"
+                    className={campoClinico}
                   />
                 </div>
 
@@ -982,14 +969,14 @@ export default function MedicalRecordPage({
                     <button
                       type="button"
                       onClick={() => setIsEditingDiag(false)}
-                      className="px-4 py-2 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-100"
+                      className="px-4 py-2 rounded-[12px] border border-line font-bold text-muted hover:bg-gelo"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={savingAction}
-                      className="px-5 py-2 rounded-xl bg-[#0284C7] text-white font-bold hover:bg-sky-700 flex items-center gap-1.5"
+                      className={`${buttonClass('azul')}`}
                     >
                       <Save size={14} /> Salvar Diagnóstico
                     </button>
@@ -1003,25 +990,25 @@ export default function MedicalRecordPage({
           {/* ABA 4: ANAMNESE FONOAUDIOLÓGICA                            */}
           {/* ========================================================== */}
           {activeTab === 'anamnese' && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="text-sm font-bold font-serif text-[#172C3A]">
+            <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-6 ring-1 ring-line space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-line">
+                <h3 className="font-serif text-[20px] font-semibold text-azul-petroleo">
                   Anamnese Fonoaudiológica
                 </h3>
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={() => setIsEditingAnamnese(!isEditingAnamnese)}
-                    className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                    className="px-3 py-1.5 rounded-[12px] border border-line bg-surface hover:bg-canvas text-[13.5px] font-bold text-ink flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
                   >
                     <Pencil size={13} /> {isEditingAnamnese ? 'Cancelar' : 'Editar'}
                   </button>
                 </div>
               </div>
 
-              <form onSubmit={handleSaveAnamnese} className="space-y-4 text-xs">
+              <form onSubmit={handleSaveAnamnese} className="space-y-4 text-[13.5px]">
                 <div className="space-y-1">
-                  <label className="text-slate-500 font-bold block">
+                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">
                     Queixa principal relatada pela família
                   </label>
                   <textarea
@@ -1029,13 +1016,13 @@ export default function MedicalRecordPage({
                     disabled={!isEditingAnamnese}
                     value={anamneseForm.mainComplaint}
                     onChange={(e) => setAnamneseForm({ ...anamneseForm, mainComplaint: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7] leading-relaxed"
+                    className={campoClinico}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">
                       Histórico familiar de disfluência
                     </label>
                     <input
@@ -1043,24 +1030,24 @@ export default function MedicalRecordPage({
                       disabled={!isEditingAnamnese}
                       value={anamneseForm.familyHistory}
                       onChange={(e) => setAnamneseForm({ ...anamneseForm, familyHistory: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">Início dos sintomas</label>
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Início dos sintomas</label>
                     <input
                       type="text"
                       disabled={!isEditingAnamnese}
                       value={anamneseForm.symptomOnset}
                       onChange={(e) => setAnamneseForm({ ...anamneseForm, symptomOnset: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">
                       Desenvolvimento da linguagem
                     </label>
                     <input
@@ -1070,22 +1057,22 @@ export default function MedicalRecordPage({
                       onChange={(e) =>
                         setAnamneseForm({ ...anamneseForm, languageDevelopment: e.target.value })
                       }
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-slate-500 font-bold block">Tratamentos anteriores</label>
+                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Tratamentos anteriores</label>
                     <input
                       type="text"
                       disabled={!isEditingAnamnese}
                       defaultValue="Nenhum"
-                      className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7]"
+                      className={campoClinico}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-500 font-bold block">Observações adicionais</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Observações adicionais</label>
                   <textarea
                     rows={3}
                     disabled={!isEditingAnamnese}
@@ -1093,7 +1080,7 @@ export default function MedicalRecordPage({
                     onChange={(e) =>
                       setAnamneseForm({ ...anamneseForm, additionalObservations: e.target.value })
                     }
-                    className="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-50 font-medium text-slate-900 outline-none focus:ring-2 focus:ring-[#0284C7] leading-relaxed"
+                    className={campoClinico}
                   />
                 </div>
 
@@ -1102,14 +1089,14 @@ export default function MedicalRecordPage({
                     <button
                       type="button"
                       onClick={() => setIsEditingAnamnese(false)}
-                      className="px-4 py-2 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-100"
+                      className="px-4 py-2 rounded-[12px] border border-line font-bold text-muted hover:bg-gelo"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={savingAction}
-                      className="px-5 py-2 rounded-xl bg-[#0284C7] text-white font-bold hover:bg-sky-700 flex items-center gap-1.5"
+                      className={`${buttonClass('azul')}`}
                     >
                       <Save size={14} /> Salvar Anamnese
                     </button>
@@ -1123,24 +1110,24 @@ export default function MedicalRecordPage({
           {/* ABA 5: ANEXOS (DOCUMENTOS, ÁUDIOS E EXAMES)               */}
           {/* ========================================================== */}
           {activeTab === 'anexos' && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <span className="text-xs font-bold text-slate-500">
+            <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-line">
+                <span className="text-[13.5px] font-bold text-muted">
                   {attachments.length} arquivos · {formatBytes(totalAttachmentBytes)}
                 </span>
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(true)}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-2xs transition cursor-pointer"
                 >
                   <UploadCloud size={14} /> Enviar arquivo
                 </button>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-[13.5px]">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
+                    <tr className="border-b border-line text-[12.5px] font-semibold text-muted">
                       <th className="py-2.5">Arquivo</th>
                       <th className="py-2.5">Tipo</th>
                       <th className="py-2.5">Data</th>
@@ -1148,7 +1135,7 @@ export default function MedicalRecordPage({
                       <th className="py-2.5 text-right">Ação</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-line">
                     {attachments.map((att) => {
                       const isAudio =
                         att.fileName.endsWith('.mp3') ||
@@ -1160,30 +1147,30 @@ export default function MedicalRecordPage({
 
                       const typeLabel = isAudio ? 'Áudio' : isPdf ? 'Documento' : 'Exame';
                       const badgeClass = isAudio
-                        ? 'bg-purple-100 text-purple-800'
+                        ? 'bg-lavanda text-on-pastel'
                         : isPdf
-                        ? 'bg-sky-100 text-sky-800'
-                        : 'bg-emerald-100 text-emerald-800';
+                        ? 'bg-gelo text-azul'
+                        : 'bg-success/10 text-success';
 
                       return (
-                        <tr key={att.id} className="hover:bg-slate-50/60 transition">
-                          <td className="py-3 font-semibold text-slate-900 flex items-center gap-2">
+                        <tr key={att.id} className="hover:bg-canvas transition">
+                          <td className="py-3 font-semibold text-ink flex items-center gap-2">
                             {isAudio ? (
-                              <Mic size={15} className="text-purple-600 shrink-0" />
+                              <Mic size={15} className="text-on-pastel shrink-0" />
                             ) : isPdf ? (
-                              <FileText size={15} className="text-[#0284C7] shrink-0" />
+                              <FileText size={15} className="text-azul shrink-0" />
                             ) : (
-                              <Paperclip size={15} className="text-emerald-600 shrink-0" />
+                              <Paperclip size={15} className="text-success shrink-0" />
                             )}
                             <span className="truncate max-w-[200px] sm:max-w-xs">{att.fileName}</span>
                           </td>
                           <td className="py-3">
-                            <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${badgeClass}`}>
+                            <span className={`px-2.5 py-0.5 rounded-md text-[12px] font-bold ${badgeClass}`}>
                               {typeLabel}
                             </span>
                           </td>
-                          <td className="py-3 text-slate-600">{formatDateBR(att.attachmentDate)}</td>
-                          <td className="py-3 text-slate-500 font-mono text-[11px]">
+                          <td className="py-3 text-muted">{formatDateBR(att.attachmentDate)}</td>
+                          <td className="py-3 text-muted font-mono text-[12.5px]">
                             {formatBytes(att.fileSize)}
                           </td>
                           <td className="py-3 text-right">
@@ -1191,7 +1178,7 @@ export default function MedicalRecordPage({
                               href={getAttachmentDownloadUrl(att.id)}
                               target="_blank"
                               rel="noreferrer"
-                              className="px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-100 font-bold text-slate-700 text-[11px] transition inline-flex items-center gap-1"
+                              className="px-2.5 py-1 rounded-lg border border-line hover:bg-gelo font-bold text-ink text-[12.5px] transition inline-flex items-center gap-1"
                             >
                               Baixar
                             </a>
@@ -1211,90 +1198,90 @@ export default function MedicalRecordPage({
       {/* MODAL: REGISTRAR NOVA SESSÃO NO HISTÓRICO                       */}
       {/* ============================================================== */}
       {showNewSessionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg bg-white rounded-2xl border border-slate-300 p-6 shadow-2xl space-y-4 text-[#172C3A]">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-lg font-bold font-serif text-[#172C3A]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
+          <div className="auth-troca w-full max-w-lg max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">
                 Registrar Evolução de Sessão
               </h3>
               <button
                 type="button"
                 onClick={() => setShowNewSessionModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1"
+                className="text-muted hover:text-ink p-1"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveNewSession} className="space-y-3.5 text-xs">
+            <form onSubmit={handleSaveNewSession} className="space-y-3.5 text-[13.5px]">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-700 block">Número da Sessão</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Número da Sessão</label>
                   <input
                     type="number"
                     required
                     value={sessionForm.sessionNumber}
                     onChange={(e) => setSessionForm({ ...sessionForm, sessionNumber: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                    className={campoClinico}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-700 block">Data da Sessão</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Data da Sessão</label>
                   <input
                     type="date"
                     required
                     value={sessionForm.date}
                     onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                    className={campoClinico}
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Evolução Clínica *</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Evolução Clínica *</label>
                 <textarea
                   rows={3}
                   required
                   placeholder="Descreva o desempenho do paciente, exercícios realizados e resposta clínica..."
                   value={sessionForm.evolution}
                   onChange={(e) => setSessionForm({ ...sessionForm, evolution: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Ponto de Melhora / Tarefa de Casa</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Ponto de Melhora / Tarefa de Casa</label>
                 <textarea
                   rows={2}
                   placeholder="Orientações para a família ou pontos a focar na próxima sessão..."
                   value={sessionForm.improvementPoint}
                   onChange={(e) => setSessionForm({ ...sessionForm, improvementPoint: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Marcadores Clínicos / Focos da Sessão (separados por vírgula)</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Marcadores Clínicos / Focos da Sessão (separados por vírgula)</label>
                 <input
                   type="text"
                   placeholder="Ex: Fonologia, Fluência, Articulação, Leitura guiada"
                   value={sessionForm.tags}
                   onChange={(e) => setSessionForm({ ...sessionForm, tags: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
-              <div className="flex gap-2 pt-2 border-t border-slate-100">
+              <div className="flex gap-2 pt-2 border-t border-line">
                 <button
                   type="button"
                   onClick={() => setShowNewSessionModal(false)}
-                  className="flex-1 py-2 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-100"
+                  className="flex-1 py-2 rounded-[12px] border border-line font-bold text-muted hover:bg-gelo"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 rounded-xl bg-[#0284C7] text-white font-bold hover:bg-sky-700"
+                  className={`${buttonClass('azul')} flex-1`}
                 >
                   Registrar Sessão
                 </button>
@@ -1308,78 +1295,78 @@ export default function MedicalRecordPage({
       {/* MODAL: NOVA AVALIAÇÃO                                          */}
       {/* ============================================================== */}
       {showNewEvalModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-300 p-6 shadow-2xl space-y-4 text-[#172C3A]">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-lg font-bold font-serif text-[#172C3A]">Nova Avaliação Clínica</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
+          <div className="auth-troca w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">Nova Avaliação Clínica</h3>
               <button
                 type="button"
                 onClick={() => setShowNewEvalModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1"
+                className="text-muted hover:text-ink p-1"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveNewEvaluation} className="space-y-3.5 text-xs">
+            <form onSubmit={handleSaveNewEvaluation} className="space-y-3.5 text-[13.5px]">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Tipo de Avaliação *</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Tipo de Avaliação *</label>
                 <input
                   type="text"
                   required
                   placeholder="Ex: Avaliação de Fluência, Audiometria, Linguagem..."
                   value={evalForm.tipoAvaliacao}
                   onChange={(e) => setEvalForm({ ...evalForm, tipoAvaliacao: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Data da Avaliação *</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Data da Avaliação *</label>
                 <input
                   type="date"
                   required
                   value={evalForm.dataAvaliacao}
                   onChange={(e) => setEvalForm({ ...evalForm, dataAvaliacao: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Resultado Observado *</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Resultado Observado *</label>
                 <textarea
                   rows={2}
                   required
                   placeholder="Ex: Disfluência moderada com bloqueios em fonemas oclusivos..."
                   value={evalForm.resultados}
                   onChange={(e) => setEvalForm({ ...evalForm, resultados: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Conduta Proposta</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Conduta Proposta</label>
                 <textarea
                   rows={2}
                   placeholder="Ex: Início de intervenção terapêutica semanal focada em controle de velocidade..."
                   value={evalForm.condutasPropostas}
                   onChange={(e) => setEvalForm({ ...evalForm, condutasPropostas: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
-              <div className="flex gap-2 pt-2 border-t border-slate-100">
+              <div className="flex gap-2 pt-2 border-t border-line">
                 <button
                   type="button"
                   onClick={() => setShowNewEvalModal(false)}
-                  className="flex-1 py-2 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-100"
+                  className="flex-1 py-2 rounded-[12px] border border-line font-bold text-muted hover:bg-gelo"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={savingAction}
-                  className="flex-1 py-2 rounded-xl bg-[#0284C7] text-white font-bold hover:bg-sky-700"
+                  className={`${buttonClass('azul')} flex-1`}
                 >
                   {savingAction ? 'Gravando...' : 'Salvar Avaliação'}
                 </button>
@@ -1393,53 +1380,53 @@ export default function MedicalRecordPage({
       {/* MODAL: VER DETALHE DA AVALIAÇÃO                                */}
       {/* ============================================================== */}
       {viewEvalDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-300 p-6 shadow-2xl space-y-4 text-[#172C3A]">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-lg font-bold font-serif text-[#172C3A]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
+          <div className="auth-troca w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">
                 {viewEvalDetail.tipoAvaliacao}
               </h3>
               <button
                 type="button"
                 onClick={() => setViewEvalDetail(null)}
-                className="text-slate-400 hover:text-slate-700 p-1"
+                className="text-muted hover:text-ink p-1"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400 font-medium">Data:</span>
-                <span className="font-bold text-slate-800">{formatDateBR(viewEvalDetail.dataAvaliacao)}</span>
+            <div className="space-y-3 text-[13.5px]">
+              <div className="flex justify-between py-1 border-b border-line">
+                <span className="text-muted font-medium">Data:</span>
+                <span className="font-bold text-ink">{formatDateBR(viewEvalDetail.dataAvaliacao)}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400 font-medium">Responsável:</span>
-                <span className="font-bold text-slate-800">
+              <div className="flex justify-between py-1 border-b border-line">
+                <span className="text-muted font-medium">Responsável:</span>
+                <span className="font-bold text-ink">
                   {viewEvalDetail.responsavelNome}
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 font-medium block mb-1">Resultado:</span>
-                <p className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-semibold">
+                <span className="text-muted font-medium block mb-1">Resultado:</span>
+                <p className="p-2.5 rounded-lg bg-warning/10 border border-warning/30 text-warning font-semibold">
                   {viewEvalDetail.resultados}
                 </p>
               </div>
               {viewEvalDetail.condutasPropostas && (
                 <div>
-                  <span className="text-slate-400 font-medium block mb-1">Conduta Proposta:</span>
-                  <p className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800">
+                  <span className="text-muted font-medium block mb-1">Conduta Proposta:</span>
+                  <p className="p-2.5 rounded-lg bg-canvas border border-line text-ink">
                     {viewEvalDetail.condutasPropostas}
                   </p>
                 </div>
               )}
             </div>
 
-            <div className="pt-2 border-t border-slate-100 text-right">
+            <div className="pt-2 border-t border-line text-right">
               <button
                 type="button"
                 onClick={() => setViewEvalDetail(null)}
-                className="px-4 py-2 bg-[#0284C7] text-white rounded-xl font-bold text-xs"
+                className="px-4 py-2 bg-azul-petroleo text-on-azul rounded-[12px] font-bold text-[13.5px]"
               >
                 Fechar
               </button>
@@ -1452,57 +1439,57 @@ export default function MedicalRecordPage({
       {/* MODAL: ENVIAR ARQUIVO ANEXO                                    */}
       {/* ============================================================== */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-300 p-6 shadow-2xl space-y-4 text-[#172C3A]">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-lg font-bold font-serif text-[#172C3A]">Enviar Novo Arquivo Anexo</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
+          <div className="auth-troca w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">Enviar Novo Arquivo Anexo</h3>
               <button
                 type="button"
                 onClick={() => setShowUploadModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1"
+                className="text-muted hover:text-ink p-1"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleUploadAttachmentSubmit} className="space-y-3.5 text-xs">
+            <form onSubmit={handleUploadAttachmentSubmit} className="space-y-3.5 text-[13.5px]">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Selecione o arquivo *</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Selecione o arquivo *</label>
                 <input
                   type="file"
                   required
                   accept=".pdf,.mp3,.wav,.ogg,.jpg,.jpeg,.png"
                   onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs p-2 rounded-lg border border-slate-300 bg-white file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-sky-100 file:text-sky-800 hover:file:bg-sky-200 cursor-pointer"
+                  className="w-full text-[13.5px] p-2 rounded-lg border border-line bg-surface file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[13.5px] file:font-bold file:bg-gelo file:text-azul hover:file:bg-azul/20 cursor-pointer"
                 />
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[12px] text-muted">
                   Formatos aceitos: Documentos (PDF), Áudios (MP3, WAV) e Exames (JPG, PNG).
                 </p>
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Descrição do Arquivo</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Descrição do Arquivo</label>
                 <input
                   type="text"
                   placeholder="Ex: Audiometria, Gravação da primeira sessão..."
                   value={uploadDesc}
                   onChange={(e) => setUploadDesc(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-[#0284C7]"
+                  className={campoClinico}
                 />
               </div>
 
-              <div className="flex gap-2 pt-2 border-t border-slate-100">
+              <div className="flex gap-2 pt-2 border-t border-line">
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="flex-1 py-2 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-100"
+                  className="flex-1 py-2 rounded-[12px] border border-line font-bold text-muted hover:bg-gelo"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="flex-1 py-2 rounded-xl bg-[#0284C7] text-white font-bold hover:bg-sky-700 disabled:opacity-60 flex items-center justify-center gap-1.5"
+                  className={`${buttonClass('azul')} flex-1`}
                 >
                   {uploading ? (
                     'Enviando...'

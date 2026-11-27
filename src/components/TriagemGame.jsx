@@ -13,7 +13,8 @@ import {
   Volume2,
 } from 'lucide-react';
 import Logo from './Logo';
-import { Capivara, Comemoracao, Sagui, Tartaruga, Tucano } from './Personagens';
+import { ATIVIDADES } from './atividades';
+import { Capivara, Comemoracao, Sagui, Tucano } from './Personagens';
 import { lerInicioTriagem, limparInicioTriagem } from '../utils/triagemInicio';
 import A11yModal from './A11yModal';
 import DataTable from './DataTable';
@@ -378,12 +379,7 @@ export default function TriagemGame() {
   // ==========================================
   // TELA 1: HOME (ESCOLHA DA FAIXA ETÁRIA)
   // ==========================================
-  const atividades = [
-    { id: 'form02', idade: '0–2', titulo: 'Marcos da comunicação', quem: 'Para pais e cuidadores', desc: 'Balbucio, primeiras palavras e resposta a sons, em perguntas de sim ou não.', campo: 'bg-coral', Personagem: Capivara },
-    { id: 'game24', idade: '2–4', titulo: 'Jogo da Palavra', quem: 'A criança nomeia figuras', desc: 'Você toca no que ouviu. Trocas como vaca → faca ficam registradas.', campo: 'bg-salvia', Personagem: Tucano },
-    { id: 'rima45', idade: '4–5', titulo: 'Jogo da Rima', quem: 'Começa com um exemplo', desc: 'Gato e pato rimam? Rodadas curtas de consciência fonológica.', campo: 'bg-lavanda', Personagem: Sagui },
-    { id: 'check6', idade: '6+', titulo: 'Checklist escolar', quem: 'Para professores', desc: 'O que foi observado em sala nas últimas semanas: fala, leitura e compreensão.', campo: 'bg-mel', Personagem: Tartaruga },
-  ];
+  const atividades = ATIVIDADES;
 
   const renderHomeScreen = () => (
     <div className="space-y-10">

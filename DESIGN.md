@@ -68,3 +68,14 @@ Natural, luz suave, adulto e criança em atividade real, sem pose para a câmera
 ## Área de acesso (`src/pages/AccessArea.jsx`)
 
 Formulário à esquerda, banner fotográfico à direita ocupando toda a altura (no celular o banner vira uma faixa no topo). O seletor "Sou profissional / Família ou paciente" troca o título, o banner (fotos cruzam com fade) e as opções de cadastro; "Entrar / Criar conta" troca o conteúdo sem mudar de rota. Usa a **logo original** (`ModeloA_Semnome.jpg`), a mesma do resto do sistema (`src/components/Logo.jsx`). Profissional: Tucano e nota de sessão flutuante, tom sóbrio. Família: Sapinho, sílabas flutuando, confetes discretos e a Capivara sentada na divisa entre formulário e foto.
+
+## Áreas internas (`src/components/area/`)
+
+- `AreaLayout` — navegação lateral flutuante (desktop) e gaveta (celular), com duas variantes: **profissional** (azul profundo, ícones com ponto mel, item ativo em branco) e **paciente** (clara, cada item com sua cor pastel, capivara acenando no rodapé).
+- `IconesFono` — ícones próprios de traço 1,8 com um "ponto" preenchido pela variável `--icone-acento`.
+- `Avatar` / `SeloStatus` — iniciais com cor pastel estável por nome; status do paciente com ponto colorido.
+- `Modal` e `campos.js` — janelas e campos com a mesma linguagem da tela de acesso.
+- `src/components/atividades.js` — catálogo único das atividades (triagem e área do paciente) e leitura do histórico que a triagem grava neste aparelho.
+
+Paciente: boas-vindas com foto e tucano, dica do dia, portas das atividades por idade, trilha (tartaruga avança com as atividades concluídas) e álbum de figurinhas — ambos a partir do histórico real da triagem salvo no aparelho, sem regras novas no backend.
+Profissional: abertura com distribuição dos pacientes por status, avaliações em andamento, atalhos e acesso rápido; lista de pacientes com busca, situação com contagens e CID; prontuário com capa do paciente, ficha, objetivo terapêutico em destaque, abas com contagens e linha do tempo das sessões.
