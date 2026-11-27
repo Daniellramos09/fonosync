@@ -7,6 +7,7 @@ import Modal from '../../components/area/Modal';
 import { campo, rotulo } from '../../components/area/campos';
 import { createGuardian, createPatient, listPatients, updatePatient } from '../../services/patientService';
 import { formatCPF } from '../../utils/formatters';
+import { FAIXAS, faixaPorIdade } from '../../experiencia/faixas';
 
 const STATUS = {
   ATIVO: { label: 'Em acompanhamento', type: 'acompanhamento' },
@@ -225,7 +226,7 @@ export default function Patients({ onOpenProntuario }) {
             placeholder="Buscar por nome ou telefone"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`${campo} min-h-[52px] pl-12 text-[15.5px]`}
+            className={`${campo} min-h-[52px] pl-12 text-[0.96875rem]`}
           />
         </label>
         <div className="flex shrink-0 gap-2">
@@ -250,13 +251,13 @@ export default function Patients({ onOpenProntuario }) {
                 type="button"
                 aria-pressed={ativo}
                 onClick={() => setActiveTab(id)}
-                className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3.5 text-[13.5px] font-semibold transition active:scale-95 ${
+                className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3.5 text-[0.84375rem] font-semibold transition active:scale-95 ${
                   ativo ? 'border-azul-petroleo bg-azul-petroleo text-on-azul' : 'border-line bg-surface text-ink hover:border-azul/40 hover:bg-gelo'
                 }`}
               >
                 {ponto && <span className={`size-2 rounded-full ${ponto}`} aria-hidden="true" />}
                 {rotulo}
-                <span className={`rounded-full px-1.5 text-[12px] ${ativo ? 'bg-white/20' : 'bg-gelo text-muted'}`}>
+                <span className={`rounded-full px-1.5 text-[0.75rem] ${ativo ? 'bg-white/20' : 'bg-gelo text-muted'}`}>
                   {loading ? '–' : contagem[id]}
                 </span>
               </button>
@@ -266,7 +267,7 @@ export default function Patients({ onOpenProntuario }) {
             <button
               type="button"
               onClick={() => setFilterAgeGroup('todos')}
-              className="inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full bg-coral/50 px-3.5 text-[13.5px] font-semibold text-on-pastel transition hover:bg-coral"
+              className="inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full bg-coral/50 px-3.5 text-[0.84375rem] font-semibold text-on-pastel transition hover:bg-coral"
             >
               {rotuloFaixa}
               <X size={14} aria-hidden="true" />
@@ -279,7 +280,7 @@ export default function Patients({ onOpenProntuario }) {
           type="button"
           aria-pressed={activeTab === 'arquivados'}
           onClick={() => setActiveTab(activeTab === 'arquivados' ? 'todos' : 'arquivados')}
-          className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3.5 text-[13.5px] font-semibold transition ${
+          className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3.5 text-[0.84375rem] font-semibold transition ${
             activeTab === 'arquivados'
               ? 'border-ink bg-ink text-surface'
               : 'border-dashed border-line text-muted hover:border-ink/40 hover:text-ink'
@@ -306,10 +307,10 @@ export default function Patients({ onOpenProntuario }) {
             filteredPatients.map((patient) => (
               <li key={patient.id} className="space-y-3 p-4">
                 <div className="flex items-center gap-3">
-                  <Avatar nome={patient.name} apagado={patient.archived} className="size-11 text-[15px]" />
+                  <Avatar nome={patient.name} apagado={patient.archived} className="size-11 text-[0.9375rem]" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[15px] font-bold text-ink">{patient.name}</p>
-                    <p className="text-[13px] text-muted">
+                    <p className="truncate text-[0.9375rem] font-bold text-ink">{patient.name}</p>
+                    <p className="text-[0.8125rem] text-muted">
                       {patient.age !== null ? `${patient.age} anos` : 'Idade não informada'}
                       {patient.cid10 && ` · CID ${patient.cid10}`}
                     </p>
@@ -317,17 +318,17 @@ export default function Patients({ onOpenProntuario }) {
                   <SeloStatus status={patient.patientStatus} />
                 </div>
                 <div className="flex items-center justify-end gap-2">
-                  <button type="button" onClick={() => openEditPatient(patient)} className={`${buttonClass('suave')} min-h-10 px-3.5 text-[13.5px]`}>
+                  <button type="button" onClick={() => openEditPatient(patient)} className={`${buttonClass('suave')} min-h-10 px-3.5 text-[0.84375rem]`}>
                     <Pencil size={14} aria-hidden="true" /> Editar
                   </button>
-                  <button type="button" onClick={() => handleOpenRecord(patient)} className={`${buttonClass('azul')} min-h-10 px-3.5 text-[13.5px]`}>
+                  <button type="button" onClick={() => handleOpenRecord(patient)} className={`${buttonClass('azul')} min-h-10 px-3.5 text-[0.84375rem]`}>
                     {patient.archived ? 'Ver prontuário' : 'Abrir prontuário'} <ChevronRight size={15} aria-hidden="true" />
                   </button>
                 </div>
               </li>
             ))
           ) : (
-            <li className={`p-8 text-center text-[14px] ${loadError ? 'font-bold text-danger' : 'text-muted'}`}>
+            <li className={`p-8 text-center text-[0.875rem] ${loadError ? 'font-bold text-danger' : 'text-muted'}`}>
               {loadError || 'Nenhum paciente encontrado nesta categoria.'}
             </li>
           )}
@@ -337,7 +338,7 @@ export default function Patients({ onOpenProntuario }) {
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-line text-[12.5px] font-semibold text-muted">
+              <tr className="border-b border-line text-[0.78125rem] font-semibold text-muted">
                 <th className="px-6 py-3.5 font-semibold">Paciente</th>
                 <th className="px-4 py-3.5 font-semibold">Idade</th>
                 <th className="px-4 py-3.5 font-semibold">CID-10</th>
@@ -347,7 +348,7 @@ export default function Patients({ onOpenProntuario }) {
                 </th>
               </tr>
             </thead>
-            <tbody className="text-[14.5px] text-ink">
+            <tbody className="text-[0.90625rem] text-ink">
               {loading ? (
                 [0, 1, 2, 3].map((i) => (
                   <tr key={i} className="border-b border-line last:border-0">
@@ -373,14 +374,19 @@ export default function Patients({ onOpenProntuario }) {
                         <Avatar nome={patient.name} apagado={patient.archived} />
                         <span className="min-w-0">
                           <span className="block font-bold transition-colors group-hover:text-azul">{patient.name}</span>
-                          {patient.phone && <span className="block text-[13px] text-muted">{patient.phone}</span>}
+                          {patient.phone && <span className="block text-[0.8125rem] text-muted">{patient.phone}</span>}
                         </span>
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-muted">{patient.age !== null && `${patient.age} anos`}</td>
+                    <td className="px-4 py-3.5 text-muted">
+                      {patient.age !== null && `${patient.age} anos`}
+                      {faixaPorIdade(patient.age) && (
+                        <span className="block text-[0.78125rem] font-semibold text-azul">{FAIXAS[faixaPorIdade(patient.age)].rotulo}</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3.5">
                       {patient.cid10 ? (
-                        <span className="rounded-[8px] bg-gelo px-2 py-1 font-mono text-[12.5px] font-semibold text-azul-petroleo">
+                        <span className="rounded-[8px] bg-gelo px-2 py-1 font-mono text-[0.78125rem] font-semibold text-azul-petroleo">
                           {patient.cid10}
                         </span>
                       ) : (
@@ -398,7 +404,7 @@ export default function Patients({ onOpenProntuario }) {
                             e.stopPropagation();
                             openEditPatient(patient);
                           }}
-                          className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] font-semibold text-muted transition hover:bg-surface hover:text-azul"
+                          className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-[10px] px-3 text-[0.84375rem] font-semibold text-muted transition hover:bg-surface hover:text-azul"
                         >
                           <Pencil size={14} aria-hidden="true" /> Editar
                         </button>
@@ -408,7 +414,7 @@ export default function Patients({ onOpenProntuario }) {
                             e.stopPropagation();
                             handleOpenRecord(patient);
                           }}
-                          className="inline-flex min-h-9 cursor-pointer items-center gap-1 rounded-[10px] rounded-bl-[3px] bg-gelo px-3 text-[13.5px] font-bold text-azul-petroleo transition group-hover:bg-azul-petroleo group-hover:text-on-azul"
+                          className="inline-flex min-h-9 cursor-pointer items-center gap-1 rounded-[10px] rounded-bl-[3px] bg-gelo px-3 text-[0.84375rem] font-bold text-azul-petroleo transition group-hover:bg-azul-petroleo group-hover:text-on-azul"
                         >
                           {patient.archived ? 'Restaurar / Ver' : 'Abrir prontuário'}
                           <ChevronRight size={15} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
@@ -498,7 +504,7 @@ export default function Patients({ onOpenProntuario }) {
                 />
               </div>
               {formAge !== null && formAge < 18 ? (
-                <p className="flex items-start gap-2 rounded-[12px] rounded-bl-[3px] bg-salvia/70 p-3 text-[13px] leading-snug text-on-pastel sm:col-span-2">
+                <p className="flex items-start gap-2 rounded-[12px] rounded-bl-[3px] bg-salvia/70 p-3 text-[0.8125rem] leading-snug text-on-pastel sm:col-span-2">
                   <ShieldCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-success" />
                   <span>
                     <strong>Proteção de menores (LGPD):</strong> por segurança e privacidade da criança, não solicitamos CPF
@@ -559,7 +565,7 @@ export default function Patients({ onOpenProntuario }) {
 
             {needsGuardian && (
               <fieldset className="space-y-3 rounded-[16px] rounded-bl-[5px] bg-gelo/70 p-4">
-                <legend className="float-left mb-1 w-full text-[14px] font-bold text-azul-petroleo">
+                <legend className="float-left mb-1 w-full text-[0.875rem] font-bold text-azul-petroleo">
                   Responsável (menor de 18 anos)
                 </legend>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -600,7 +606,7 @@ export default function Patients({ onOpenProntuario }) {
             )}
 
             {formError && (
-              <p role="alert" className="rounded-[12px] rounded-bl-[3px] bg-danger/10 p-3 text-[13.5px] font-bold text-danger">
+              <p role="alert" className="rounded-[12px] rounded-bl-[3px] bg-danger/10 p-3 text-[0.84375rem] font-bold text-danger">
                 {formError}
               </p>
             )}

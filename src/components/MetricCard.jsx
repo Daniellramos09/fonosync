@@ -5,7 +5,7 @@ export default function MetricCard({ icon: Icon, label, value, note }) {
         <Icon size={18} className="shrink-0 text-primary" aria-hidden="true" />
         {label}
       </div>
-      <p className="text-[28px] leading-none text-navy">{value}</p>
+      <p className="text-[1.75rem] leading-none text-navy">{value}</p>
       <p className="text-sm text-success">{note}</p>
     </div>
   );

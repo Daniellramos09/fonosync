@@ -29,7 +29,7 @@ export default function Modal({ titulo, onFechar, children, largura = 'max-w-lg'
         className={`auth-troca relative max-h-[92dvh] w-full overflow-y-auto rounded-t-[26px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] sm:rounded-[26px] sm:rounded-bl-[8px] ${largura}`}
       >
         <div className="mb-5 flex items-start justify-between gap-4">
-          <h3 id={id} className="font-serif text-[24px] font-semibold leading-tight text-azul-petroleo">
+          <h3 id={id} className="font-serif text-[1.5rem] font-semibold leading-tight text-azul-petroleo">
             {titulo}
           </h3>
           <button

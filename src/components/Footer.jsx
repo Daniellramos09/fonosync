@@ -7,7 +7,7 @@ import Notice from './Notice';
 import { INFO_PAGES } from '../utils/constants';
 
 const fieldClass =
-  'min-h-12 w-full rounded-[10px] rounded-bl-[3px] border-[1.5px] border-line bg-surface px-3.5 text-[16px] text-ink transition-colors hover:border-primary/40 focus:border-primary';
+  'min-h-12 w-full rounded-[10px] rounded-bl-[3px] border-[1.5px] border-line bg-surface px-3.5 text-[1rem] text-ink transition-colors hover:border-primary/40 focus:border-primary';
 
 function ContactForm() {
   const [sent, setSent] = useState(false);
@@ -63,7 +63,7 @@ export default function Footer() {
 
   const info = dialog && dialog !== 'contato' ? INFO_PAGES[dialog] : null;
   const linkClass =
-    'text-left text-[16px] text-white/80 underline-offset-[6px] transition-colors hover:text-white hover:underline';
+    'text-left text-[1rem] text-white/80 underline-offset-[6px] transition-colors hover:text-white hover:underline';
 
   return (
     <footer className="on-dark bg-ocean-deep text-white">
@@ -71,10 +71,10 @@ export default function Footer() {
         <div className="grid gap-14 border-b border-white/15 pb-16 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-24">
           <div>
             <Logo tone="claro" markClassName="size-10" />
-            <p className="display mt-10 max-w-[16ch] text-[40px] sm:text-[56px]">
+            <p className="display mt-10 max-w-[16ch] text-[2.5rem] sm:text-[3.5rem]">
               Cada criança encontra a sua voz no seu tempo.
             </p>
-            <p className="mt-6 max-w-[52ch] text-[15px] leading-[1.6] text-white/72">
+            <p className="mt-6 max-w-[52ch] text-[0.9375rem] leading-[1.6] text-white/72">
               Plataforma acadêmico-clínica para o acompanhamento fonoaudiológico entre consultório,
               família e escola. As atividades de rastreio não substituem a avaliação presencial.
             </p>
@@ -82,13 +82,13 @@ export default function Footer() {
 
           <nav aria-label="Rodapé" className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:gap-16">
             <div className="flex flex-col items-start gap-3">
-              <p className="text-[13px] font-semibold text-on-band-muted">Plataforma</p>
+              <p className="text-[0.8125rem] font-semibold text-on-band-muted">Plataforma</p>
               <a href="#/triagem" className={linkClass}>Rastreio fonológico</a>
               <a href="#/acesso" className={linkClass}>Área do profissional</a>
               <a href="#/acesso" className={linkClass}>Área da família</a>
             </div>
             <div className="flex flex-col items-start gap-3">
-              <p className="text-[13px] font-semibold text-on-band-muted">Ética</p>
+              <p className="text-[0.8125rem] font-semibold text-on-band-muted">Ética</p>
               <button type="button" onClick={() => setDialog('pesquisa')} className={linkClass}>
                 Pesquisa e validação
               </button>
@@ -97,7 +97,7 @@ export default function Footer() {
               </button>
             </div>
             <div className="flex flex-col items-start gap-3">
-              <p className="text-[13px] font-semibold text-on-band-muted">Suporte</p>
+              <p className="text-[0.8125rem] font-semibold text-on-band-muted">Suporte</p>
               <button type="button" onClick={() => setShowA11y(true)} className={linkClass}>
                 Acessibilidade
               </button>
@@ -108,7 +108,7 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="flex flex-col items-start justify-between gap-3 pt-8 text-[14px] text-white/65 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start justify-between gap-3 pt-8 text-[0.875rem] text-white/65 sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} FonoSync · Projeto acadêmico-clínico (FATEC)</p>
           <p>Rastreio não é diagnóstico clínico</p>
         </div>

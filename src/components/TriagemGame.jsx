@@ -384,10 +384,10 @@ export default function TriagemGame() {
   const renderHomeScreen = () => (
     <div className="space-y-10">
       <div>
-        <h1 className="display max-w-[16ch] text-[38px] text-navy sm:text-[48px]">
+        <h1 className="display max-w-[16ch] text-[2.375rem] text-navy sm:text-[3rem]">
           Qual a idade da criança?
         </h1>
-        <p className="mt-4 max-w-[56ch] text-[17px] leading-[1.6] text-muted">
+        <p className="mt-4 max-w-[56ch] text-[1.0625rem] leading-[1.6] text-muted">
           Atividades curtas, sem microfone e sem cadastro. Quem escuta a criança é você: escolha a
           faixa etária e siga as instruções na tela.
         </p>
@@ -403,15 +403,15 @@ export default function TriagemGame() {
             >
               <span className="flex items-start justify-between gap-4">
                 <span>
-                  <span className="display block text-[44px]">{a.idade}</span>
-                  <span className="text-[14px] font-semibold opacity-75">anos</span>
+                  <span className="display block text-[2.75rem]">{a.idade}</span>
+                  <span className="text-[0.875rem] font-semibold opacity-75">anos</span>
                 </span>
                 <Personagem className="-mt-2 -mr-2 w-28 shrink-0 sm:w-32" animated={false} />
               </span>
-              <span className="mt-4 block font-serif text-[24px] leading-tight font-semibold">{a.titulo}</span>
-              <span className="mt-1 block text-[14px] font-semibold opacity-75">{a.quem}</span>
-              <span className="mt-3 block max-w-[38ch] flex-1 text-[15px] leading-[1.55] opacity-85">{a.desc}</span>
-              <span className="mt-5 inline-flex items-center gap-2 text-[15px] font-bold">
+              <span className="mt-4 block font-serif text-[1.5rem] leading-tight font-semibold">{a.titulo}</span>
+              <span className="mt-1 block text-[0.875rem] font-semibold opacity-75">{a.quem}</span>
+              <span className="mt-3 block max-w-[38ch] flex-1 text-[0.9375rem] leading-[1.55] opacity-85">{a.desc}</span>
+              <span className="mt-5 inline-flex items-center gap-2 text-[0.9375rem] font-bold">
                 Começar
                 <ArrowRight size={17} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
               </span>
@@ -420,7 +420,7 @@ export default function TriagemGame() {
         ))}
       </ul>
 
-      <p className="flex items-start gap-2 text-[14px] leading-[1.55] text-muted">
+      <p className="flex items-start gap-2 text-[0.875rem] leading-[1.55] text-muted">
         <Info size={17} aria-hidden="true" className="mt-0.5 shrink-0 text-primary" />
         O rastreio não é diagnóstico. Ele indica se vale a pena procurar um fonoaudiólogo para uma
         avaliação presencial.
@@ -450,8 +450,8 @@ export default function TriagemGame() {
           <div className="on-dark flex items-center gap-4 bg-ocean px-6 py-5 text-white">
             <Tucano key={phoneticIndex} className={`w-20 shrink-0 ${phoneticFeedback?.isCorrect ? 'char-pula' : ''}`} galho={false} />
             <div>
-              <h3 className="font-serif text-[22px] font-semibold">Mostre a figura e pergunte: “O que é isso?”</h3>
-              <p className="mt-1 text-[15px] text-white/85">Depois toque no que a criança falou. Não corrija, apenas registre.</p>
+              <h3 className="font-serif text-[1.375rem] font-semibold">Mostre a figura e pergunte: “O que é isso?”</h3>
+              <p className="mt-1 text-[0.9375rem] text-white/85">Depois toque no que a criança falou. Não corrija, apenas registre.</p>
             </div>
           </div>
 
@@ -476,7 +476,7 @@ export default function TriagemGame() {
 
             {/* Feedback da rodada */}
             {phoneticFeedback && (
-              <div role="status" className={`mb-6 rounded-[14px] rounded-bl-[3px] p-4 text-center text-[15px] font-semibold text-on-pastel ${phoneticFeedback.isCorrect ? 'bg-salvia' : 'bg-coral/60'}`}>
+              <div role="status" className={`mb-6 rounded-[14px] rounded-bl-[3px] p-4 text-center text-[0.9375rem] font-semibold text-on-pastel ${phoneticFeedback.isCorrect ? 'bg-salvia' : 'bg-coral/60'}`}>
                 {phoneticFeedback.isCorrect ? 'Pronúncia esperada registrada.' : `Registrado: "${phoneticFeedback.spoken}" · ${phoneticFeedback.note}`}
               </div>
             )}
@@ -484,7 +484,7 @@ export default function TriagemGame() {
             {/* Botões Rápidos recomendados pela especificação */}
             {!isTypingCustom ? (
               <div className="space-y-4">
-                <p className="text-center text-[15px] font-semibold text-ink">
+                <p className="text-center text-[0.9375rem] font-semibold text-ink">
                   O que a criança disse? Toque na opção mais próxima.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -496,7 +496,7 @@ export default function TriagemGame() {
                       className="rounded-[16px] rounded-bl-[4px] border-2 border-line bg-surface p-4 text-center text-lg font-bold text-ink transition-colors hover:border-primary hover:bg-salvia/40"
                     >
                       "{opt.label}"
-                      <span className="block text-[11px] font-normal text-muted mt-1">{opt.note}</span>
+                      <span className="block text-[0.6875rem] font-normal text-muted mt-1">{opt.note}</span>
                     </button>
                   ))}
                 </div>
@@ -520,7 +520,7 @@ export default function TriagemGame() {
               </div>
             ) : (
               <div className="space-y-4 max-w-md mx-auto">
-                <label htmlFor="pronuncia-digitada" className="block text-center text-[15px] font-semibold text-ink">
+                <label htmlFor="pronuncia-digitada" className="block text-center text-[0.9375rem] font-semibold text-ink">
                   Digite exatamente como a criança pronunciou:
                 </label>
                 <div className="flex gap-2">
@@ -621,8 +621,8 @@ export default function TriagemGame() {
           <div className="on-dark flex items-center gap-4 bg-ocean px-6 py-5 text-white">
             <Tucano key={rimaIndex} className={`w-20 shrink-0 ${rimaFeedback ? 'char-pula' : ''}`} galho={false} />
             <div>
-              <h3 className="font-serif text-[22px] font-semibold">Essas palavras rimam?</h3>
-              <p className="mt-1 text-[15px] text-white/85">Leia as duas em voz alta e pergunte o que a criança acha.</p>
+              <h3 className="font-serif text-[1.375rem] font-semibold">Essas palavras rimam?</h3>
+              <p className="mt-1 text-[0.9375rem] text-white/85">Leia as duas em voz alta e pergunte o que a criança acha.</p>
             </div>
           </div>
 
@@ -660,7 +660,7 @@ export default function TriagemGame() {
             </div>
 
             {rimaFeedback && (
-              <div role="status" className="rounded-[14px] rounded-bl-[3px] bg-salvia p-4 text-center text-[15px] font-semibold text-on-pastel">
+              <div role="status" className="rounded-[14px] rounded-bl-[3px] bg-salvia p-4 text-center text-[0.9375rem] font-semibold text-on-pastel">
                 {rimaFeedback}
               </div>
             )}
@@ -738,7 +738,7 @@ export default function TriagemGame() {
             </div>
 
             {/* Aviso fixo obrigatório */}
-            <p className="flex items-start gap-2 rounded-[14px] rounded-bl-[3px] bg-nevoa p-4 text-[14px] font-semibold text-navy">
+            <p className="flex items-start gap-2 rounded-[14px] rounded-bl-[3px] bg-nevoa p-4 text-[0.875rem] font-semibold text-navy">
               <Info size={17} aria-hidden="true" className="mt-0.5 shrink-0 text-primary" />
               Este resultado não é um diagnóstico. Ele apenas indica se vale a pena procurar um fonoaudiólogo para avaliação.
             </p>
@@ -867,7 +867,7 @@ export default function TriagemGame() {
       </div>
 
       <div className="space-y-6 rounded-[22px] rounded-bl-[5px] border border-line bg-surface p-6 md:p-8">
-        <p className="text-[15px] text-muted">Marque os comportamentos observados nas últimas 3 semanas em sala:</p>
+        <p className="text-[0.9375rem] text-muted">Marque os comportamentos observados nas últimas 3 semanas em sala:</p>
         <div className="space-y-3">
           {checklistItems.map((item, idx) => {
             const isChecked = !!checkListState[idx];
@@ -883,7 +883,7 @@ export default function TriagemGame() {
                 <span aria-hidden="true" className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[5px] border-[1.5px] ${isChecked ? 'border-primary bg-primary text-on-primary' : 'border-muted/60 bg-surface'}`}>
                   {isChecked && <Check size={13} strokeWidth={3} />}
                 </span>
-                <span className="text-[15px] font-semibold text-ink">{item}</span>
+                <span className="text-[0.9375rem] font-semibold text-ink">{item}</span>
               </button>
             );
           })}
@@ -949,10 +949,10 @@ export default function TriagemGame() {
                   if (tab.id === 'home') showScreen('home');
                   else handleSelectActivity(tab.id);
                 }}
-                className={`flex min-h-12 items-center gap-2 whitespace-nowrap border-b-[3px] px-3 text-[15px] font-semibold transition-colors ${ativo ? 'border-mel text-white' : 'border-transparent text-on-band-muted hover:text-white'}`}
+                className={`flex min-h-12 items-center gap-2 whitespace-nowrap border-b-[3px] px-3 text-[0.9375rem] font-semibold transition-colors ${ativo ? 'border-mel text-white' : 'border-transparent text-on-band-muted hover:text-white'}`}
               >
                 {tab.title}
-                {tab.badge && <span className={`rounded-[6px] rounded-bl-[2px] px-1.5 py-0.5 text-[11px] font-bold ${ativo ? 'bg-mel text-on-pastel' : 'bg-white/10'}`}>{tab.badge}</span>}
+                {tab.badge && <span className={`rounded-[6px] rounded-bl-[2px] px-1.5 py-0.5 text-[0.6875rem] font-bold ${ativo ? 'bg-mel text-on-pastel' : 'bg-white/10'}`}>{tab.badge}</span>}
               </button>
             );
           })}
@@ -968,7 +968,7 @@ export default function TriagemGame() {
         {activeScreen === 'unified_result' && renderUnifiedResultScreen()}
       </main>
 
-      <footer className="mx-auto max-w-5xl px-5 pb-10 text-[14px] text-muted md:px-8">
+      <footer className="mx-auto max-w-5xl px-5 pb-10 text-[0.875rem] text-muted md:px-8">
         FonoSync · Rastreio fonoaudiológico. Não substitui a avaliação clínica profissional.
       </footer>
 

@@ -574,3 +574,35 @@
 :root[data-motion="reduce"] :is(.surge, .painel-gaveta, .painel-fundo, .barra-enche, .figurinha-cola, .esqueleto) {
   animation: none !important;
 }
+
+/* ===================== Experiência por faixa etária ([data-faixa]) ===================== */
+
+/* Adolescentes: fundo frio e neutro, que acompanha os temas escuro e alto contraste */
+.fundo-jovem { background-color: #f1f4f9; }
+:root[data-theme="dark"] .fundo-jovem,
+:root[data-contrast="high"] .fundo-jovem { background-color: var(--color-canvas); }
+
+/* 60+: conteúdo maior e alvos amplos. Soma-se ao tamanho de texto escolhido no painel de acessibilidade. */
+[data-faixa="idoso"] .area-conteudo { zoom: 1.12; }
+[data-faixa="idoso"] .area-conteudo :is(button, select, input:not([type="checkbox"]):not([type="radio"])) { min-height: 3.25rem; }
+[data-faixa="idoso"] .area-conteudo p { line-height: 1.7; }
+
+/* Movimento por faixa: crianças têm personagens vivos; adultos e 60+ ficam com movimento mínimo */
+[data-faixa="adulto"] :is(.flutua, .char-olho, .char-respira, .char-bico, .char-cauda),
+[data-faixa="idoso"] :is(.flutua, .char-olho, .char-respira, .char-bico, .char-cauda, .onda-barra, .surge, .auth-troca) {
+  animation: none !important;
+}
+
+/* Anel de progresso (metas dos adolescentes) */
+.anel-progresso circle { transition: stroke-dashoffset 1s var(--ease-out-soft); }
+
+/* Estação do mapa de aventura: a atividade indicada pulsa devagar */
+@keyframes fs-pulso {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.35); opacity: 0; }
+}
+.estacao-pulso { transform-box: fill-box; transform-origin: center; animation: fs-pulso 2.2s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .estacao-pulso { animation: none !important; } }
+:root[data-motion="reduce"] .estacao-pulso { animation: none !important; }
+[data-faixa="idoso"] aside nav button { min-height: 3.5rem; font-size: 1.0625rem; }
+[data-faixa="idoso"] aside .rounded-\[16px\] p { font-size: 0.9375rem; }

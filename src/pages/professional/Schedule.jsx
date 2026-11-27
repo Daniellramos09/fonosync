@@ -156,15 +156,15 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
       {/* ---------------------------------------------------------------- */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
         <div>
-          <h1 className="display text-[38px] text-azul-petroleo sm:text-[46px]">Agenda de Atendimentos</h1>
-          <p className="text-[13.5px] text-muted mt-1">
+          <h1 className="display text-[2.375rem] text-azul-petroleo sm:text-[2.875rem]">Agenda de Atendimentos</h1>
+          <p className="text-[0.84375rem] text-muted mt-1">
             Organize suas sessões, realize atendimentos clínicos e alimente automaticamente o prontuário.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Seletor de Visão */}
-          <div className="flex items-center bg-gelo p-1 rounded-[12px] text-[13.5px] font-bold text-muted">
+          <div className="flex items-center bg-gelo p-1 rounded-[12px] text-[0.84375rem] font-bold text-muted">
             {['Hoje', 'Semana', 'Lista'].map((v) => (
               <button
                 key={v}
@@ -182,7 +182,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-xs transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[0.84375rem] font-bold shadow-xs transition cursor-pointer"
           >
             <CalendarPlus size={15} /> Novo Agendamento
           </button>
@@ -191,7 +191,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
 
       {/* FEEDBACK BANNER */}
       {feedback && (
-        <div className="flex items-center gap-2 p-3.5 bg-success/10 border border-success/30 text-success rounded-[12px] text-[13.5px] font-semibold shadow-2xs animate-fade-in">
+        <div className="flex items-center gap-2 p-3.5 bg-success/10 border border-success/30 text-success rounded-[12px] text-[0.84375rem] font-semibold shadow-2xs animate-fade-in">
           <CheckCircle2 size={16} className="text-success shrink-0" />
           <span>{feedback}</span>
         </div>
@@ -208,10 +208,10 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-[13.5px] font-bold font-serif text-ink">
+          <span className="text-[0.84375rem] font-bold font-serif text-ink">
             <span className="first-letter:uppercase inline-block">{todayLabel}</span>
           </span>
-          <span className="px-2 py-0.5 rounded-md text-[12px] font-bold bg-gelo text-azul">Hoje</span>
+          <span className="px-2 py-0.5 rounded-md text-[0.75rem] font-bold bg-gelo text-azul">Hoje</span>
           <button
             type="button"
             className="p-1.5 text-muted hover:text-ink hover:bg-gelo rounded-lg transition cursor-pointer"
@@ -220,7 +220,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-3 text-[13.5px] text-muted">
+        <div className="flex items-center gap-3 text-[0.84375rem] text-muted">
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-success" /> Confirmada
           </span>
@@ -241,8 +241,8 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
           {todayAppts.length === 0 && (
             <div className="flex flex-col items-center gap-3 rounded-[24px] rounded-bl-[7px] bg-surface px-6 py-10 text-center ring-1 ring-line">
               <Tartaruga className="w-32" andando={false} />
-              <p className="font-serif text-[22px] font-semibold text-azul-petroleo">Nenhum atendimento para hoje</p>
-              <p className="max-w-[42ch] text-[14.5px] text-muted">
+              <p className="font-serif text-[1.375rem] font-semibold text-azul-petroleo">Nenhum atendimento para hoje</p>
+              <p className="max-w-[42ch] text-[0.90625rem] text-muted">
                 Use “Novo agendamento” para marcar uma sessão. Ao realizar o atendimento, a evolução vai direto para o prontuário.
               </p>
               <button type="button" onClick={() => setShowNewModal(true)} className={`${buttonClass('azul')} mt-1`}>
@@ -264,11 +264,11 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                   {/* Badge de Horário */}
                   <div className="w-20 shrink-0 text-center py-2 px-1 bg-canvas border border-line rounded-[12px]">
                     <span className="block text-sm font-bold text-ink font-serif">{appt.time}</span>
-                    <span className="text-[12px] text-muted">{appt.duration} min</span>
+                    <span className="text-[0.75rem] text-muted">{appt.duration} min</span>
                   </div>
 
                   {/* Avatar Circular com Iniciais */}
-                  <div className="w-10 h-10 rounded-full bg-gelo text-azul font-bold text-[13.5px] flex items-center justify-center shrink-0 border border-azul/20">
+                  <div className="w-10 h-10 rounded-full bg-gelo text-azul font-bold text-[0.84375rem] flex items-center justify-center shrink-0 border border-azul/20">
                     {appt.patientName.slice(0, 2).toUpperCase()}
                   </div>
 
@@ -278,9 +278,9 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                       <h3 className="text-sm font-bold text-ink hover:text-azul cursor-pointer" onClick={() => handleGoToProntuario(appt)}>
                         {appt.patientName}
                       </h3>
-                      <span className="text-[13.5px] text-muted">· {appt.patientAge} anos</span>
+                      <span className="text-[0.84375rem] text-muted">· {appt.patientAge} anos</span>
                       <span
-                        className={`px-2 py-0.5 rounded-md text-[12px] font-bold ${
+                        className={`px-2 py-0.5 rounded-md text-[0.75rem] font-bold ${
                           isRealizada
                             ? 'bg-success/10 text-success'
                             : appt.status === 'Confirmada'
@@ -292,10 +292,10 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                       </span>
                     </div>
 
-                    <p className="text-[13.5px] text-muted flex items-center gap-2">
+                    <p className="text-[0.84375rem] text-muted flex items-center gap-2">
                       <span>{appt.therapyType}</span>
                       <span className="text-muted">•</span>
-                      <span className="flex items-center gap-1 text-[12.5px] text-muted">
+                      <span className="flex items-center gap-1 text-[0.78125rem] text-muted">
                         {appt.modality === 'Presencial' ? <MapPin size={11} /> : <Video size={11} />}
                         {appt.modality}
                       </span>
@@ -303,7 +303,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
 
                     {/* Se já realizada, exibe prévia da evolução gravada */}
                     {isRealizada && appt.sessionDone && (
-                      <div className="mt-2 text-[12.5px] text-success bg-success/10 p-2 rounded-lg border border-emerald-100">
+                      <div className="mt-2 text-[0.78125rem] text-success bg-success/10 p-2 rounded-lg border border-emerald-100">
                         <strong>Evolução registrada:</strong> {appt.sessionDone.evolucao}
                       </div>
                     )}
@@ -316,7 +316,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                     <button
                       type="button"
                       onClick={() => handleGoToProntuario(appt)}
-                      className="px-3.5 py-2 bg-success hover:bg-success text-white rounded-[12px] text-[13.5px] font-bold shadow-2xs flex items-center gap-1.5 transition cursor-pointer"
+                      className="px-3.5 py-2 bg-success hover:bg-success text-white rounded-[12px] text-[0.84375rem] font-bold shadow-2xs flex items-center gap-1.5 transition cursor-pointer"
                     >
                       <CheckCircle size={14} /> Ver no Prontuário
                     </button>
@@ -325,14 +325,14 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                       <button
                         type="button"
                         onClick={() => handleOpenPerformSession(appt)}
-                        className="px-3.5 py-2 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-xs flex items-center gap-1.5 transition cursor-pointer"
+                        className="px-3.5 py-2 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[0.84375rem] font-bold shadow-xs flex items-center gap-1.5 transition cursor-pointer"
                       >
                         <Stethoscope size={14} /> Realizar Atendimento
                       </button>
                       <button
                         type="button"
                         onClick={() => handleGoToProntuario(appt)}
-                        className="px-3 py-2 bg-surface border border-line hover:bg-canvas text-ink rounded-[12px] text-[13.5px] font-bold transition flex items-center gap-1 cursor-pointer"
+                        className="px-3 py-2 bg-surface border border-line hover:bg-canvas text-ink rounded-[12px] text-[0.84375rem] font-bold transition flex items-center gap-1 cursor-pointer"
                         title="Ver prontuário do paciente"
                       >
                         <FileText size={13} className="text-azul" /> Prontuário
@@ -365,8 +365,8 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
               }`}
             >
               <div className="flex items-center justify-between pb-2 border-b border-line">
-                <span className="text-[13.5px] font-bold font-serif text-ink">{col.label}</span>
-                <span className="text-[12px] font-bold px-1.5 py-0.5 rounded bg-gelo text-muted">
+                <span className="text-[0.84375rem] font-bold font-serif text-ink">{col.label}</span>
+                <span className="text-[0.75rem] font-bold px-1.5 py-0.5 rounded bg-gelo text-muted">
                   {col.day}
                 </span>
               </div>
@@ -377,12 +377,12 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                     <div
                       key={appt.id}
                       onClick={() => handleOpenPerformSession(appt)}
-                      className="p-2.5 rounded-[12px] border border-line bg-canvas hover:bg-gelo hover:border-azul/20 transition-all cursor-pointer text-[13.5px] space-y-1"
+                      className="p-2.5 rounded-[12px] border border-line bg-canvas hover:bg-gelo hover:border-azul/20 transition-all cursor-pointer text-[0.84375rem] space-y-1"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-ink">{appt.time}</span>
                         <span
-                          className={`text-[9px] font-bold px-1 rounded ${
+                          className={`text-[0.5625rem] font-bold px-1 rounded ${
                             appt.status === 'Realizada' ? 'bg-success/10 text-success' : 'bg-gelo text-azul'
                           }`}
                         >
@@ -390,25 +390,25 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                         </span>
                       </div>
                       <p className="font-semibold text-ink truncate">{appt.patientName}</p>
-                      <p className="text-[12px] text-muted truncate">{appt.therapyType}</p>
+                      <p className="text-[0.75rem] text-muted truncate">{appt.therapyType}</p>
                     </div>
                   ))}
                 </div>
               ) : col.day === 'Qui 20' ? (
                 <div className="space-y-2">
-                  <div className="p-2.5 rounded-[12px] border border-line bg-canvas text-[13.5px] space-y-1">
+                  <div className="p-2.5 rounded-[12px] border border-line bg-canvas text-[0.84375rem] space-y-1">
                     <span className="font-bold text-ink">09:30</span>
                     <p className="font-semibold text-ink">Valentina Souza</p>
-                    <p className="text-[12px] text-muted">Desenvolvimento Linguístico</p>
+                    <p className="text-[0.75rem] text-muted">Desenvolvimento Linguístico</p>
                   </div>
-                  <div className="p-2.5 rounded-[12px] border border-line bg-canvas text-[13.5px] space-y-1">
+                  <div className="p-2.5 rounded-[12px] border border-line bg-canvas text-[0.84375rem] space-y-1">
                     <span className="font-bold text-ink">14:00</span>
                     <p className="font-semibold text-ink">Lucas Gabriel Lima</p>
-                    <p className="text-[12px] text-muted">Consciência Fonológica</p>
+                    <p className="text-[0.75rem] text-muted">Consciência Fonológica</p>
                   </div>
                 </div>
               ) : (
-                <p className="text-[13.5px] text-muted italic text-center py-8">Nenhum atendimento</p>
+                <p className="text-[0.84375rem] text-muted italic text-center py-8">Nenhum atendimento</p>
               )}
             </div>
           ))}
@@ -420,9 +420,9 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
       {/* ================================================================ */}
       {view === 'Lista' && (
         <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line">
-          <table className="w-full text-left text-[13.5px]">
+          <table className="w-full text-left text-[0.84375rem]">
             <thead>
-              <tr className="border-b border-line text-[12.5px] font-semibold text-muted">
+              <tr className="border-b border-line text-[0.78125rem] font-semibold text-muted">
                 <th className="py-2.5 px-3">Data & Horário</th>
                 <th className="py-2.5 px-3">Paciente</th>
                 <th className="py-2.5 px-3">Terapia</th>
@@ -442,7 +442,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                   <td className="py-3 px-3 text-muted">{appt.modality}</td>
                   <td className="py-3 px-3">
                     <span
-                      className={`px-2 py-0.5 rounded-md text-[12px] font-bold ${
+                      className={`px-2 py-0.5 rounded-md text-[0.75rem] font-bold ${
                         appt.status === 'Realizada'
                           ? 'bg-success/10 text-success'
                           : 'bg-gelo text-azul'
@@ -455,7 +455,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                     <button
                       type="button"
                       onClick={() => handleGoToProntuario(appt)}
-                      className="text-azul hover:underline font-bold text-[13.5px] cursor-pointer"
+                      className="text-azul hover:underline font-bold text-[0.84375rem] cursor-pointer"
                     >
                       Prontuário
                     </button>
@@ -478,7 +478,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
                 <h3 className="text-base font-bold font-serif text-ink flex items-center gap-2">
                   <Stethoscope size={18} className="text-azul" /> Realizar Atendimento & Registrar Sessão
                 </h3>
-                <p className="text-[13.5px] text-muted mt-0.5">
+                <p className="text-[0.84375rem] text-muted mt-0.5">
                   Paciente: <strong className="text-ink">{sessionModalAppt.patientName}</strong> · Horário:{' '}
                   {sessionModalAppt.time} ({sessionModalAppt.duration} min)
                 </p>
@@ -492,7 +492,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
               </button>
             </div>
 
-            <form onSubmit={handleCompleteSession} className="space-y-4 text-[13.5px]">
+            <form onSubmit={handleCompleteSession} className="space-y-4 text-[0.84375rem]">
               <div>
                 <label className="text-ink font-bold block mb-1">
                   Evolução Clínica do Atendimento (Tabela: sessao.evolucao) *
@@ -570,7 +570,7 @@ export default function Schedule({ onNavigate, onSelectPatient }) {
               </button>
             </div>
 
-            <form onSubmit={handleCreateAgendamento} className="space-y-3.5 text-[13.5px]">
+            <form onSubmit={handleCreateAgendamento} className="space-y-3.5 text-[0.84375rem]">
               <div>
                 <label className="text-ink font-bold block mb-1">Paciente *</label>
                 {patients.length > 0 ? (

@@ -134,20 +134,20 @@ function Hero() {
         <div className="flex items-start gap-3">
           <Tucano className="-mt-2 -ml-2 w-20 shrink-0" galho={false} />
           <div>
-            <p className="text-[13px] font-semibold text-on-band-muted">Exemplo · rodada 2 de 5</p>
-            <p className="mt-1 font-serif text-[30px] leading-none font-semibold">
+            <p className="text-[0.8125rem] font-semibold text-on-band-muted">Exemplo · rodada 2 de 5</p>
+            <p className="mt-1 font-serif text-[1.875rem] leading-none font-semibold">
               <Silabas>ga·to</Silabas>
             </p>
           </div>
         </div>
-        <figcaption className="mt-3 text-[14px] leading-snug text-white/90">
+        <figcaption className="mt-3 text-[0.875rem] leading-snug text-white/90">
           A criança vê a figura, fala o nome, e você toca no que ouviu.
         </figcaption>
         <div className="mt-3 flex gap-1.5" aria-hidden="true">
           {['gato', 'tato', 'ato'].map((w, i) => (
             <span
               key={w}
-              className={`rounded-[8px] rounded-bl-[2px] px-2.5 py-1 text-[13px] font-semibold ${
+              className={`rounded-[8px] rounded-bl-[2px] px-2.5 py-1 text-[0.8125rem] font-semibold ${
                 i === 0 ? 'bg-mel text-on-pastel' : 'bg-white/12 text-white'
               }`}
             >
@@ -158,7 +158,7 @@ function Hero() {
       </figure>
 
       <div className="relative mx-auto w-full max-w-[1320px] px-5 pt-32 pb-10 md:px-10 lg:pb-16">
-        <h1 className="display max-w-[11ch] text-[50px] text-white sm:text-[66px] lg:max-w-none lg:text-[80px] xl:text-[88px]">
+        <h1 className="display max-w-[11ch] text-[3.125rem] text-white sm:text-[4.125rem] lg:max-w-none lg:text-[5rem] xl:text-[5.5rem]">
           <span className="hero-linha">
             <span>Toda criança tem uma voz</span>
           </span>
@@ -174,7 +174,7 @@ function Hero() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,520px)_1fr] lg:items-end">
           <div>
-            <p className="max-w-[46ch] text-[17px] leading-[1.6] text-white/92 md:text-[19px]">
+            <p className="max-w-[46ch] text-[1.0625rem] leading-[1.6] text-white/92 md:text-[1.1875rem]">
               Rastreio fonológico lúdico por idade, prontuário clínico completo e a família
               acompanhando cada passo. O FonoSync liga o consultório, a casa e a escola.
             </p>
@@ -194,7 +194,7 @@ function Hero() {
             aria-labelledby="hero-idade"
             className="rounded-[16px] rounded-bl-[4px] bg-[#0f2a2f]/55 p-3 backdrop-blur-md sm:p-4 lg:justify-self-end"
           >
-            <p id="hero-idade" className="text-[14px] font-semibold text-white">
+            <p id="hero-idade" className="text-[0.875rem] font-semibold text-white">
               Ou comece pela idade da criança
             </p>
             <div className="mt-2.5 grid grid-cols-4 gap-1.5 sm:gap-2">
@@ -205,8 +205,8 @@ function Hero() {
                   onClick={() => iniciarTriagem(f.atividade)}
                   className="group flex min-h-16 flex-col justify-center rounded-[12px] rounded-bl-[3px] border border-white/30 bg-white/10 px-3 py-2 backdrop-blur-md transition-colors hover:border-mel hover:bg-mel hover:text-on-pastel sm:min-w-[104px] sm:px-4"
                 >
-                  <span className="font-serif text-[24px] leading-none font-semibold sm:text-[28px]">{f.idade}</span>
-                  <span className="mt-1 text-[12px] font-semibold opacity-85">anos</span>
+                  <span className="font-serif text-[1.5rem] leading-none font-semibold sm:text-[1.75rem]">{f.idade}</span>
+                  <span className="mt-1 text-[0.75rem] font-semibold opacity-85">anos</span>
                 </a>
               ))}
             </div>
@@ -237,10 +237,10 @@ function ParaQuem() {
     <section id="para-quem" className="scroll-mt-24 bg-quente px-5 py-20 md:px-10 lg:py-28">
       <div className="mx-auto grid max-w-[1320px] gap-12 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-16">
         <div className="flex flex-col">
-          <h2 className="display text-[40px] text-navy sm:text-[52px] lg:text-[60px]">
+          <h2 className="display text-[2.5rem] text-navy sm:text-[3.25rem] lg:text-[3.75rem]">
             Três lugares onde a fala acontece.
           </h2>
-          <p className="mt-5 max-w-[40ch] text-[17px] leading-[1.6] text-muted">
+          <p className="mt-5 max-w-[40ch] text-[1.0625rem] leading-[1.6] text-muted">
             Casa, consultório e escola enxergam a mesma criança por ângulos diferentes. Escolha o
             seu.
           </p>
@@ -264,13 +264,13 @@ function ParaQuem() {
                 >
                   <span>
                     <span
-                      className={`block font-serif text-[30px] leading-tight font-semibold transition-colors sm:text-[34px] ${
+                      className={`block font-serif text-[1.875rem] leading-tight font-semibold transition-colors sm:text-[2.125rem] ${
                         selecionado ? 'text-navy' : 'text-navy/45 group-hover:text-navy/80'
                       }`}
                     >
                       {p.nome}
                     </span>
-                    <span className={`mt-1 block text-[15px] ${selecionado ? 'text-muted' : 'text-muted/80'}`}>{p.resumo}</span>
+                    <span className={`mt-1 block text-[0.9375rem] ${selecionado ? 'text-muted' : 'text-muted/80'}`}>{p.resumo}</span>
                   </span>
                   <ArrowRight
                     size={24}
@@ -292,10 +292,10 @@ function ParaQuem() {
         >
           <div className="relative z-10 flex flex-col justify-between gap-8 lg:py-2">
             <div>
-              <h3 className="font-serif text-[30px] leading-[1.1] font-semibold tracking-[-0.015em] sm:text-[36px]">
+              <h3 className="font-serif text-[1.875rem] leading-[1.1] font-semibold tracking-[-0.015em] sm:text-[2.25rem]">
                 {atual.titulo}
               </h3>
-              <p className="mt-5 max-w-[44ch] text-[16px] leading-[1.65] text-on-pastel/85">{atual.texto}</p>
+              <p className="mt-5 max-w-[44ch] text-[1rem] leading-[1.65] text-on-pastel/85">{atual.texto}</p>
             </div>
             <div className="flex items-end justify-between gap-4">
               <a href={atual.acao.href} onClick={atual.acao.onClick} className={buttonClass('primary', 'lg')}>
@@ -315,10 +315,10 @@ function ParaQuem() {
               className="h-[300px] w-full rounded-[20px] rounded-tr-[90px] object-cover sm:h-[380px] lg:h-full"
             />
             <div className="absolute right-3 -bottom-4 left-3 rounded-[14px] rounded-bl-[3px] bg-quente p-4 text-ink shadow-[0_18px_40px_-18px_rgba(23,67,74,0.45)] sm:right-auto sm:left-[-28px] sm:w-[280px] lg:bottom-10">
-              <p className="text-[13px] font-semibold text-muted">{atual.nota.titulo}</p>
+              <p className="text-[0.8125rem] font-semibold text-muted">{atual.nota.titulo}</p>
               <ul className="mt-2 space-y-1.5">
                 {atual.nota.linhas.map((linha) => (
-                  <li key={linha} className="flex gap-2 text-[14.5px] leading-snug font-semibold text-navy">
+                  <li key={linha} className="flex gap-2 text-[0.90625rem] leading-snug font-semibold text-navy">
                     <span aria-hidden="true" className="mt-[7px] size-1.5 shrink-0 rounded-full bg-coral-ink" />
                     {linha}
                   </li>
@@ -353,18 +353,18 @@ function Rastreio() {
           />
           <p
             aria-hidden="true"
-            className="absolute top-6 -left-2 rounded-[12px] rounded-bl-[3px] bg-mel px-4 py-2 font-serif text-[26px] font-semibold text-on-pastel shadow-lg sm:-left-6"
+            className="absolute top-6 -left-2 rounded-[12px] rounded-bl-[3px] bg-mel px-4 py-2 font-serif text-[1.625rem] font-semibold text-on-pastel shadow-lg sm:-left-6"
           >
             gi<span className="text-coral-ink">·</span>ra<span className="text-coral-ink">·</span>fa
           </p>
         </div>
 
         <div>
-          <h2 className="display text-[40px] sm:text-[52px] lg:text-[60px]">
+          <h2 className="display text-[2.5rem] sm:text-[3.25rem] lg:text-[3.75rem]">
             Parece brincadeira.
             <span className="block text-mel">É rastreio de verdade.</span>
           </h2>
-          <p className="mt-6 max-w-[52ch] text-[17px] leading-[1.65] text-white/85">
+          <p className="mt-6 max-w-[52ch] text-[1.0625rem] leading-[1.65] text-white/85">
             Quem escuta a criança é o adulto que convive com ela. Cada faixa etária tem uma atividade
             curta, com processos fonológicos mapeados e uma devolutiva clara no final, que você pode
             baixar e levar ao fonoaudiólogo.
@@ -378,10 +378,10 @@ function Rastreio() {
                   onClick={() => iniciarTriagem(f.atividade)}
                   className="group grid grid-cols-[72px_1fr_auto] items-start gap-4 py-5 sm:grid-cols-[96px_1fr_auto]"
                 >
-                  <span className="display text-[34px] text-mel sm:text-[42px]">{f.idade}</span>
+                  <span className="display text-[2.125rem] text-mel sm:text-[2.625rem]">{f.idade}</span>
                   <span>
-                    <span className="block text-[18px] font-bold">{f.nome}</span>
-                    <span className="mt-1 block text-[15px] leading-[1.55] text-white/75">{f.texto}</span>
+                    <span className="block text-[1.125rem] font-bold">{f.nome}</span>
+                    <span className="mt-1 block text-[0.9375rem] leading-[1.55] text-white/75">{f.texto}</span>
                   </span>
                   <ArrowUpRight
                     size={22}
@@ -393,7 +393,7 @@ function Rastreio() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 max-w-[56ch] text-[14px] leading-[1.6] text-white/70">
+          <p className="mt-6 max-w-[56ch] text-[0.875rem] leading-[1.6] text-white/70">
             O rastreio não é diagnóstico. Ele indica se vale a pena procurar um fonoaudiólogo para uma
             avaliação presencial.
           </p>
@@ -409,10 +409,10 @@ function Jornada() {
     <section id="jornada" className="scroll-mt-24 overflow-hidden bg-lavanda px-5 py-20 text-on-pastel md:px-10 lg:py-28">
       <div className="mx-auto max-w-[1320px]">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
-          <h2 className="display max-w-[14ch] text-[40px] sm:text-[52px] lg:text-[64px]">
+          <h2 className="display max-w-[14ch] text-[2.5rem] sm:text-[3.25rem] lg:text-[4rem]">
             Um caminho no ritmo da criança.
           </h2>
-          <p className="max-w-[40ch] text-[17px] leading-[1.6] text-on-pastel/80">
+          <p className="max-w-[40ch] text-[1.0625rem] leading-[1.6] text-on-pastel/80">
             Do primeiro rastreio à evolução registrada, cada etapa fica no mesmo lugar, para a família e
             para o fonoaudiólogo.
           </p>
@@ -432,9 +432,9 @@ function Jornada() {
           {jornada.map((etapa, i) => (
             <li key={etapa.titulo} className="relative lg:pt-8">
               <span aria-hidden="true" className="absolute -top-[9px] left-0 hidden size-4 rounded-full border-[3px] border-lavanda bg-ocean lg:block" />
-              <p className="font-serif text-[15px] font-semibold text-on-pastel/60">Etapa {i + 1}</p>
-              <h3 className="mt-1 font-serif text-[22px] leading-tight font-semibold">{etapa.titulo}</h3>
-              <p className="mt-2 text-[15px] leading-[1.55] text-on-pastel/80">{etapa.texto}</p>
+              <p className="font-serif text-[0.9375rem] font-semibold text-on-pastel/60">Etapa {i + 1}</p>
+              <h3 className="mt-1 font-serif text-[1.375rem] leading-tight font-semibold">{etapa.titulo}</h3>
+              <p className="mt-2 text-[0.9375rem] leading-[1.55] text-on-pastel/80">{etapa.texto}</p>
             </li>
           ))}
         </ol>
@@ -450,10 +450,10 @@ function Familias() {
     <section id="familias" className="scroll-mt-24 bg-nevoa">
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[1fr_1fr]">
         <div className="flex flex-col justify-center px-5 py-20 md:px-10 lg:py-28 lg:pr-16 lg:pl-[max(2.5rem,calc((100vw-1320px)/2))]">
-          <h2 className="display max-w-[13ch] text-[40px] text-navy sm:text-[52px] lg:text-[60px]">
+          <h2 className="display max-w-[13ch] text-[2.5rem] text-navy sm:text-[3.25rem] lg:text-[3.75rem]">
             A terapia continua na mesa da cozinha.
           </h2>
-          <p className="mt-6 max-w-[48ch] text-[17px] leading-[1.65] text-muted">
+          <p className="mt-6 max-w-[48ch] text-[1.0625rem] leading-[1.65] text-muted">
             Uma sessão por semana é pouco tempo perto de tudo o que a criança fala em casa. Quando a
             família entende o objetivo de cada exercício, o treino vira parte da rotina, sem cara de
             tarefa.
@@ -466,8 +466,8 @@ function Familias() {
               ['Histórico do rastreio', 'Os resultados ficam salvos e podem ser baixados.'],
             ].map(([t, d]) => (
               <div key={t} className="border-t-2 border-primary/25 pt-3">
-                <dt className="font-serif text-[20px] font-semibold text-navy">{t}</dt>
-                <dd className="mt-1.5 text-[15px] leading-[1.55] text-muted">{d}</dd>
+                <dt className="font-serif text-[1.25rem] font-semibold text-navy">{t}</dt>
+                <dd className="mt-1.5 text-[0.9375rem] leading-[1.55] text-muted">{d}</dd>
               </div>
             ))}
           </dl>
@@ -527,8 +527,8 @@ function Cuidado() {
     <section id="cuidado" className="scroll-mt-24 bg-salvia px-5 py-20 text-on-pastel md:px-10 lg:py-28">
       <div className="mx-auto grid max-w-[1320px] gap-14 lg:grid-cols-[minmax(0,460px)_1fr] lg:gap-20">
         <div>
-          <h2 className="display text-[40px] sm:text-[52px]">Acessível e privado desde a primeira linha.</h2>
-          <p className="mt-5 max-w-[42ch] text-[17px] leading-[1.6] text-on-pastel/80">
+          <h2 className="display text-[2.5rem] sm:text-[3.25rem]">Acessível e privado desde a primeira linha.</h2>
+          <p className="mt-5 max-w-[42ch] text-[1.0625rem] leading-[1.6] text-on-pastel/80">
             Famílias, crianças e profissionais diferentes usam a mesma plataforma. Os ajustes estão a um
             toque, em qualquer tela.
           </p>
@@ -545,10 +545,10 @@ function Cuidado() {
         <div className="grid gap-10 sm:grid-cols-2">
           {grupos.map((g) => (
             <div key={g.titulo}>
-              <h3 className="font-serif text-[24px] font-semibold">{g.titulo}</h3>
+              <h3 className="font-serif text-[1.5rem] font-semibold">{g.titulo}</h3>
               <ul className="mt-4 border-t border-on-pastel/20">
                 {g.itens.map((item) => (
-                  <li key={item} className="border-b border-on-pastel/20 py-3.5 text-[15.5px] leading-[1.5]">
+                  <li key={item} className="border-b border-on-pastel/20 py-3.5 text-[0.96875rem] leading-[1.5]">
                     {item}
                   </li>
                 ))}
@@ -568,10 +568,10 @@ function Convite() {
     <section className="relative overflow-hidden bg-mel px-5 pt-20 text-on-pastel md:px-10 lg:pt-24">
       <div className="mx-auto grid max-w-[1320px] items-end gap-6 lg:grid-cols-[1fr_auto]">
         <div className="pb-16 lg:pb-24">
-          <h2 className="display max-w-[14ch] text-[44px] sm:text-[60px] lg:text-[76px]">
+          <h2 className="display max-w-[14ch] text-[2.75rem] sm:text-[3.75rem] lg:text-[4.75rem]">
             Vamos ouvir o que ela tem a <Silabas>di·zer</Silabas>?
           </h2>
-          <p className="mt-6 max-w-[46ch] text-[17px] leading-[1.6] text-on-pastel/80">
+          <p className="mt-6 max-w-[46ch] text-[1.0625rem] leading-[1.6] text-on-pastel/80">
             Escolha a idade e comece uma atividade agora, ou entre na área clínica do FonoSync.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">

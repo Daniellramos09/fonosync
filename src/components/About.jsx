@@ -130,7 +130,7 @@ function PatientPreview() {
   return (
     <div className="flex min-h-96 flex-col sm:flex-row">
       <aside className="shrink-0 bg-band p-3 text-white sm:w-52 sm:p-4">
-        <p className="mb-2 hidden px-3 text-[11px] font-bold tracking-wider text-on-band-muted uppercase sm:block">
+        <p className="mb-2 hidden px-3 text-[0.6875rem] font-bold tracking-wider text-on-band-muted uppercase sm:block">
           Área do paciente
         </p>
         <nav aria-label="Prévia da área do paciente" className="flex gap-1 sm:flex-col">
@@ -207,7 +207,7 @@ function PatientPreview() {
                 <div className="flex-1 space-y-2">
                   <h4 className="font-bold text-navy">{game.name}</h4>
                   <p className="text-xs text-muted">{game.desc}</p>
-                  <span className={`${buttonClass('primary')} min-h-9 py-1.5 text-[13px]`} aria-hidden="true">Jogar agora</span>
+                  <span className={`${buttonClass('primary')} min-h-9 py-1.5 text-[0.8125rem]`} aria-hidden="true">Jogar agora</span>
                 </div>
               </div>
             ))}
@@ -256,10 +256,10 @@ export default function About() {
     <section id="sobre" className="scroll-mt-24 bg-quente px-5 py-20 md:px-10 lg:py-28">
       <div className="mx-auto max-w-[1320px]">
         <div className="grid gap-6 lg:grid-cols-[1fr_minmax(0,420px)] lg:items-end">
-          <h2 className="display max-w-[15ch] text-[40px] text-navy sm:text-[52px] lg:text-[60px]">
+          <h2 className="display max-w-[15ch] text-[2.5rem] text-navy sm:text-[3.25rem] lg:text-[3.75rem]">
             O consultório e a casa, na mesma tela.
           </h2>
-          <p className="text-[17px] leading-[1.6] text-muted">
+          <p className="text-[1.0625rem] leading-[1.6] text-muted">
             Estas são as duas áreas da plataforma, com dados de exemplo. Alterne entre a visão do
             profissional e a da família.
           </p>
@@ -280,7 +280,7 @@ export default function About() {
                   tabIndex={selected ? 0 : -1}
                   onClick={() => setProfile(p.id)}
                   onKeyDown={onKeyDown}
-                  className={`relative -mb-px border-b-[3px] pb-3 font-serif text-[20px] font-semibold transition-colors sm:text-[24px] ${
+                  className={`relative -mb-px border-b-[3px] pb-3 font-serif text-[1.25rem] font-semibold transition-colors sm:text-[1.5rem] ${
                     selected ? 'border-primary text-navy' : 'border-transparent text-navy/45 hover:text-navy/80'
                   }`}
                 >
@@ -289,7 +289,7 @@ export default function About() {
               );
             })}
           </div>
-          <p aria-live="polite" className="max-w-xl pb-3 text-[15px] text-muted">{current.text}</p>
+          <p aria-live="polite" className="max-w-xl pb-3 text-[0.9375rem] text-muted">{current.text}</p>
         </div>
 
         <div className="mt-8 overflow-hidden rounded-[22px] rounded-bl-[6px] border border-line bg-surface shadow-[0_30px_60px_-30px_rgba(23,67,74,0.35)]">

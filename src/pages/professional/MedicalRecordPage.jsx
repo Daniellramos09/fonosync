@@ -470,16 +470,16 @@ export default function MedicalRecordPage({
         <OndaSonora className="absolute -bottom-2 right-6 -z-10 hidden h-24 w-80 text-white/[0.06] lg:block" />
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-3 sm:px-8">
-          <p className="text-[13px] font-semibold text-white/65">
+          <p className="text-[0.8125rem] font-semibold text-white/65">
             Prontuário · {sessionsCount} sessões registradas
           </p>
-          <label className="relative flex items-center gap-2 text-[13px] font-semibold text-white/70">
+          <label className="relative flex items-center gap-2 text-[0.8125rem] font-semibold text-white/70">
             Paciente
             <select
               value={activePatientId}
               onChange={handlePatientSelectChange}
               aria-label="Selecionar Paciente para Prontuário"
-              className="min-h-10 cursor-pointer appearance-none rounded-full bg-white/10 py-2 pl-4 pr-9 text-[14px] font-semibold text-white outline-none ring-1 ring-white/20 transition hover:bg-white/15 focus:ring-2 focus:ring-mel [&>option]:text-ink"
+              className="min-h-10 cursor-pointer appearance-none rounded-full bg-white/10 py-2 pl-4 pr-9 text-[0.875rem] font-semibold text-white outline-none ring-1 ring-white/20 transition hover:bg-white/15 focus:ring-2 focus:ring-mel [&>option]:text-ink"
             >
               {patients.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -493,20 +493,20 @@ export default function MedicalRecordPage({
 
         <div className="grid items-end gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto]">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <Avatar nome={patient.name} apagado={isArchived} className="size-20 text-[26px] ring-4 ring-white/10" />
+            <Avatar nome={patient.name} apagado={isArchived} className="size-20 text-[1.625rem] ring-4 ring-white/10" />
             <div className="min-w-0">
-              <h1 className="display text-[34px] sm:text-[42px]">{patient.name}</h1>
-              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14.5px] text-white/80">
+              <h1 className="display text-[2.125rem] sm:text-[2.625rem]">{patient.name}</h1>
+              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.90625rem] text-white/80">
                 <span>{age !== null ? `${age} anos` : 'Idade não informada'}</span>
                 <span aria-hidden="true">·</span>
                 <span>{sexoTexto}</span>
                 {cidAtual && (
-                  <span className="rounded-[8px] bg-white/12 px-2 py-0.5 font-mono text-[12.5px] font-semibold text-mel">
+                  <span className="rounded-[8px] bg-white/12 px-2 py-0.5 font-mono text-[0.78125rem] font-semibold text-mel">
                     CID {cidAtual}
                   </span>
                 )}
               </p>
-              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[13px] font-bold">
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[0.8125rem] font-bold">
                 <span className={`size-2 rounded-full ${statusInfo.ponto}`} aria-hidden="true" />
                 {statusInfo.rotulo}
               </p>
@@ -542,7 +542,7 @@ export default function MedicalRecordPage({
       <div role="status">
         {notice && (
           <div
-            className={`auth-troca flex items-center gap-2.5 rounded-[14px] rounded-bl-[4px] px-4 py-3 text-[14px] font-bold ${
+            className={`auth-troca flex items-center gap-2.5 rounded-[14px] rounded-bl-[4px] px-4 py-3 text-[0.875rem] font-bold ${
               notice.tone === 'success' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
             }`}
           >
@@ -559,8 +559,8 @@ export default function MedicalRecordPage({
         <div className="space-y-4 lg:sticky lg:top-6">
           {/* Ficha cadastral */}
           <section className="surge rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line" style={{ '--i': 1 }}>
-            <h2 className="font-serif text-[19px] font-semibold text-azul-petroleo">Ficha</h2>
-            <dl className="mt-3 text-[14px]">
+            <h2 className="font-serif text-[1.1875rem] font-semibold text-azul-petroleo">Ficha</h2>
+            <dl className="mt-3 text-[0.875rem]">
               {[
                 ['Nascimento', formatDateBR(patient.dateOfBirth)],
                 ['Responsável', guardian?.name || (isMinor ? '' : 'Próprio paciente')],
@@ -577,11 +577,11 @@ export default function MedicalRecordPage({
 
           {/* Objetivo terapêutico */}
           <section className="surge rounded-[24px] rounded-bl-[7px] bg-mel/70 p-5 text-on-pastel" style={{ '--i': 2 }}>
-            <h2 className="font-serif text-[19px] font-semibold">Objetivo terapêutico</h2>
+            <h2 className="font-serif text-[1.1875rem] font-semibold">Objetivo terapêutico</h2>
             {objetivo ? (
-              <p className="mt-2 text-[14.5px] leading-relaxed">{objetivo}</p>
+              <p className="mt-2 text-[0.90625rem] leading-relaxed">{objetivo}</p>
             ) : (
-              <p className="mt-2 text-[14px] leading-relaxed opacity-80">Ainda não definido no plano terapêutico.</p>
+              <p className="mt-2 text-[0.875rem] leading-relaxed opacity-80">Ainda não definido no plano terapêutico.</p>
             )}
           </section>
 
@@ -617,7 +617,7 @@ export default function MedicalRecordPage({
                 key={rotuloAcao}
                 type="button"
                 onClick={onClick}
-                className="group flex min-h-[52px] w-full cursor-pointer items-center gap-3 border-b border-line px-4 text-left text-[14.5px] font-semibold text-ink transition last:border-0 hover:bg-gelo"
+                className="group flex min-h-[52px] w-full cursor-pointer items-center gap-3 border-b border-line px-4 text-left text-[0.90625rem] font-semibold text-ink transition last:border-0 hover:bg-gelo"
               >
                 <span className="grid size-8 place-items-center rounded-[10px] bg-gelo text-azul transition group-hover:bg-surface">
                   <Icon size={16} aria-hidden="true" />
@@ -648,14 +648,14 @@ export default function MedicalRecordPage({
                   role="tab"
                   aria-selected={active}
                   onClick={() => setActiveTab(id)}
-                  className={`flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-[13px] rounded-bl-[4px] px-4 text-[14px] font-semibold transition duration-200 ${
+                  className={`flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-[13px] rounded-bl-[4px] px-4 text-[0.875rem] font-semibold transition duration-200 ${
                     active ? 'bg-azul-petroleo text-on-azul shadow-[0_10px_20px_-14px_rgba(29,78,104,0.9)]' : 'text-muted hover:bg-gelo hover:text-ink'
                   }`}
                 >
                   <Icon size={16} aria-hidden="true" />
                   {label}
                   {total !== undefined && (
-                    <span className={`rounded-full px-1.5 text-[12px] ${active ? 'bg-white/20' : 'bg-gelo'}`}>{total}</span>
+                    <span className={`rounded-full px-1.5 text-[0.75rem] ${active ? 'bg-white/20' : 'bg-gelo'}`}>{total}</span>
                   )}
                 </button>
               );
@@ -679,8 +679,8 @@ export default function MedicalRecordPage({
               {sessions.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 rounded-[24px] rounded-bl-[7px] bg-surface p-8 text-center ring-1 ring-line">
                   <Tucano className="w-24" />
-                  <p className="font-serif text-[20px] font-semibold text-azul-petroleo">Nenhuma sessão registrada ainda</p>
-                  <p className="max-w-[40ch] text-[14px] text-muted">
+                  <p className="font-serif text-[1.25rem] font-semibold text-azul-petroleo">Nenhuma sessão registrada ainda</p>
+                  <p className="max-w-[40ch] text-[0.875rem] text-muted">
                     Registre a primeira sessão para começar a linha do tempo de evolução deste paciente.
                   </p>
                   <button
@@ -703,8 +703,8 @@ export default function MedicalRecordPage({
               ) : (
                 <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line sm:p-6">
                   <div className="mb-5 flex items-center justify-between gap-3">
-                    <h2 className="font-serif text-[20px] font-semibold text-azul-petroleo">Evolução das sessões</h2>
-                    <button type="button" onClick={abrirNovaSessao} className={`${buttonClass('suave')} min-h-10 px-3.5 text-[13.5px]`}>
+                    <h2 className="font-serif text-[1.25rem] font-semibold text-azul-petroleo">Evolução das sessões</h2>
+                    <button type="button" onClick={abrirNovaSessao} className={`${buttonClass('suave')} min-h-10 px-3.5 text-[0.84375rem]`}>
                       <Plus size={15} aria-hidden="true" /> Nova sessão
                     </button>
                   </div>
@@ -720,12 +720,12 @@ export default function MedicalRecordPage({
                             aria-hidden="true"
                           />
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <p className="text-[15px] font-bold text-ink">
+                            <p className="text-[0.9375rem] font-bold text-ink">
                               Sessão {sess.sessionNumber}
                               <span className="ml-2 font-semibold text-muted">{formatDateBR(sess.date)}</span>
                             </p>
                             <span
-                              className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold ${
+                              className={`rounded-full px-2.5 py-0.5 text-[0.75rem] font-bold ${
                                 isRealizada ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
                               }`}
                             >
@@ -734,7 +734,7 @@ export default function MedicalRecordPage({
                           </div>
 
                           {isRealizada ? (
-                            <div className="mt-2 space-y-2.5 text-[14.5px] leading-relaxed">
+                            <div className="mt-2 space-y-2.5 text-[0.90625rem] leading-relaxed">
                               <p className="text-ink">
                                 <strong className="font-semibold text-muted">Evolução: </strong>
                                 {sess.evolution}
@@ -748,7 +748,7 @@ export default function MedicalRecordPage({
                               {sess.tags && sess.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1.5 pt-0.5">
                                   {sess.tags.map((tag, tIdx) => (
-                                    <span key={tIdx} className="rounded-full bg-gelo px-2.5 py-0.5 text-[12.5px] font-semibold text-azul-petroleo">
+                                    <span key={tIdx} className="rounded-full bg-gelo px-2.5 py-0.5 text-[0.78125rem] font-semibold text-azul-petroleo">
                                       {tag}
                                     </span>
                                   ))}
@@ -756,7 +756,7 @@ export default function MedicalRecordPage({
                               )}
                             </div>
                           ) : (
-                            <div className="mt-2 space-y-3 text-[14px]">
+                            <div className="mt-2 space-y-3 text-[0.875rem]">
                               <p className="italic text-muted">
                                 Sessão agendada na clínica. Realize o atendimento para registrar a evolução clínica e os pontos de
                                 melhora.
@@ -794,22 +794,22 @@ export default function MedicalRecordPage({
           {activeTab === 'avaliacoes' && (
             <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-line">
-                <h3 className="font-serif text-[20px] font-semibold text-azul-petroleo">
+                <h3 className="font-serif text-[1.25rem] font-semibold text-azul-petroleo">
                   Avaliações Registradas
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowNewEvalModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-2xs transition cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[0.84375rem] font-bold shadow-2xs transition cursor-pointer"
                 >
                   <Plus size={14} /> Nova Avaliação
                 </button>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-[13.5px]">
+                <table className="w-full text-left text-[0.84375rem]">
                   <thead>
-                    <tr className="border-b border-line text-[12.5px] font-semibold text-muted">
+                    <tr className="border-b border-line text-[0.78125rem] font-semibold text-muted">
                       <th className="py-2.5">Data</th>
                       <th className="py-2.5">Tipo</th>
                       <th className="py-2.5">Resultado</th>
@@ -823,7 +823,7 @@ export default function MedicalRecordPage({
                         <td className="py-3 font-medium text-ink">{formatDateBR(ev.dataAvaliacao)}</td>
                         <td className="py-3 font-semibold text-ink">{ev.tipoAvaliacao}</td>
                         <td className="py-3">
-                          <span className="px-2.5 py-0.5 rounded-md text-[12px] font-bold bg-warning/10 text-warning">
+                          <span className="px-2.5 py-0.5 rounded-md text-[0.75rem] font-bold bg-warning/10 text-warning">
                             {ev.resultados}
                           </span>
                         </td>
@@ -832,7 +832,7 @@ export default function MedicalRecordPage({
                           <button
                             type="button"
                             onClick={() => setViewEvalDetail(ev)}
-                            className="px-2.5 py-1 rounded-lg border border-line hover:bg-gelo font-bold text-ink text-[12.5px] transition cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg border border-line hover:bg-gelo font-bold text-ink text-[0.78125rem] transition cursor-pointer"
                           >
                             Ver
                           </button>
@@ -851,22 +851,22 @@ export default function MedicalRecordPage({
           {activeTab === 'diagnostico' && (
             <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-6 ring-1 ring-line space-y-5">
               <div className="flex items-center justify-between pb-3 border-b border-line">
-                <h3 className="font-serif text-[20px] font-semibold text-azul-petroleo">
+                <h3 className="font-serif text-[1.25rem] font-semibold text-azul-petroleo">
                   Diagnóstico & Plano Terapêutico
                 </h3>
                 <button
                   type="button"
                   onClick={() => setIsEditingDiag(!isEditingDiag)}
-                  className="px-3 py-1.5 rounded-[12px] border border-line bg-surface hover:bg-canvas text-[13.5px] font-bold text-ink flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                  className="px-3 py-1.5 rounded-[12px] border border-line bg-surface hover:bg-canvas text-[0.84375rem] font-bold text-ink flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
                 >
                   <Pencil size={13} /> {isEditingDiag ? 'Cancelar' : 'Editar'}
                 </button>
               </div>
 
-              <form onSubmit={handleSaveDiagnostic} className="space-y-4 text-[13.5px]">
+              <form onSubmit={handleSaveDiagnostic} className="space-y-4 text-[0.84375rem]">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="sm:col-span-2 space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Diagnóstico fonoaudiológico</label>
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Diagnóstico fonoaudiológico</label>
                     <input
                       type="text"
                       disabled={!isEditingDiag}
@@ -876,7 +876,7 @@ export default function MedicalRecordPage({
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">CID-10 (Sugestão Clínica)</label>
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">CID-10 (Sugestão Clínica)</label>
                     <input
                       type="text"
                       list="cid10-prontuario-sugestoes"
@@ -902,7 +902,7 @@ export default function MedicalRecordPage({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Área Terapêutica</label>
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Área Terapêutica</label>
                     <input
                       type="text"
                       list="areas-terapeuticas-sugestoes"
@@ -922,7 +922,7 @@ export default function MedicalRecordPage({
                     </datalist>
                   </div>
                   <div className="space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Periodicidade / Frequência das Sessões</label>
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Periodicidade / Frequência das Sessões</label>
                     <input
                       type="text"
                       list="frequencia-sessoes-sugestoes"
@@ -943,7 +943,7 @@ export default function MedicalRecordPage({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Objetivos do tratamento</label>
+                  <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Objetivos do tratamento</label>
                   <textarea
                     rows={4}
                     disabled={!isEditingDiag}
@@ -954,7 +954,7 @@ export default function MedicalRecordPage({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Condutas terapêuticas</label>
+                  <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Condutas terapêuticas</label>
                   <textarea
                     rows={3}
                     disabled={!isEditingDiag}
@@ -992,23 +992,23 @@ export default function MedicalRecordPage({
           {activeTab === 'anamnese' && (
             <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-6 ring-1 ring-line space-y-5">
               <div className="flex items-center justify-between pb-3 border-b border-line">
-                <h3 className="font-serif text-[20px] font-semibold text-azul-petroleo">
+                <h3 className="font-serif text-[1.25rem] font-semibold text-azul-petroleo">
                   Anamnese Fonoaudiológica
                 </h3>
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={() => setIsEditingAnamnese(!isEditingAnamnese)}
-                    className="px-3 py-1.5 rounded-[12px] border border-line bg-surface hover:bg-canvas text-[13.5px] font-bold text-ink flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                    className="px-3 py-1.5 rounded-[12px] border border-line bg-surface hover:bg-canvas text-[0.84375rem] font-bold text-ink flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
                   >
                     <Pencil size={13} /> {isEditingAnamnese ? 'Cancelar' : 'Editar'}
                   </button>
                 </div>
               </div>
 
-              <form onSubmit={handleSaveAnamnese} className="space-y-4 text-[13.5px]">
+              <form onSubmit={handleSaveAnamnese} className="space-y-4 text-[0.84375rem]">
                 <div className="space-y-1">
-                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">
+                  <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">
                     Queixa principal relatada pela família
                   </label>
                   <textarea
@@ -1022,7 +1022,7 @@ export default function MedicalRecordPage({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">
                       Histórico familiar de disfluência
                     </label>
                     <input
@@ -1034,7 +1034,7 @@ export default function MedicalRecordPage({
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Início dos sintomas</label>
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Início dos sintomas</label>
                     <input
                       type="text"
                       disabled={!isEditingAnamnese}
@@ -1047,7 +1047,7 @@ export default function MedicalRecordPage({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">
                       Desenvolvimento da linguagem
                     </label>
                     <input
@@ -1061,7 +1061,7 @@ export default function MedicalRecordPage({
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="mb-1.5 block text-[13px] font-semibold text-muted">Tratamentos anteriores</label>
+                    <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Tratamentos anteriores</label>
                     <input
                       type="text"
                       disabled={!isEditingAnamnese}
@@ -1072,7 +1072,7 @@ export default function MedicalRecordPage({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Observações adicionais</label>
+                  <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Observações adicionais</label>
                   <textarea
                     rows={3}
                     disabled={!isEditingAnamnese}
@@ -1112,22 +1112,22 @@ export default function MedicalRecordPage({
           {activeTab === 'anexos' && (
             <div className="rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-line">
-                <span className="text-[13.5px] font-bold text-muted">
+                <span className="text-[0.84375rem] font-bold text-muted">
                   {attachments.length} arquivos · {formatBytes(totalAttachmentBytes)}
                 </span>
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(true)}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-2xs transition cursor-pointer"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[0.84375rem] font-bold shadow-2xs transition cursor-pointer"
                 >
                   <UploadCloud size={14} /> Enviar arquivo
                 </button>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-[13.5px]">
+                <table className="w-full text-left text-[0.84375rem]">
                   <thead>
-                    <tr className="border-b border-line text-[12.5px] font-semibold text-muted">
+                    <tr className="border-b border-line text-[0.78125rem] font-semibold text-muted">
                       <th className="py-2.5">Arquivo</th>
                       <th className="py-2.5">Tipo</th>
                       <th className="py-2.5">Data</th>
@@ -1165,12 +1165,12 @@ export default function MedicalRecordPage({
                             <span className="truncate max-w-[200px] sm:max-w-xs">{att.fileName}</span>
                           </td>
                           <td className="py-3">
-                            <span className={`px-2.5 py-0.5 rounded-md text-[12px] font-bold ${badgeClass}`}>
+                            <span className={`px-2.5 py-0.5 rounded-md text-[0.75rem] font-bold ${badgeClass}`}>
                               {typeLabel}
                             </span>
                           </td>
                           <td className="py-3 text-muted">{formatDateBR(att.attachmentDate)}</td>
-                          <td className="py-3 text-muted font-mono text-[12.5px]">
+                          <td className="py-3 text-muted font-mono text-[0.78125rem]">
                             {formatBytes(att.fileSize)}
                           </td>
                           <td className="py-3 text-right">
@@ -1178,7 +1178,7 @@ export default function MedicalRecordPage({
                               href={getAttachmentDownloadUrl(att.id)}
                               target="_blank"
                               rel="noreferrer"
-                              className="px-2.5 py-1 rounded-lg border border-line hover:bg-gelo font-bold text-ink text-[12.5px] transition inline-flex items-center gap-1"
+                              className="px-2.5 py-1 rounded-lg border border-line hover:bg-gelo font-bold text-ink text-[0.78125rem] transition inline-flex items-center gap-1"
                             >
                               Baixar
                             </a>
@@ -1201,7 +1201,7 @@ export default function MedicalRecordPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
           <div className="auth-troca w-full max-w-lg max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
             <div className="flex items-center justify-between border-b border-line pb-3">
-              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">
+              <h3 className="font-serif text-[1.5rem] font-semibold text-azul-petroleo">
                 Registrar Evolução de Sessão
               </h3>
               <button
@@ -1213,10 +1213,10 @@ export default function MedicalRecordPage({
               </button>
             </div>
 
-            <form onSubmit={handleSaveNewSession} className="space-y-3.5 text-[13.5px]">
+            <form onSubmit={handleSaveNewSession} className="space-y-3.5 text-[0.84375rem]">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Número da Sessão</label>
+                  <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Número da Sessão</label>
                   <input
                     type="number"
                     required
@@ -1226,7 +1226,7 @@ export default function MedicalRecordPage({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="mb-1.5 block text-[13px] font-semibold text-muted">Data da Sessão</label>
+                  <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Data da Sessão</label>
                   <input
                     type="date"
                     required
@@ -1238,7 +1238,7 @@ export default function MedicalRecordPage({
               </div>
 
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Evolução Clínica *</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Evolução Clínica *</label>
                 <textarea
                   rows={3}
                   required
@@ -1250,7 +1250,7 @@ export default function MedicalRecordPage({
               </div>
 
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Ponto de Melhora / Tarefa de Casa</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Ponto de Melhora / Tarefa de Casa</label>
                 <textarea
                   rows={2}
                   placeholder="Orientações para a família ou pontos a focar na próxima sessão..."
@@ -1261,7 +1261,7 @@ export default function MedicalRecordPage({
               </div>
 
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Marcadores Clínicos / Focos da Sessão (separados por vírgula)</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Marcadores Clínicos / Focos da Sessão (separados por vírgula)</label>
                 <input
                   type="text"
                   placeholder="Ex: Fonologia, Fluência, Articulação, Leitura guiada"
@@ -1298,7 +1298,7 @@ export default function MedicalRecordPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
           <div className="auth-troca w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
             <div className="flex items-center justify-between border-b border-line pb-3">
-              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">Nova Avaliação Clínica</h3>
+              <h3 className="font-serif text-[1.5rem] font-semibold text-azul-petroleo">Nova Avaliação Clínica</h3>
               <button
                 type="button"
                 onClick={() => setShowNewEvalModal(false)}
@@ -1308,9 +1308,9 @@ export default function MedicalRecordPage({
               </button>
             </div>
 
-            <form onSubmit={handleSaveNewEvaluation} className="space-y-3.5 text-[13.5px]">
+            <form onSubmit={handleSaveNewEvaluation} className="space-y-3.5 text-[0.84375rem]">
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Tipo de Avaliação *</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Tipo de Avaliação *</label>
                 <input
                   type="text"
                   required
@@ -1322,7 +1322,7 @@ export default function MedicalRecordPage({
               </div>
 
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Data da Avaliação *</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Data da Avaliação *</label>
                 <input
                   type="date"
                   required
@@ -1333,7 +1333,7 @@ export default function MedicalRecordPage({
               </div>
 
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Resultado Observado *</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Resultado Observado *</label>
                 <textarea
                   rows={2}
                   required
@@ -1345,7 +1345,7 @@ export default function MedicalRecordPage({
               </div>
 
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Conduta Proposta</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Conduta Proposta</label>
                 <textarea
                   rows={2}
                   placeholder="Ex: Início de intervenção terapêutica semanal focada em controle de velocidade..."
@@ -1383,7 +1383,7 @@ export default function MedicalRecordPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
           <div className="auth-troca w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
             <div className="flex items-center justify-between border-b border-line pb-3">
-              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">
+              <h3 className="font-serif text-[1.5rem] font-semibold text-azul-petroleo">
                 {viewEvalDetail.tipoAvaliacao}
               </h3>
               <button
@@ -1395,7 +1395,7 @@ export default function MedicalRecordPage({
               </button>
             </div>
 
-            <div className="space-y-3 text-[13.5px]">
+            <div className="space-y-3 text-[0.84375rem]">
               <div className="flex justify-between py-1 border-b border-line">
                 <span className="text-muted font-medium">Data:</span>
                 <span className="font-bold text-ink">{formatDateBR(viewEvalDetail.dataAvaliacao)}</span>
@@ -1426,7 +1426,7 @@ export default function MedicalRecordPage({
               <button
                 type="button"
                 onClick={() => setViewEvalDetail(null)}
-                className="px-4 py-2 bg-azul-petroleo text-on-azul rounded-[12px] font-bold text-[13.5px]"
+                className="px-4 py-2 bg-azul-petroleo text-on-azul rounded-[12px] font-bold text-[0.84375rem]"
               >
                 Fechar
               </button>
@@ -1442,7 +1442,7 @@ export default function MedicalRecordPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-azul-profundo/50 backdrop-blur-sm p-4">
           <div className="auth-troca w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-[26px] rounded-bl-[8px] bg-surface p-6 shadow-[0_40px_80px_-30px_rgba(11,30,48,0.7)] space-y-4 text-ink">
             <div className="flex items-center justify-between border-b border-line pb-3">
-              <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo">Enviar Novo Arquivo Anexo</h3>
+              <h3 className="font-serif text-[1.5rem] font-semibold text-azul-petroleo">Enviar Novo Arquivo Anexo</h3>
               <button
                 type="button"
                 onClick={() => setShowUploadModal(false)}
@@ -1452,23 +1452,23 @@ export default function MedicalRecordPage({
               </button>
             </div>
 
-            <form onSubmit={handleUploadAttachmentSubmit} className="space-y-3.5 text-[13.5px]">
+            <form onSubmit={handleUploadAttachmentSubmit} className="space-y-3.5 text-[0.84375rem]">
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Selecione o arquivo *</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Selecione o arquivo *</label>
                 <input
                   type="file"
                   required
                   accept=".pdf,.mp3,.wav,.ogg,.jpg,.jpeg,.png"
                   onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                  className="w-full text-[13.5px] p-2 rounded-lg border border-line bg-surface file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[13.5px] file:font-bold file:bg-gelo file:text-azul hover:file:bg-azul/20 cursor-pointer"
+                  className="w-full text-[0.84375rem] p-2 rounded-lg border border-line bg-surface file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[0.84375rem] file:font-bold file:bg-gelo file:text-azul hover:file:bg-azul/20 cursor-pointer"
                 />
-                <p className="text-[12px] text-muted">
+                <p className="text-[0.75rem] text-muted">
                   Formatos aceitos: Documentos (PDF), Áudios (MP3, WAV) e Exames (JPG, PNG).
                 </p>
               </div>
 
               <div className="space-y-1">
-                <label className="mb-1.5 block text-[13px] font-semibold text-muted">Descrição do Arquivo</label>
+                <label className="mb-1.5 block text-[0.8125rem] font-semibold text-muted">Descrição do Arquivo</label>
                 <input
                   type="text"
                   placeholder="Ex: Audiometria, Gravação da primeira sessão..."
