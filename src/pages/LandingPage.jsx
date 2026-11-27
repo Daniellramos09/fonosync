@@ -126,39 +126,11 @@ function Hero() {
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,28,31,0.35)_0%,rgba(9,28,31,0.05)_30%,rgba(9,28,31,0.55)_62%,rgba(9,28,31,0.92)_100%)] lg:bg-[linear-gradient(100deg,rgba(9,28,31,0.88)_0%,rgba(9,28,31,0.62)_34%,rgba(9,28,31,0.08)_62%,rgba(9,28,31,0)_100%)]"
+        className="hero-veu absolute inset-0"
       />
 
-      {/* Ficha de rodada: um exemplo do que acontece no rastreio */}
-      <figure className="absolute top-28 right-[5%] hidden w-[300px] rounded-[16px] rounded-bl-[4px] border border-white/30 bg-[#0f2a2f]/45 p-4 backdrop-blur-md xl:block">
-        <div className="flex items-start gap-3">
-          <Tucano className="-mt-2 -ml-2 w-20 shrink-0" galho={false} />
-          <div>
-            <p className="text-[0.8125rem] font-semibold text-on-band-muted">Exemplo · rodada 2 de 5</p>
-            <p className="mt-1 font-serif text-[1.875rem] leading-none font-semibold">
-              <Silabas>ga·to</Silabas>
-            </p>
-          </div>
-        </div>
-        <figcaption className="mt-3 text-[0.875rem] leading-snug text-white/90">
-          A criança vê a figura, fala o nome, e você toca no que ouviu.
-        </figcaption>
-        <div className="mt-3 flex gap-1.5" aria-hidden="true">
-          {['gato', 'tato', 'ato'].map((w, i) => (
-            <span
-              key={w}
-              className={`rounded-[8px] rounded-bl-[2px] px-2.5 py-1 text-[0.8125rem] font-semibold ${
-                i === 0 ? 'bg-mel text-on-pastel' : 'bg-white/12 text-white'
-              }`}
-            >
-              {w}
-            </span>
-          ))}
-        </div>
-      </figure>
-
-      <div className="relative mx-auto w-full max-w-[1320px] px-5 pt-32 pb-10 md:px-10 lg:pb-16">
-        <h1 className="display max-w-[11ch] text-[3.125rem] text-white sm:text-[4.125rem] lg:max-w-none lg:text-[5rem] xl:text-[5.5rem]">
+      <div className="relative mx-auto w-full max-w-[1320px] px-5 pt-28 pb-[max(2.5rem,env(safe-area-inset-bottom))] sm:pt-32 md:px-10 lg:pb-16">
+        <h1 className="display max-w-[11ch] text-[clamp(2.375rem,10.5vw,3.125rem)] text-white sm:text-[4.125rem] lg:max-w-none lg:text-[5rem] xl:text-[5.5rem]">
           <span className="hero-linha">
             <span>Toda criança tem uma voz</span>
           </span>
@@ -172,44 +144,19 @@ function Hero() {
           </span>
         </h1>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,520px)_1fr] lg:items-end">
-          <div>
-            <p className="max-w-[46ch] text-[1.0625rem] leading-[1.6] text-white/92 md:text-[1.1875rem]">
-              Rastreio fonológico lúdico por idade, prontuário clínico completo e a família
-              acompanhando cada passo. O FonoSync liga o consultório, a casa e a escola.
-            </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <a href="#/triagem" onClick={() => iniciarTriagem()} className={buttonClass('mel', 'lg')}>
-                Começar o rastreio
-                <ArrowRight size={18} aria-hidden="true" className="transition-transform group-hover/btn:translate-x-0.5" />
-              </a>
-              <a href="#/acesso" className={buttonClass('claro', 'lg')}>
-                Sou fonoaudiólogo(a)
-              </a>
-            </div>
-          </div>
-
-          <div
-            role="group"
-            aria-labelledby="hero-idade"
-            className="rounded-[16px] rounded-bl-[4px] bg-[#0f2a2f]/55 p-3 backdrop-blur-md sm:p-4 lg:justify-self-end"
-          >
-            <p id="hero-idade" className="text-[0.875rem] font-semibold text-white">
-              Ou comece pela idade da criança
-            </p>
-            <div className="mt-2.5 grid grid-cols-4 gap-1.5 sm:gap-2">
-              {faixas.map((f) => (
-                <a
-                  key={f.idade}
-                  href="#/triagem"
-                  onClick={() => iniciarTriagem(f.atividade)}
-                  className="group flex min-h-16 flex-col justify-center rounded-[12px] rounded-bl-[3px] border border-white/30 bg-white/10 px-3 py-2 backdrop-blur-md transition-colors hover:border-mel hover:bg-mel hover:text-on-pastel sm:min-w-[104px] sm:px-4"
-                >
-                  <span className="font-serif text-[1.5rem] leading-none font-semibold sm:text-[1.75rem]">{f.idade}</span>
-                  <span className="mt-1 text-[0.75rem] font-semibold opacity-85">anos</span>
-                </a>
-              ))}
-            </div>
+        <div className="mt-6 max-w-[560px] sm:mt-8">
+          <p className="max-w-[46ch] text-[1.0625rem] leading-[1.6] text-white/92 md:text-[1.1875rem]">
+            Rastreio fonológico lúdico por idade, prontuário clínico completo e a família
+            acompanhando cada passo. O FonoSync liga o consultório, a casa e a escola.
+          </p>
+          <div className="mt-7 flex flex-col gap-3 min-[440px]:flex-row min-[440px]:flex-wrap min-[440px]:items-center">
+            <a href="#/triagem" onClick={() => iniciarTriagem()} className={buttonClass('mel', 'lg')}>
+              Começar o rastreio
+              <ArrowRight size={18} aria-hidden="true" className="transition-transform group-hover/btn:translate-x-0.5" />
+            </a>
+            <a href="#/acesso" className={buttonClass('claro', 'lg')}>
+              Sou fonoaudiólogo(a)
+            </a>
           </div>
         </div>
       </div>
@@ -237,7 +184,7 @@ function ParaQuem() {
     <section id="para-quem" className="scroll-mt-24 bg-quente px-5 py-20 md:px-10 lg:py-28">
       <div className="mx-auto grid max-w-[1320px] gap-12 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-16">
         <div className="flex flex-col">
-          <h2 className="display text-[2.5rem] text-navy sm:text-[3.25rem] lg:text-[3.75rem]">
+          <h2 className="display text-[clamp(2rem,9vw,2.5rem)] text-navy sm:text-[3.25rem] lg:text-[3.75rem]">
             Três lugares onde a fala acontece.
           </h2>
           <p className="mt-5 max-w-[40ch] text-[1.0625rem] leading-[1.6] text-muted">
@@ -297,12 +244,12 @@ function ParaQuem() {
               </h3>
               <p className="mt-5 max-w-[44ch] text-[1rem] leading-[1.65] text-on-pastel/85">{atual.texto}</p>
             </div>
-            <div className="flex items-end justify-between gap-4">
-              <a href={atual.acao.href} onClick={atual.acao.onClick} className={buttonClass('primary', 'lg')}>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <a href={atual.acao.href} onClick={atual.acao.onClick} className={`${buttonClass('primary', 'lg')} max-sm:w-full max-sm:whitespace-normal`}>
                 {atual.acao.label}
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <Personagem className="w-28 shrink-0 sm:w-36 lg:hidden" />
+              <Personagem className="ml-auto w-24 shrink-0 sm:w-36 lg:hidden" />
             </div>
           </div>
 
@@ -312,9 +259,9 @@ function ParaQuem() {
               src={atual.foto}
               alt={atual.fotoAlt}
               loading="lazy"
-              className="h-[300px] w-full rounded-[20px] rounded-tr-[90px] object-cover sm:h-[380px] lg:h-full"
+              className="h-[240px] w-full rounded-[20px] rounded-tr-[70px] object-cover min-[400px]:h-[300px] sm:h-[380px] sm:rounded-tr-[90px] lg:h-full"
             />
-            <div className="absolute right-3 -bottom-4 left-3 rounded-[14px] rounded-bl-[3px] bg-quente p-4 text-ink shadow-[0_18px_40px_-18px_rgba(23,67,74,0.45)] sm:right-auto sm:left-[-28px] sm:w-[280px] lg:bottom-10">
+            <div className="absolute right-3 -bottom-4 left-3 rounded-[14px] rounded-bl-[3px] bg-quente p-4 text-ink shadow-[0_18px_40px_-18px_color-mix(in_srgb,var(--color-ocean-deep)_45%,transparent)] sm:right-auto sm:left-[-28px] sm:w-[280px] lg:bottom-10">
               <p className="text-[0.8125rem] font-semibold text-muted">{atual.nota.titulo}</p>
               <ul className="mt-2 space-y-1.5">
                 {atual.nota.linhas.map((linha) => (
@@ -349,18 +296,18 @@ function Rastreio() {
             src={articulacaoImg}
             alt="Fonoaudióloga e criança tocando o queixo para sentir o som durante a sessão"
             loading="lazy"
-            className="absolute -right-3 -bottom-2 w-[52%] rounded-[18px] rounded-tl-[4px] border-[6px] border-ocean object-cover shadow-[0_24px_48px_-16px_rgba(0,0,0,0.45)] sm:-right-8 lg:-bottom-10"
+            className="absolute -right-3 -bottom-2 w-[52%] rounded-[18px] rounded-tl-[4px] border-[6px] border-ocean object-cover shadow-[0_24px_48px_-16px_rgba(0,0,0,0.45)] md:-right-8 lg:-bottom-10"
           />
           <p
             aria-hidden="true"
-            className="absolute top-6 -left-2 rounded-[12px] rounded-bl-[3px] bg-mel px-4 py-2 font-serif text-[1.625rem] font-semibold text-on-pastel shadow-lg sm:-left-6"
+            className="absolute top-6 -left-2 rounded-[12px] rounded-bl-[3px] bg-mel px-4 py-2 font-serif text-[1.625rem] font-semibold text-on-pastel shadow-lg md:-left-6"
           >
             gi<span className="text-coral-ink">·</span>ra<span className="text-coral-ink">·</span>fa
           </p>
         </div>
 
         <div>
-          <h2 className="display text-[2.5rem] sm:text-[3.25rem] lg:text-[3.75rem]">
+          <h2 className="display text-[clamp(2rem,9vw,2.5rem)] sm:text-[3.25rem] lg:text-[3.75rem]">
             Parece brincadeira.
             <span className="block text-mel">É rastreio de verdade.</span>
           </h2>
@@ -376,9 +323,9 @@ function Rastreio() {
                 <a
                   href="#/triagem"
                   onClick={() => iniciarTriagem(f.atividade)}
-                  className="group grid grid-cols-[72px_1fr_auto] items-start gap-4 py-5 sm:grid-cols-[96px_1fr_auto]"
+                  className="group grid grid-cols-[60px_1fr_auto] items-start gap-3 py-5 min-[400px]:grid-cols-[72px_1fr_auto] min-[400px]:gap-4 sm:grid-cols-[96px_1fr_auto]"
                 >
-                  <span className="display text-[2.125rem] text-mel sm:text-[2.625rem]">{f.idade}</span>
+                  <span className="display text-[1.875rem] text-mel min-[400px]:text-[2.125rem] sm:text-[2.625rem]">{f.idade}</span>
                   <span>
                     <span className="block text-[1.125rem] font-bold">{f.nome}</span>
                     <span className="mt-1 block text-[0.9375rem] leading-[1.55] text-white/75">{f.texto}</span>
@@ -409,7 +356,7 @@ function Jornada() {
     <section id="jornada" className="scroll-mt-24 overflow-hidden bg-lavanda px-5 py-20 text-on-pastel md:px-10 lg:py-28">
       <div className="mx-auto max-w-[1320px]">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
-          <h2 className="display max-w-[14ch] text-[2.5rem] sm:text-[3.25rem] lg:text-[4rem]">
+          <h2 className="display max-w-[14ch] text-[clamp(2rem,9vw,2.5rem)] sm:text-[3.25rem] lg:text-[4rem]">
             Um caminho no ritmo da criança.
           </h2>
           <p className="max-w-[40ch] text-[1.0625rem] leading-[1.6] text-on-pastel/80">
@@ -450,7 +397,7 @@ function Familias() {
     <section id="familias" className="scroll-mt-24 bg-nevoa">
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[1fr_1fr]">
         <div className="flex flex-col justify-center px-5 py-20 md:px-10 lg:py-28 lg:pr-16 lg:pl-[max(2.5rem,calc((100vw-1320px)/2))]">
-          <h2 className="display max-w-[13ch] text-[2.5rem] text-navy sm:text-[3.25rem] lg:text-[3.75rem]">
+          <h2 className="display max-w-[13ch] text-[clamp(2rem,9vw,2.5rem)] text-navy sm:text-[3.25rem] lg:text-[3.75rem]">
             A terapia continua na mesa da cozinha.
           </h2>
           <p className="mt-6 max-w-[48ch] text-[1.0625rem] leading-[1.65] text-muted">
@@ -478,7 +425,7 @@ function Familias() {
           </div>
         </div>
 
-        <div className="relative min-h-[520px] lg:min-h-[760px]">
+        <div className="relative min-h-[420px] sm:min-h-[520px] lg:min-h-[760px]">
           <img
             src={blocosImg}
             alt="Adulto e criança montando uma torre de blocos de madeira desenhados à mão"
@@ -527,12 +474,12 @@ function Cuidado() {
     <section id="cuidado" className="scroll-mt-24 bg-salvia px-5 py-20 text-on-pastel md:px-10 lg:py-28">
       <div className="mx-auto grid max-w-[1320px] gap-14 lg:grid-cols-[minmax(0,460px)_1fr] lg:gap-20">
         <div>
-          <h2 className="display text-[2.5rem] sm:text-[3.25rem]">Acessível e privado desde a primeira linha.</h2>
+          <h2 className="display text-[clamp(2rem,9vw,2.5rem)] sm:text-[3.25rem]">Acessível e privado desde a primeira linha.</h2>
           <p className="mt-5 max-w-[42ch] text-[1.0625rem] leading-[1.6] text-on-pastel/80">
             Famílias, crianças e profissionais diferentes usam a mesma plataforma. Os ajustes estão a um
             toque, em qualquer tela.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-col gap-3 min-[440px]:flex-row min-[440px]:flex-wrap">
             <button type="button" onClick={() => setShowA11y(true)} className={buttonClass('primary', 'lg')}>
               <PersonStanding size={18} aria-hidden="true" /> Ajustar acessibilidade
             </button>
@@ -568,13 +515,13 @@ function Convite() {
     <section className="relative overflow-hidden bg-mel px-5 pt-20 text-on-pastel md:px-10 lg:pt-24">
       <div className="mx-auto grid max-w-[1320px] items-end gap-6 lg:grid-cols-[1fr_auto]">
         <div className="pb-16 lg:pb-24">
-          <h2 className="display max-w-[14ch] text-[2.75rem] sm:text-[3.75rem] lg:text-[4.75rem]">
+          <h2 className="display max-w-[14ch] text-[clamp(2.25rem,10vw,2.75rem)] sm:text-[3.75rem] lg:text-[4.75rem]">
             Vamos ouvir o que ela tem a <Silabas>di·zer</Silabas>?
           </h2>
           <p className="mt-6 max-w-[46ch] text-[1.0625rem] leading-[1.6] text-on-pastel/80">
             Escolha a idade e comece uma atividade agora, ou entre na área clínica do FonoSync.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-col gap-3 min-[440px]:flex-row min-[440px]:flex-wrap">
             <a href="#/triagem" onClick={() => iniciarTriagem()} className={buttonClass('primary', 'lg')}>
               Começar o rastreio
               <ArrowRight size={18} aria-hidden="true" />
@@ -584,7 +531,7 @@ function Convite() {
             </a>
           </div>
         </div>
-        <Capivara acenando title="Capivara do FonoSync acenando" className="mx-auto w-64 sm:w-80 lg:w-[400px]" />
+        <Capivara acenando title="Capivara do FonoSync acenando" className="mx-auto w-52 sm:w-80 lg:w-[400px]" />
       </div>
     </section>
   );
@@ -593,10 +540,16 @@ function Convite() {
 export default function LandingPage() {
   useEffect(() => {
     document.title = 'FonoSync — Cada criança encontra a sua voz';
+    // Paleta temporária baseada na logo atual (tokens em index.css, bloco [data-marca="logo"])
+    const root = document.documentElement;
+    root.dataset.marca = 'logo';
+    return () => {
+      delete root.dataset.marca;
+    };
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-quente font-sans text-ink">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-quente font-sans text-ink">
       <Header />
       <main id="primary" className="flex-1">
         <Hero />

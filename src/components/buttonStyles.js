@@ -10,7 +10,7 @@ const variants = {
     'border-danger bg-danger text-on-primary hover:brightness-[0.9] active:translate-y-px',
   // Destaque sobre fotografias e faixas oceano
   mel:
-    'border-mel bg-mel text-on-pastel hover:bg-[#f0cd6a] hover:border-[#f0cd6a] active:translate-y-px',
+    'border-mel bg-mel text-on-pastel hover:bg-[color-mix(in_oklab,var(--color-mel),black_8%)] hover:border-[color-mix(in_oklab,var(--color-mel),black_8%)] active:translate-y-px',
   // Áreas internas: azul institucional e botão claro sobre fundo creme
   azul:
     'border-azul-petroleo bg-azul-petroleo text-on-azul shadow-[0_12px_26px_-16px_rgba(29,78,104,0.9)] hover:-translate-y-0.5 hover:border-azul hover:bg-azul active:translate-y-0',
