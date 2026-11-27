@@ -130,13 +130,13 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5">
+      <header className="fixed inset-x-0 top-0 z-40 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] md:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.25rem,env(safe-area-inset-left))]">
         <div
           ref={navRef}
           className={`relative mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-3 rounded-[14px] px-3 transition-[background-color,box-shadow,color] duration-300 md:px-5 ${
             dark
-              ? 'on-dark bg-[#0f2a2f]/50 text-white backdrop-blur-xl'
-              : 'bg-quente/95 text-navy shadow-[0_12px_32px_-14px_rgba(23,67,74,0.3)] backdrop-blur-xl'
+              ? 'on-dark bg-veu/50 text-white backdrop-blur-xl'
+              : 'bg-quente/95 text-navy shadow-[0_12px_32px_-14px_color-mix(in_srgb,var(--color-ocean-deep)_30%,transparent)] backdrop-blur-xl'
           }`}
         >
           <a href="#/" aria-label="FonoSync, página inicial" className="shrink-0">
@@ -174,7 +174,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setShowA11y(true)}
-              className={`inline-flex size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors xl:w-auto xl:gap-2 xl:px-3 ${chipClass}`}
+              className={`inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors xl:w-auto xl:gap-2 xl:px-3 ${chipClass}`}
               title="Acessibilidade"
             >
               <PersonStanding size={17} aria-hidden="true" />
@@ -184,7 +184,7 @@ export default function Header() {
               type="button"
               aria-pressed={isPlayerOpen}
               onClick={() => speakPageContent()}
-              className={`hidden size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors md:inline-flex ${
+              className={`hidden size-10 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors md:inline-flex ${
                 isPlayerOpen ? 'border-mel bg-mel text-on-pastel' : chipClass
               }`}
               title="Ouvir página"
@@ -203,7 +203,7 @@ export default function Header() {
             <a
               href="#/triagem"
               onClick={() => iniciarTriagem()}
-              className={`${buttonClass(dark ? 'mel' : 'primary')} hidden min-h-10 py-2 md:inline-flex`}
+              className={`${buttonClass(dark ? 'mel' : 'primary')} min-h-10 py-2 max-md:hidden`}
             >
               Começar o rastreio
             </a>
@@ -212,7 +212,7 @@ export default function Header() {
               onClick={() => setMobileOpen(true)}
               aria-expanded={mobileOpen}
               aria-controls="menu-movel"
-              className={`inline-flex size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border lg:hidden ${chipClass}`}
+              className={`inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border lg:hidden ${chipClass}`}
             >
               <Menu size={20} aria-hidden="true" />
               <span className="sr-only">Abrir menu</span>
@@ -223,7 +223,7 @@ export default function Header() {
             <div
               onMouseEnter={() => handleMouseEnter(active.id)}
               onMouseLeave={handleMouseLeave}
-              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[820px] -translate-x-1/2 grid-cols-[1fr_250px] gap-6 rounded-[18px] rounded-tl-[4px] bg-quente p-6 text-ink shadow-[0_30px_70px_-20px_rgba(23,67,74,0.35)] lg:grid"
+              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[820px] -translate-x-1/2 grid-cols-[1fr_250px] gap-6 rounded-[18px] rounded-tl-[4px] bg-quente p-6 text-ink shadow-[0_30px_70px_-20px_color-mix(in_srgb,var(--color-ocean-deep)_35%,transparent)] lg:grid"
             >
               {active.faixas ? (
                 <ul className="grid grid-cols-2 gap-x-6">
@@ -282,7 +282,7 @@ export default function Header() {
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className="on-dark fixed inset-0 z-50 flex flex-col overflow-y-auto bg-ocean-deep px-5 pt-5 pb-8 text-white lg:hidden"
+          className="on-dark fixed inset-0 z-50 flex flex-col overflow-y-auto overscroll-contain bg-ocean-deep pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1.25rem,env(safe-area-inset-right))] pb-[max(2rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))] text-white lg:hidden"
         >
           <div className="flex items-center justify-between">
             <Logo tone="claro" />
@@ -296,7 +296,7 @@ export default function Header() {
               <span className="sr-only">Fechar menu</span>
             </button>
           </div>
-          <nav aria-label="Principal (celular)" className="mt-10 flex-1">
+          <nav aria-label="Principal (celular)" className="mt-8 flex-1">
             <p className="text-[0.875rem] font-semibold text-on-band-muted">Rastreio por idade</p>
             <ul className="mt-3 grid grid-cols-2 gap-2">
               {menus[2].faixas.map((f) => (

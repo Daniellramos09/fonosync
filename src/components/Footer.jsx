@@ -67,11 +67,11 @@ export default function Footer() {
 
   return (
     <footer className="on-dark bg-ocean-deep text-white">
-      <div className="mx-auto max-w-[1320px] px-5 pt-20 pb-10 md:px-10">
+      <div className="mx-auto max-w-[1320px] px-5 pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))] sm:pt-20 md:px-10">
         <div className="grid gap-14 border-b border-white/15 pb-16 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-24">
           <div>
             <Logo tone="claro" markClassName="size-10" />
-            <p className="display mt-10 max-w-[16ch] text-[2.5rem] sm:text-[3.5rem]">
+            <p className="display mt-10 max-w-[16ch] text-[clamp(2rem,9vw,2.5rem)] sm:text-[3.5rem]">
               Cada criança encontra a sua voz no seu tempo.
             </p>
             <p className="mt-6 max-w-[52ch] text-[0.9375rem] leading-[1.6] text-white/72">
@@ -80,7 +80,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <nav aria-label="Rodapé" className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:gap-16">
+          <nav aria-label="Rodapé" className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 sm:gap-10 lg:gap-16">
             <div className="flex flex-col items-start gap-3">
               <p className="text-[0.8125rem] font-semibold text-on-band-muted">Plataforma</p>
               <a href="#/triagem" className={linkClass}>Rastreio fonológico</a>

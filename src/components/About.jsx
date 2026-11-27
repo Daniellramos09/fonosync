@@ -90,7 +90,7 @@ const setInert = (inactive) => (el) => {
 /* ---------- Prévia: profissional ---------- */
 function ProfessionalPreview() {
   return (
-    <div ref={setInert(true)} className="space-y-4 p-5 select-none">
+    <div ref={setInert(true)} className="space-y-4 p-3 select-none sm:p-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric) => (
           <MetricCard key={metric.label} {...metric} />
@@ -142,7 +142,7 @@ function PatientPreview() {
                 type="button"
                 onClick={() => setView(id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex min-h-11 flex-1 items-center gap-2 rounded-[10px] rounded-bl-[3px] px-3 text-left text-sm font-bold transition-colors sm:flex-none sm:gap-3 ${
+                className={`flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-[10px] rounded-bl-[3px] px-2 py-1.5 text-center text-xs font-bold transition-colors sm:min-h-11 sm:flex-none sm:flex-row sm:justify-start sm:gap-3 sm:px-3 sm:py-0 sm:text-left sm:text-sm ${
                   isActive
                     ? 'bg-white/14 text-white'
                     : 'text-on-band-muted hover:bg-white/8 hover:text-white'
@@ -156,7 +156,7 @@ function PatientPreview() {
         </nav>
       </aside>
 
-      <div className="flex-1 space-y-5 bg-canvas p-6">
+      <div className="min-w-0 flex-1 space-y-5 bg-canvas p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
           <div>
             <h3 className="font-serif text-2xl font-bold text-navy">{info.title}</h3>
@@ -266,7 +266,7 @@ export default function About() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-end justify-between gap-4 border-b border-line">
-          <div role="tablist" aria-label="Prévia das áreas do FonoSync" className="flex gap-6">
+          <div role="tablist" aria-label="Prévia das áreas do FonoSync" className="grid w-full grid-cols-2 gap-4 sm:flex sm:w-auto sm:gap-6">
             {profiles.map((p) => {
               const selected = profile === p.id;
               return (
@@ -280,7 +280,7 @@ export default function About() {
                   tabIndex={selected ? 0 : -1}
                   onClick={() => setProfile(p.id)}
                   onKeyDown={onKeyDown}
-                  className={`relative -mb-px border-b-[3px] pb-3 font-serif text-[1.25rem] font-semibold transition-colors sm:text-[1.5rem] ${
+                  className={`relative -mb-px min-h-11 border-b-[3px] pb-3 text-left font-serif text-[1.125rem] leading-tight font-semibold transition-colors sm:text-[1.5rem] ${
                     selected ? 'border-primary text-navy' : 'border-transparent text-navy/45 hover:text-navy/80'
                   }`}
                 >
@@ -292,7 +292,7 @@ export default function About() {
           <p aria-live="polite" className="max-w-xl pb-3 text-[0.9375rem] text-muted">{current.text}</p>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-[22px] rounded-bl-[6px] border border-line bg-surface shadow-[0_30px_60px_-30px_rgba(23,67,74,0.35)]">
+        <div className="mt-8 overflow-hidden rounded-[22px] rounded-bl-[6px] border border-line bg-surface shadow-[0_30px_60px_-30px_color-mix(in_srgb,var(--color-ocean-deep)_35%,transparent)]">
           <div className="flex items-center gap-2 border-b border-line bg-nevoa px-4 py-3" aria-hidden="true">
             <span className="size-2.5 rounded-full bg-coral" />
             <span className="size-2.5 rounded-full bg-mel" />

@@ -41,6 +41,7 @@
   --color-line: #d5e2dd;
   --color-focus: #c2571f;
   --color-accent: #f5d887;     /* ícones sobre faixas oceano */
+  --color-veu: #0f2a2f;        /* véu escuro sobre fotografias (hero, cabeçalho) */
 
   --font-serif: "Fraunces", Georgia, serif;
   --font-sans: "Manrope", system-ui, sans-serif;
@@ -198,6 +199,82 @@
   min-height: 3.5rem;
 }
 
+/* ===================== Paleta da logo atual (temporária) =====================
+   Ativa só enquanto a landing está aberta: LandingPage.jsx define <html data-marca="logo">.
+   Cores tiradas da logo (escudo): água #79BAB4 → azul aço #6D8BB1 → índigo #5A68A7,
+   texto da marca #2D3C4F. Alto contraste e as cores escolhidas no painel de
+   acessibilidade continuam valendo por cima desta paleta. */
+:root[data-marca="logo"]:not([data-theme="dark"]):not([data-contrast="high"]) {
+  --color-ocean: #2b4c7e;       /* faixas de identidade (azul da logo, aprofundado) */
+  --color-ocean-deep: #1b2f50;  /* rodapé, menu móvel, fundo do hero */
+  --color-veu: #0e1a2e;         /* véu sobre fotografias */
+  --color-band: #1b2f50;
+  --color-on-band-muted: #c3d1e4;
+  --color-on-primary: #ffffff;
+  --color-mist: #e9eff7;
+  --color-warm: #f3f6fb;
+  --color-warm-alt: #dde6f2;
+  --color-surface: #fbfcfe;
+  --color-canvas: #f3f6fb;
+  --color-quente: #fbfcfe;      /* base clara da página */
+  --color-nevoa: #f1f5fa;
+  --color-line: #d5deea;
+  --color-salvia: #d2ebe6;      /* água clara (topo do escudo) */
+  --color-coral: #d8e5f4;       /* azul aço claro */
+  --color-coral-ink: #2c7a71;   /* água profunda: ponto silábico, marcadores */
+  --color-terracotta: #2c7a71;
+  --color-mel: #96d4c9;         /* água: CTA sobre fundo escuro e destaques */
+  --color-accent: #96d4c9;
+  --color-lavanda: #dddff3;     /* índigo claro (base do escudo) */
+  --color-on-pastel: #22324a;
+}
+:root[data-marca="logo"]:not([data-theme="dark"]):not([data-contrast="high"]):not([data-a11y-button]) {
+  --color-primary: #2d5a8e;
+}
+:root[data-marca="logo"]:not([data-theme="dark"]):not([data-contrast="high"]):not([data-a11y-text]) {
+  --color-navy: #1f3150;
+  --color-ink: #25344a;
+  --color-muted: #52627a;
+}
+
+:root[data-marca="logo"][data-theme="dark"]:not([data-contrast="high"]) {
+  --color-ocean: #1d375a;
+  --color-ocean-deep: #0f2038;
+  --color-veu: #08111f;
+  --color-band: #0c1a2d;
+  --color-on-band-muted: #b3c3d9;
+  --color-on-primary: #0b1828;
+  --color-mist: #15212f;
+  --color-warm: #111d2b;
+  --color-warm-alt: #192839;
+  --color-surface: #0e1824;
+  --color-canvas: #0a131e;
+  --color-quente: #0e1824;
+  --color-nevoa: #111d2b;
+  --color-line: #26354a;
+  --color-salvia: #a7d4cb;
+  --color-coral: #adc6e6;
+  --color-coral-ink: #86d2c6;
+  --color-terracotta: #86d2c6;
+  --color-mel: #86cbbf;
+  --color-accent: #86cbbf;
+  --color-lavanda: #bcc0e6;
+  --color-on-pastel: #22324a;
+}
+:root[data-marca="logo"][data-theme="dark"]:not([data-contrast="high"]):not([data-a11y-button]) {
+  --color-primary: #8db5e6;
+}
+:root[data-marca="logo"][data-theme="dark"]:not([data-contrast="high"]):not([data-a11y-text]) {
+  --color-navy: #e2eaf5;
+  --color-ink: #e3e9f2;
+  --color-muted: #a5b3c6;
+}
+
+/* Ponto silábico sobre fundo escuro: água da logo */
+:root[data-marca="logo"] .on-dark .silaba-ponto {
+  color: var(--color-mel);
+}
+
 /* Modos de cor para daltonismo */
 :root[data-color-vision="red-green"] {
   --color-success: #0062a8;
@@ -353,6 +430,24 @@
   font-variation-settings: "SOFT" 100, "WONK" 1;
   letter-spacing: -0.025em;
   line-height: 1.02;
+}
+
+/* Véu do hero: escurece a base (celular) ou a esquerda (desktop) da foto para o texto */
+.hero-veu {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--color-veu) 35%, transparent) 0%,
+    color-mix(in srgb, var(--color-veu) 5%, transparent) 30%,
+    color-mix(in srgb, var(--color-veu) 60%, transparent) 58%,
+    color-mix(in srgb, var(--color-veu) 94%, transparent) 100%);
+}
+@media (min-width: 64rem) {
+  .hero-veu {
+    background: linear-gradient(100deg,
+      color-mix(in srgb, var(--color-veu) 88%, transparent) 0%,
+      color-mix(in srgb, var(--color-veu) 62%, transparent) 34%,
+      color-mix(in srgb, var(--color-veu) 8%, transparent) 62%,
+      transparent 100%);
+  }
 }
 
 /* Foco visível também sobre fotos e faixas oceano */
