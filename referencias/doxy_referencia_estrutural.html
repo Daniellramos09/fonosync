@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!-- Referência Estrutural e de Composição: Doxy.me (Estudo de Hierarquia, Tipografia, Espaçamento e Fotografia Editorial) -->
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Doxy.me — Referência Estrutural e Editorial</title>
+    <style>
+      /* Tokens e Padrões de Composição estudados do Doxy.me:
+       * - Background primário: #ffffff e #f6f5f3 (warm alabaster / off-white editorial)
+       * - Texto primário: #232323 (grafite profundo, não preto puro)
+       * - Texto secundário: #5e5e5e (cinza equilibrado para leitura prolongada)
+       * - Tipografia Display: 48px a 58px, line-height 110%-120%, letter-spacing -0.01em
+       * - Tipografia Corpo: 18px a 20px, line-height 150%
+       * - Espaçamento de Seção: 120px a 160px vertical, max-width 1220px-1280px
+       * - Grid Assimétrico / Bento Editorial com raio 20px-32px em blocos de superfície #f6f5f3
+       * - Alternância entre fotografia humana real e visualização limpa de fluxo do produto
+       */
+      body {
+        margin: 0;
+        background-color: #ffffff;
+        color: #232323;
+        font-family: sans-serif;
+      }
+      .hero-warm {
+        background-color: #f6f5f3;
+        padding: 140px 40px 100px;
+      }
+      .container {
+        max-width: 1220px;
+        margin: 0 auto;
+      }
+      .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .bento-card {
+        background: #f6f5f3;
+        border-radius: 24px;
+        padding: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero-warm">
+      <div class="container">
+        <h1>Simple, human-centered clinical care without complexity</h1>
+        <p>Editorial composition with warm neutral surfaces (#f6f5f3), real human photography, and clear typographic scale.</p>
+      </div>
+    </section>
+  </body>
+</html>

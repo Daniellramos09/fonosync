@@ -239,73 +239,75 @@ export default function About() {
     }`;
 
   return (
-    <section id="sobre" className="mx-auto max-w-360 scroll-mt-24 px-6 md:px-18 pt-20">
-      <Reveal className="mb-10 max-w-3xl">
-        <span className="mb-4 block text-sm font-bold tracking-wider text-primary uppercase">Sobre o FonoSync</span>
-        <h2 className="mb-5 text-3xl text-navy md:text-4xl">Terapia fonoaudiológica em um só lugar</h2>
-        <p className="mb-4 text-lg text-muted">
-          O FonoSync é um sistema de apoio à fonoaudiologia que reúne prontuário digital, agenda e jogos terapêuticos.
-          O profissional acompanha a evolução de cada paciente; o paciente
-          e a família praticam em casa, de forma leve e acompanhada.
-        </p>
-        <p className="text-lg text-muted">
-          O projeto nasceu como TCC na FATEC Ferraz de Vasconcelos, com foco em uso clínico real e em
-          conformidade com a LGPD.
-        </p>
-      </Reveal>
+    <section id="sobre" className="mx-auto max-w-[1240px] scroll-mt-24 px-6 md:px-10 py-20 lg:py-24">
+      <div className="rounded-[28px] bg-[#f6f5f3] p-6 sm:p-10 lg:p-14">
+        <Reveal className="mb-10 max-w-3xl">
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1 text-xs font-medium text-ink shadow-2xs">
+            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+            Ambiente da Plataforma · Demonstração Real
+          </span>
+          <h2 className="mb-4 font-sans text-3xl sm:text-[42px] font-medium tracking-[-0.03em] text-ink leading-[1.1]">
+            Visão integrada entre o consultório e a casa da família.
+          </h2>
+          <p className="text-[17px] text-[#5e5e5e] leading-[1.6]">
+            O FonoSync reúne prontuário digital, agenda clínica e atividades terapêuticas em uma mesma
+            arquitetura. Alterne abaixo entre as duas visões reais da plataforma:
+          </p>
+        </Reveal>
 
-      <Reveal>
-        <div role="tablist" aria-label="Prévia das áreas do FonoSync" className="mb-3 inline-flex rounded-xl border border-line bg-surface p-1">
-          {profiles.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              role="tab"
-              id={`tab-${p.id}`}
-              aria-selected={profile === p.id}
-              aria-controls={`preview-${p.id}`}
-              onClick={() => setProfile(p.id)}
-              className={`rounded-lg px-5 py-2 text-sm font-bold transition-colors ${
-                profile === p.id ? 'bg-primary text-on-primary' : 'text-muted hover:text-primary'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <p aria-live="polite" className="mb-6 max-w-2xl text-muted">{current.text}</p>
-
-        <div className="overflow-hidden rounded-2xl border border-line bg-canvas shadow-lg">
-          <div className="flex items-center gap-2 border-b border-line bg-surface px-4 py-3">
-            <span className="size-2.5 rounded-full bg-line" />
-            <span className="size-2.5 rounded-full bg-line" />
-            <span className="size-2.5 rounded-full bg-line" />
-            <span className="ml-2 flex-1 truncate rounded-md bg-mist px-3 py-1 text-xs text-muted">{current.url}</span>
+        <Reveal>
+          <div role="tablist" aria-label="Prévia das áreas do FonoSync" className="mb-4 inline-flex rounded-full bg-white p-1 shadow-2xs">
+            {profiles.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                role="tab"
+                id={`tab-${p.id}`}
+                aria-selected={profile === p.id}
+                aria-controls={`preview-${p.id}`}
+                onClick={() => setProfile(p.id)}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                  profile === p.id ? 'bg-ink text-white' : 'text-[#5e5e5e] hover:text-ink'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
           </div>
+          <p aria-live="polite" className="mb-6 max-w-2xl text-[15px] text-[#5e5e5e]">{current.text}</p>
 
-          {/* Os dois painéis ocupam a mesma célula: a altura não "pula" ao trocar de aba */}
-          <div className="grid">
-            <div
-              role="tabpanel"
-              id="preview-profissional"
-              aria-labelledby="tab-profissional"
-              ref={setInert(profile !== 'profissional')}
-              className={panelClass('profissional')}
-            >
-              <ProfessionalPreview />
+          <div className="overflow-hidden rounded-[22px] border border-black/6 bg-surface shadow-[0_12px_40px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center gap-2 border-b border-black/6 bg-surface px-4 py-3">
+              <span className="size-2.5 rounded-full bg-black/15" />
+              <span className="size-2.5 rounded-full bg-black/15" />
+              <span className="size-2.5 rounded-full bg-black/15" />
+              <span className="ml-2 flex-1 truncate rounded-md bg-[#f6f5f3] px-3 py-1 text-xs text-muted">{current.url}</span>
             </div>
-            <div
-              role="tabpanel"
-              id="preview-paciente"
-              aria-labelledby="tab-paciente"
-              ref={setInert(profile !== 'paciente')}
-              className={panelClass('paciente')}
-            >
-              <PatientPreview />
+
+            {/* Os dois painéis ocupam a mesma célula: a altura não "pula" ao trocar de aba */}
+            <div className="grid">
+              <div
+                role="tabpanel"
+                id="preview-profissional"
+                aria-labelledby="tab-profissional"
+                ref={setInert(profile !== 'profissional')}
+                className={panelClass('profissional')}
+              >
+                <ProfessionalPreview />
+              </div>
+              <div
+                role="tabpanel"
+                id="preview-paciente"
+                aria-labelledby="tab-paciente"
+                ref={setInert(profile !== 'paciente')}
+                className={panelClass('paciente')}
+              >
+                <PatientPreview />
+              </div>
             </div>
           </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
     </section>
   );
 }

@@ -2,24 +2,28 @@
 
 @theme {
 
-  --color-primary: #17689b;  /* botões, links, barras */
+  --color-primary: #156082;  /* azul clínico editorial */
   --color-on-primary: #ffffff; /* texto sobre a cor primária */
-  --color-navy: #103d5a;     /* títulos */
-  --color-band: #092e45;     /* faixas escuras: destaques, footer, menu lateral */
-  --color-on-band-muted: #c9e5f3; /* texto secundário sobre as faixas escuras */
-  --color-mist: #eaf2f8;     /* hero, cards, CTA */
+  --color-navy: #14222c;     /* títulos escuros com contraste editorial */
+  --color-band: #16242f;     /* faixas estruturais profundas */
+  --color-on-band-muted: #c8dae6; /* texto secundário sobre as faixas escuras */
+  --color-mist: #eef3f5;     /* superfícies azuladas sutis */
+  --color-warm: #f6f5f3;     /* superfície editorial quente (alabastro) */
+  --color-warm-alt: #edece8; /* variação quente para blocos de destaque */
+  --color-terracotta: #b86a52; /* acento humano acolhedor */
   --color-surface: #ffffff;  /* fundo da página e dos cards */
-  --color-canvas: #f5f9fc;   /* fundo da área de trabalho logada */
-  --color-ink: #172c3a;      /* Texto */
-  --color-muted: #5c7180;    /* Texto secundário */
-  --color-success: #197451;  /* Sucesso */
-  --color-warning: #a65412;  /* Atenção */
-  --color-danger: #a9343b;   /* Erro */
-  --color-line: #cad8e1;     /* Divisor: bordas */
-  --color-focus: #ffb23f;    /* Contorno de foco (teclado) */
-  --color-accent: #ffb23f;   /* ícones sobre as faixas escuras */
-  --font-serif: "Source Serif 4", Georgia, serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --color-canvas: #faf9f6;   /* fundo da área de trabalho e leitura */
+  --color-ink: #1a1d20;      /* Texto */
+  --color-muted: #52606b;    /* Texto secundário */
+  --color-success: #1b6b4d;  /* Sucesso */
+  --color-warning: #9c5214;  /* Atenção */
+  --color-danger: #a32e35;   /* Erro */
+  --color-line: #dedbd3;     /* Divisor: bordas */
+  --color-focus: #d9822b;    /* Contorno de foco (teclado) */
+  --color-accent: #e08e36;   /* ícones sobre as faixas escuras */
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
 }
 
 /* painel de acessibilidade */
