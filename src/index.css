@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @theme {
+  /* Azuis do FonoSync (logo original: escudo azul com ondas sonoras) */
+  --color-azul-profundo: #13304a; /* faixas e sobreposições sobre fotos */
+  --color-azul-petroleo: #1d4e68; /* institucional: botões e títulos da área de acesso */
+  --color-azul: #2c6aa6;          /* médio: links, foco, estados ativos */
+  --color-azul-vivo: #4c9be8;     /* destaque e detalhes decorativos */
+  --color-on-azul: #ffffff;
+  --color-gelo: #eaf3fb;          /* azul gelo */
+  --color-creme: #fffaf2;         /* off-white cremoso */
   /* Identidade FonoSync — rebrand 2026-11 */
   --color-ocean: #235b63;      /* Verde Oceano: identidade e contraste */
   --color-ocean-deep: #17434a; /* faixas profundas e hover do primário */
@@ -44,6 +52,12 @@
 /* painel de acessibilidade */
 
 :root[data-theme="dark"] {
+  --color-azul-petroleo: #8cc4f2;
+  --color-azul: #9ccdf5;
+  --color-azul-vivo: #6fb2f0;
+  --color-on-azul: #0b1b2a;
+  --color-gelo: #13263a;
+  --color-creme: #0c1724;
   --color-primary: #86c9c4;
   --color-on-primary: #0c1d20;
   --color-navy: #e3f0ec;
@@ -72,6 +86,11 @@
 
 /* Alto contraste: campos de cor viram branco/preto, mantendo a leitura */
 :root[data-contrast="high"] {
+  --color-azul-petroleo: #00427a;
+  --color-azul: #00427a;
+  --color-on-azul: #ffffff;
+  --color-gelo: #ffffff;
+  --color-creme: #ffffff;
   --color-ocean: #000000;
   --color-ocean-deep: #000000;
   --color-nevoa: #ffffff;
@@ -87,6 +106,11 @@
 }
 
 :root[data-theme="dark"][data-contrast="high"] {
+  --color-azul-petroleo: #8fd0ff;
+  --color-azul: #8fd0ff;
+  --color-on-azul: #000000;
+  --color-gelo: #000000;
+  --color-creme: #000000;
   --color-nevoa: #000000;
   --color-salvia: #000000;
   --color-coral: #000000;
@@ -429,3 +453,86 @@
 :root[data-motion="reduce"] :is(.char-olho, .char-acena, .char-respira, .char-bico, .char-pata-a, .char-pata-b, .char-pula, .char-cauda, .hero-linha > span) {
   animation: none !important;
 }
+
+/* ===================== Área de acesso (login e cadastro) ===================== */
+
+/* Entrada gradual: cada bloco sobe com um pequeno atraso (--i) */
+@keyframes fs-entra {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.auth-entra { animation: fs-entra 0.7s var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 70ms + 60ms); }
+
+/* Troca entre Entrar / Criar conta e entre perfis */
+@keyframes fs-troca {
+  from { opacity: 0; transform: translateY(10px) scale(0.995); filter: blur(2px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.auth-troca { animation: fs-troca 0.5s var(--ease-out-soft) both; }
+
+/* Campo com erro balança uma vez */
+@keyframes fs-balanca {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+.campo-erro { animation: fs-balanca 0.4s ease-in-out 1; }
+
+/* Banner: a foto se aproxima devagar; a troca de perfil cruza as imagens */
+@keyframes fs-aproxima {
+  from { transform: scale(1.08); }
+  to { transform: scale(1); }
+}
+.banner-foto { animation: fs-aproxima 18s var(--ease-out-soft) both; }
+
+/* Elementos decorativos flutuando devagar */
+@keyframes fs-flutua {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
+  50% { transform: translate3d(0, var(--y, -10px), 0) rotate(calc(var(--r, 0deg) + 4deg)); }
+}
+.flutua { animation: fs-flutua var(--d, 7s) ease-in-out infinite; animation-delay: var(--atraso, 0s); }
+
+/* Ondas sonoras da logo, respirando */
+@keyframes fs-onda {
+  0%, 100% { transform: scaleY(0.45); }
+  50% { transform: scaleY(1); }
+}
+.onda-barra { transform-box: fill-box; transform-origin: center; animation: fs-onda 1.6s ease-in-out infinite; }
+
+/* Anéis de som saindo do coaxar do sapinho */
+@keyframes fs-anel {
+  0% { transform: scale(0.6); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.char-anel { transform-box: fill-box; transform-origin: 0% 50%; animation: fs-anel 2.8s ease-out infinite; }
+@keyframes fs-papo {
+  0%, 70%, 100% { transform: scale(1); }
+  78% { transform: scale(1.35); }
+  86% { transform: scale(1.05); }
+}
+.char-papo { transform-box: fill-box; transform-origin: center; animation: fs-papo 2.8s ease-in-out infinite; }
+
+/* Botão principal: a seta avança no hover */
+.botao-seta svg { transition: transform 0.25s var(--ease-out-soft); }
+.botao-seta:hover svg, .botao-seta:focus-visible svg { transform: translateX(4px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-entra, .auth-troca, .campo-erro, .banner-foto, .flutua, .onda-barra, .char-anel, .char-papo { animation: none !important; }
+}
+:root[data-motion="reduce"] :is(.auth-entra, .auth-troca, .campo-erro, .banner-foto, .flutua, .onda-barra, .char-anel, .char-papo) {
+  animation: none !important;
+}
+
+/* Grifo desenhado sob a palavra de destaque do título */
+@keyframes fs-risco {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+.risco path { stroke-dasharray: 1; animation: fs-risco 0.9s var(--ease-out-soft) 0.35s both; }
+@media (prefers-reduced-motion: reduce) {
+  .risco path { animation: none !important; }
+}
+:root[data-motion="reduce"] .risco path { animation: none !important; }

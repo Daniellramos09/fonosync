@@ -35,7 +35,7 @@ SPA React 19 + Vite + Tailwind 4, roteamento por hash (`#/`, `#/triagem`, `#/ace
 
 ## Brand Commitments
 
-- Nome: **FonoSync**. Logo antigo (escudo com onda em degradê) substituído por wordmark próprio em 2026-11-27, a pedido do usuário.
+- Nome: **FonoSync**. Logo original (escudo com ondas sonoras em degradê, `ModeloA_Semnome.jpg`) mantida em todo o sistema; o wordmark "Fono·Sync" foi descartado a pedido do usuário (2026-11-27).
 - Personagens autorais inspirados na fauna brasileira (capivara, tucano, tartaruga, sagui) fazem parte da identidade lúdica, usados com intenção — não como decoração.
 - Paleta, tipografia (Fraunces + Manrope) e referência visual (HU Health) fixadas pelo usuário no briefing de rebrand de 2026-11-27.
 

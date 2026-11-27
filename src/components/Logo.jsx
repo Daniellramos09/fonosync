@@ -1,36 +1,26 @@
-// Marca FonoSync: balão de fala com três sílabas (o ponto central em coral)
-// e o nome separado como se separam as sílabas: Fono·Sync.
-export function LogoMark({ className = 'size-9', tone = 'ocean' }) {
-  const fundo = tone === 'claro' ? '#FFFCF7' : 'var(--color-ocean)';
-  const balao = tone === 'claro' ? 'var(--color-ocean)' : '#FFFCF7';
-  const ponto = tone === 'claro' ? '#FFFCF7' : 'var(--color-ocean)';
+// Logo original do FonoSync: escudo com ondas sonoras (arquivo preservado sem alterações).
+// O símbolo fica num círculo branco para funcionar sobre fundos claros e escuros.
+import logoImg from '../assets/images/ModeloA_Semnome.jpg';
+
+export function LogoMark({ className = 'size-9' }) {
   return (
-    <svg viewBox="0 0 64 64" className={className} aria-hidden="true" focusable="false">
-      <rect width="64" height="64" rx="16" fill={fundo} />
-      <path
-        d="M16 16h28a9 9 0 0 1 9 9v12a9 9 0 0 1-9 9H28l-11 8 2-8h-3a9 9 0 0 1-9-9V25a9 9 0 0 1 9-9z"
-        fill={balao}
-      />
-      <circle cx="22" cy="31" r="3.2" fill={ponto} />
-      <circle cx="32" cy="31" r="3.2" fill="#F4B7A3" />
-      <circle cx="42" cy="31" r="3.2" fill={ponto} />
-    </svg>
+    <span
+      className={`inline-grid shrink-0 place-items-center overflow-hidden rounded-full bg-white shadow-[0_6px_16px_-10px_rgba(19,48,74,0.6)] ring-1 ring-black/5 ${className}`}
+    >
+      <img src={logoImg} alt="" className="size-full scale-[1.12] object-cover" />
+    </span>
   );
 }
 
 export default function Logo({ tone = 'ocean', className = '', markClassName = 'size-9', showName = true }) {
   const texto = tone === 'claro' ? 'text-white' : 'text-navy';
-  const ponto = tone === 'claro' ? 'text-coral' : 'text-coral-ink';
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <LogoMark className={markClassName} tone={tone} />
-      {showName && (
-        <span
-          className={`font-serif text-[21px] font-semibold leading-none tracking-[-0.02em] ${texto}`}
-          style={{ fontVariationSettings: '"SOFT" 100, "WONK" 0' }}
-        >
-          Fono<span className={ponto} aria-hidden="true">·</span>Sync
-        </span>
+      <LogoMark className={markClassName} />
+      {showName ? (
+        <span className={`font-serif text-[21px] font-semibold leading-none tracking-[-0.02em] ${texto}`}>FonoSync</span>
+      ) : (
+        <span className="sr-only">FonoSync</span>
       )}
     </span>
   );
