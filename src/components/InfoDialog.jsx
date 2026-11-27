@@ -53,7 +53,7 @@ export default function InfoDialog({ isOpen, onClose, title, children, footer = 
         className="relative flex max-h-[90vh] w-full max-w-lg flex-col gap-4 overflow-y-auto rounded-[10px] border-2 border-navy bg-surface p-6 shadow-[0_8px_24px_rgba(13,51,71,0.18)]"
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 id={titleId} ref={titleRef} tabIndex={-1} className="text-[22px] text-navy">
+          <h2 id={titleId} ref={titleRef} tabIndex={-1} className="text-[1.375rem] text-navy">
             {title}
           </h2>
           <button

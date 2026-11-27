@@ -197,8 +197,8 @@ export default function Reports() {
       {/* ---------------------------------------------------------------- */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
         <div>
-          <h1 className="display text-[38px] text-azul-petroleo sm:text-[46px]">Relatórios & Documentos Clínicos</h1>
-          <p className="text-[13.5px] text-muted mt-1">
+          <h1 className="display text-[2.375rem] text-azul-petroleo sm:text-[2.875rem]">Relatórios & Documentos Clínicos</h1>
+          <p className="text-[0.84375rem] text-muted mt-1">
             Gere laudos de evolução, relatórios para outros profissionais, atestados com CRFa e importe prontuários externos.
           </p>
         </div>
@@ -215,7 +215,7 @@ export default function Reports() {
 
       {/* FEEDBACK BANNER */}
       {feedback && (
-        <div className="flex items-center gap-2 p-3.5 bg-success/10 border border-success/30 text-success rounded-[12px] text-[13.5px] font-semibold shadow-2xs animate-fade-in">
+        <div className="flex items-center gap-2 p-3.5 bg-success/10 border border-success/30 text-success rounded-[12px] text-[0.84375rem] font-semibold shadow-2xs animate-fade-in">
           <CheckCircle2 size={16} className="text-success shrink-0" />
           <span>{feedback}</span>
         </div>
@@ -237,7 +237,7 @@ export default function Reports() {
               key={id}
               type="button"
               onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 px-4 py-3 text-[13.5px] font-bold border-b-2 transition whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-3 text-[0.84375rem] font-bold border-b-2 transition whitespace-nowrap cursor-pointer ${
                 active
                   ? 'border-azul text-azul bg-gelo'
                   : 'border-transparent text-muted hover:text-ink hover:bg-canvas'
@@ -265,14 +265,14 @@ export default function Reports() {
                 <h3 className="text-base font-bold font-serif text-ink group-hover:text-azul transition-colors">
                   Relatório de Evolução Clínica
                 </h3>
-                <p className="text-[13.5px] text-muted leading-relaxed">
+                <p className="text-[0.84375rem] text-muted leading-relaxed">
                   Histórico completo e consolidado de sessões, progresso terapêutico, parâmetros fonéticos, assiduidade e objetivos alcançados para o paciente e familiares.
                 </p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-gelo text-muted">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-gelo text-muted">
                     Acompanhamento
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-gelo text-muted">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-gelo text-muted">
                     Formato PDF Oficial
                   </span>
                 </div>
@@ -281,7 +281,7 @@ export default function Reports() {
                 <button
                   type="button"
                   onClick={() => setShowEvolutionModal(true)}
-                  className="w-full py-2.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
+                  className="w-full py-2.5 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[0.84375rem] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <FileDown size={15} /> Gerar Relatório de Evolução
                 </button>
@@ -297,14 +297,14 @@ export default function Reports() {
                 <h3 className="text-base font-bold font-serif text-ink group-hover:text-azul transition-colors">
                   Relatório para Outros Profissionais
                 </h3>
-                <p className="text-[13.5px] text-muted leading-relaxed">
+                <p className="text-[0.84375rem] text-muted leading-relaxed">
                   Sumário clínico estruturado com conduta terapêutica, hipótese diagnóstica (CID-10) e recomendações para médico neuropediatra, psicólogo, otorrinolaringologista ou escola.
                 </p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-gelo text-azul">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-gelo text-azul">
                     Interdisciplinar
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-gelo text-azul">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-gelo text-azul">
                     Médicos & Escolas
                   </span>
                 </div>
@@ -313,7 +313,7 @@ export default function Reports() {
                 <button
                   type="button"
                   onClick={() => setShowInterModal(true)}
-                  className="w-full py-2.5 bg-azul hover:bg-azul-petroleo text-on-azul rounded-[12px] text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
+                  className="w-full py-2.5 bg-azul hover:bg-azul-petroleo text-on-azul rounded-[12px] text-[0.84375rem] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <Share2 size={15} /> Emitir Relatório para Outro Profissional
                 </button>
@@ -329,14 +329,14 @@ export default function Reports() {
                 <h3 className="text-base font-bold font-serif text-ink group-hover:text-success transition-colors">
                   Atestado Fonoaudiológico Oficial
                 </h3>
-                <p className="text-[13.5px] text-muted leading-relaxed">
+                <p className="text-[0.84375rem] text-muted leading-relaxed">
                   Declaração formal de comparecimento em atendimento, tratamento contínuo ou aptidão com carimbo digital, QR Code de validação e CRFa do profissional.
                 </p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-success/10 text-success">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-success/10 text-success">
                     Assinatura com CRFa
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-success/10 text-success">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-success/10 text-success">
                     Justificativa Escolar / Trabalho
                   </span>
                 </div>
@@ -345,7 +345,7 @@ export default function Reports() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('atestados')}
-                  className="w-full py-2.5 bg-success hover:bg-success text-white rounded-[12px] text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
+                  className="w-full py-2.5 bg-success hover:bg-success text-white rounded-[12px] text-[0.84375rem] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <BadgeCheck size={15} /> Emitir Atestado Oficial
                 </button>
@@ -361,14 +361,14 @@ export default function Reports() {
                 <h3 className="text-base font-bold font-serif text-ink group-hover:text-warning transition-colors">
                   Importar Prontuário de Outro Sistema
                 </h3>
-                <p className="text-[13.5px] text-muted leading-relaxed">
+                <p className="text-[0.84375rem] text-muted leading-relaxed">
                   Migração facilitada e segura de prontuários clínicos e fichas vindas de outros softwares médicos (JSON, planilhas CSV ou prontuários físicos digitalizados).
                 </p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-warning/10 text-warning">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-warning/10 text-warning">
                     Migração de Dados
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-warning/10 text-warning">
+                  <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-warning/10 text-warning">
                     JSON / CSV / PDF
                   </span>
                 </div>
@@ -377,7 +377,7 @@ export default function Reports() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('importar')}
-                  className="w-full py-2.5 bg-surface border border-line hover:bg-canvas text-ink rounded-[12px] text-[13.5px] font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
+                  className="w-full py-2.5 bg-surface border border-line hover:bg-canvas text-ink rounded-[12px] text-[0.84375rem] font-bold shadow-2xs flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <UploadCloud size={15} className="text-warning" /> Iniciar Importação de Prontuário
                 </button>
@@ -400,16 +400,16 @@ export default function Reports() {
                 placeholder="Buscar por paciente ou documento..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-canvas border border-line rounded-[12px] text-[13.5px] text-ink focus:outline-none focus:ring-2 focus:ring-azul/20"
+                className="w-full pl-9 pr-3 py-2 bg-canvas border border-line rounded-[12px] text-[0.84375rem] text-ink focus:outline-none focus:ring-2 focus:ring-azul/20"
               />
             </div>
-            <span className="text-[13.5px] text-muted font-semibold">{filteredDocs.length} documentos encontrados</span>
+            <span className="text-[0.84375rem] text-muted font-semibold">{filteredDocs.length} documentos encontrados</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-[13.5px]">
+            <table className="w-full text-left text-[0.84375rem]">
               <thead>
-                <tr className="border-b border-line text-[12.5px] font-semibold text-muted">
+                <tr className="border-b border-line text-[0.78125rem] font-semibold text-muted">
                   <th className="py-3 px-3">Documento</th>
                   <th className="py-3 px-3">Paciente</th>
                   <th className="py-3 px-3">Especialidade / Destino</th>
@@ -426,13 +426,13 @@ export default function Reports() {
                         <FileText size={15} className="text-azul shrink-0" />
                         <span>{doc.document}</span>
                       </div>
-                      <p className="text-[12px] text-muted pl-5.5">{doc.size} · {doc.format}</p>
+                      <p className="text-[0.75rem] text-muted pl-5.5">{doc.size} · {doc.format}</p>
                     </td>
                     <td className="py-3.5 px-3 font-semibold text-ink">{doc.patient}</td>
                     <td className="py-3.5 px-3 text-muted">{doc.specialty}</td>
                     <td className="py-3.5 px-3 text-muted">{doc.createdAt}</td>
                     <td className="py-3.5 px-3">
-                      <span className="px-2.5 py-0.5 rounded-full text-[12px] font-bold bg-success/10 text-success">
+                      <span className="px-2.5 py-0.5 rounded-full text-[0.75rem] font-bold bg-success/10 text-success">
                         {doc.status}
                       </span>
                     </td>
@@ -440,7 +440,7 @@ export default function Reports() {
                       <button
                         type="button"
                         onClick={() => setPreviewDoc(doc)}
-                        className="px-2.5 py-1 text-azul hover:bg-gelo rounded-lg font-bold text-[13.5px] inline-flex items-center gap-1 transition cursor-pointer"
+                        className="px-2.5 py-1 text-azul hover:bg-gelo rounded-lg font-bold text-[0.84375rem] inline-flex items-center gap-1 transition cursor-pointer"
                         title="Visualizar documento"
                       >
                         <Eye size={13} /> Visualizar
@@ -448,7 +448,7 @@ export default function Reports() {
                       <button
                         type="button"
                         onClick={() => showNotification(`Download de "${doc.document}" iniciado!`)}
-                        className="px-2.5 py-1 text-muted hover:bg-gelo rounded-lg font-bold text-[13.5px] inline-flex items-center gap-1 transition cursor-pointer"
+                        className="px-2.5 py-1 text-muted hover:bg-gelo rounded-lg font-bold text-[0.84375rem] inline-flex items-center gap-1 transition cursor-pointer"
                         title="Baixar PDF"
                       >
                         <Download size={13} /> Baixar
@@ -469,11 +469,11 @@ export default function Reports() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Formulário do Atestado */}
           <div className="lg:col-span-5 rounded-[24px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line space-y-4">
-            <h3 className="font-serif text-[20px] font-semibold text-azul-petroleo flex items-center gap-2">
+            <h3 className="font-serif text-[1.25rem] font-semibold text-azul-petroleo flex items-center gap-2">
               <BadgeCheck size={16} className="text-success" /> Configurar Atestado Fonoaudiológico
             </h3>
 
-            <div className="space-y-3 text-[13.5px]">
+            <div className="space-y-3 text-[0.84375rem]">
               <div>
                 <label className="text-muted font-bold block mb-1">Paciente *</label>
                 <select
@@ -543,7 +543,7 @@ export default function Reports() {
                 <button
                   type="button"
                   onClick={handleGenerateAtestado}
-                  className="w-full py-2.5 bg-success hover:bg-success text-white rounded-[12px] text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
+                  className="w-full py-2.5 bg-success hover:bg-success text-white rounded-[12px] text-[0.84375rem] font-bold shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <BadgeCheck size={15} /> Confirmar e Emitir Atestado
                 </button>
@@ -559,12 +559,12 @@ export default function Reports() {
                 <LogoMark className="size-10" />
                 <div>
                   <h2 className="font-serif font-bold text-lg text-ink">FonoSync Clínica Fonoaudiológica</h2>
-                  <p className="text-[12px] text-muted tracking-wide uppercase font-semibold">
+                  <p className="text-[0.75rem] text-muted tracking-wide uppercase font-semibold">
                     Atendimento Clínico Especializado & Terapia de Fala
                   </p>
                 </div>
               </div>
-              <div className="text-right text-[12.5px] text-muted">
+              <div className="text-right text-[0.78125rem] text-muted">
                 <p className="font-bold text-ink">Dra. Renata Lima</p>
                 <p className="text-muted">CRFa 2-19842 / SP</p>
               </div>
@@ -588,7 +588,7 @@ export default function Reports() {
                 <strong className="text-ink">{atestadoDuration}</strong>, para fins de{' '}
                 <strong className="text-ink">{atestadoPurpose}</strong>.
               </p>
-              <p className="text-[13.5px] text-muted">
+              <p className="text-[0.84375rem] text-muted">
                 O presente documento é emitido em conformidade com o Código de Ética da Fonoaudiologia e legislação pertinente.
               </p>
             </div>
@@ -596,9 +596,9 @@ export default function Reports() {
             {/* Assinatura e Carimbo Digital */}
             <div className="pt-8 border-t border-line flex flex-col items-center justify-center text-center space-y-1">
               <div className="w-48 border-b border-slate-400 mb-2" />
-              <p className="text-[13.5px] font-bold text-ink">Dra. Renata Lima</p>
-              <p className="text-[12.5px] text-muted">Fonoaudióloga Clínica · CRFa 2-19842</p>
-              <span className="inline-flex items-center gap-1 text-[12px] text-success font-semibold mt-1 bg-success/10 px-2 py-0.5 rounded-full border border-success/30">
+              <p className="text-[0.84375rem] font-bold text-ink">Dra. Renata Lima</p>
+              <p className="text-[0.78125rem] text-muted">Fonoaudióloga Clínica · CRFa 2-19842</p>
+              <span className="inline-flex items-center gap-1 text-[0.75rem] text-success font-semibold mt-1 bg-success/10 px-2 py-0.5 rounded-full border border-success/30">
                 <CheckCircle2 size={11} /> Assinado digitalmente com chave certificada
               </span>
             </div>
@@ -607,7 +607,7 @@ export default function Reports() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-3.5 py-2 bg-gelo hover:bg-gelo text-ink rounded-[12px] text-[13.5px] font-bold transition flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-2 bg-gelo hover:bg-gelo text-ink rounded-[12px] text-[0.84375rem] font-bold transition flex items-center gap-1.5 cursor-pointer"
               >
                 <Printer size={14} /> Imprimir Atestado
               </button>
@@ -622,15 +622,15 @@ export default function Reports() {
       {activeTab === 'importar' && (
         <div className="max-w-3xl mx-auto rounded-[24px] rounded-bl-[7px] bg-surface p-7 ring-1 ring-line space-y-6">
           <div className="space-y-1">
-            <h3 className="font-serif text-[24px] font-semibold text-azul-petroleo flex items-center gap-2">
+            <h3 className="font-serif text-[1.5rem] font-semibold text-azul-petroleo flex items-center gap-2">
               <UploadCloud size={20} className="text-azul" /> Migração e Importação de Prontuários
             </h3>
-            <p className="text-[13.5px] text-muted">
+            <p className="text-[0.84375rem] text-muted">
               Importe facilmente os prontuários, cadastros e histórico clínico de pacientes vindos de outros softwares de gestão médica ou fonoaudiológica.
             </p>
           </div>
 
-          <div className="space-y-4 text-[13.5px]">
+          <div className="space-y-4 text-[0.84375rem]">
             {/* Escolha do Software de Origem */}
             <div>
               <label className="text-ink font-bold block mb-1.5">Software de Gestão de Origem *</label>
@@ -666,13 +666,13 @@ export default function Reports() {
                 </div>
                 {importFile ? (
                   <div>
-                    <p className="text-[13.5px] font-bold text-ink">{importFile.name}</p>
-                    <p className="text-[12.5px] text-muted">{(importFile.size / 1024).toFixed(1)} KB · Clique para trocar</p>
+                    <p className="text-[0.84375rem] font-bold text-ink">{importFile.name}</p>
+                    <p className="text-[0.78125rem] text-muted">{(importFile.size / 1024).toFixed(1)} KB · Clique para trocar</p>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-[13.5px] font-bold text-ink">Clique para selecionar o arquivo de prontuário</p>
-                    <p className="text-[12.5px] text-muted mt-1">Suporta arquivos .JSON, .CSV ou relatórios em .PDF</p>
+                    <p className="text-[0.84375rem] font-bold text-ink">Clique para selecionar o arquivo de prontuário</p>
+                    <p className="text-[0.78125rem] text-muted mt-1">Suporta arquivos .JSON, .CSV ou relatórios em .PDF</p>
                   </div>
                 )}
               </label>
@@ -681,10 +681,10 @@ export default function Reports() {
             {/* Feedback e Botão de Ação */}
             {importSuccessData && (
               <div className="p-4 bg-success/10 border border-success/30 rounded-[12px] space-y-2">
-                <div className="flex items-center gap-2 text-success font-bold text-[13.5px]">
+                <div className="flex items-center gap-2 text-success font-bold text-[0.84375rem]">
                   <CheckCircle2 size={16} /> Importação Concluída com Sucesso!
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-[12.5px] text-success pt-1">
+                <div className="grid grid-cols-3 gap-2 text-[0.78125rem] text-success pt-1">
                   <div>
                     <strong>Pacientes:</strong> {importSuccessData.patientsCount}
                   </div>
@@ -740,7 +740,7 @@ export default function Reports() {
               </button>
             </div>
 
-            <form onSubmit={handleGenerateEvolutionReport} className="space-y-4 text-[13.5px]">
+            <form onSubmit={handleGenerateEvolutionReport} className="space-y-4 text-[0.84375rem]">
               <div>
                 <label className="text-ink font-bold block mb-1">Paciente *</label>
                 <select
@@ -824,7 +824,7 @@ export default function Reports() {
               </button>
             </div>
 
-            <form onSubmit={handleGenerateInterdisciplinary} className="space-y-4 text-[13.5px]">
+            <form onSubmit={handleGenerateInterdisciplinary} className="space-y-4 text-[0.84375rem]">
               <div>
                 <label className="text-ink font-bold block mb-1">Paciente *</label>
                 <select
@@ -910,7 +910,7 @@ export default function Reports() {
             <div className="flex items-center justify-between border-b border-line pb-3">
               <div>
                 <h3 className="text-base font-bold font-serif text-ink">{previewDoc.document}</h3>
-                <p className="text-[13.5px] text-muted">
+                <p className="text-[0.84375rem] text-muted">
                   Paciente: {previewDoc.patient} · Emitido em: {previewDoc.createdAt}
                 </p>
               </div>
@@ -924,13 +924,13 @@ export default function Reports() {
             </div>
 
             {/* Conteúdo formatado com timbrado */}
-            <div className="p-6 bg-canvas border border-line rounded-[12px] space-y-4 text-[13.5px] text-ink leading-relaxed">
+            <div className="p-6 bg-canvas border border-line rounded-[12px] space-y-4 text-[0.84375rem] text-ink leading-relaxed">
               <div className="flex items-center justify-between border-b border-line pb-3">
                 <div className="flex items-center gap-2">
                   <LogoMark className="size-7" />
                   <span className="font-serif font-bold text-sm text-ink">FonoSync Clínica</span>
                 </div>
-                <span className="text-[12px] text-muted">Dra. Renata Lima · CRFa 2-19842</span>
+                <span className="text-[0.75rem] text-muted">Dra. Renata Lima · CRFa 2-19842</span>
               </div>
 
               <div>
@@ -951,7 +951,7 @@ export default function Reports() {
                 <p>{previewDoc.summary}</p>
               </div>
 
-              <div className="pt-4 border-t border-line text-center text-[12px] text-muted">
+              <div className="pt-4 border-t border-line text-center text-[0.75rem] text-muted">
                 <p>Documento autenticado digitalmente pelo sistema FonoSync.</p>
                 <p>Validade jurídica conforme ICP-Brasil e Conselho Federal de Fonoaudiologia.</p>
               </div>
@@ -961,7 +961,7 @@ export default function Reports() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-4 py-2 bg-gelo hover:bg-gelo text-ink rounded-[12px] text-[13.5px] font-bold transition flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-gelo hover:bg-gelo text-ink rounded-[12px] text-[0.84375rem] font-bold transition flex items-center gap-1.5 cursor-pointer"
               >
                 <Printer size={14} /> Imprimir
               </button>
@@ -971,7 +971,7 @@ export default function Reports() {
                   showNotification(`Documento "${previewDoc.document}" baixado com sucesso!`);
                   setPreviewDoc(null);
                 }}
-                className="px-4 py-2 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[13.5px] font-bold transition flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-azul-petroleo hover:bg-azul text-on-azul rounded-[12px] text-[0.84375rem] font-bold transition flex items-center gap-1.5 cursor-pointer"
               >
                 <Download size={14} /> Baixar PDF
               </button>

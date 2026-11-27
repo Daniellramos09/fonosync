@@ -19,7 +19,7 @@ function iniciais(nome = '') {
     .toUpperCase();
 }
 
-export default function Avatar({ nome, className = 'size-10 text-[14px]', apagado = false }) {
+export default function Avatar({ nome, className = 'size-10 text-[0.875rem]', apagado = false }) {
   return (
     <span
       aria-hidden="true"
@@ -41,7 +41,7 @@ const STATUS_PACIENTE = {
 export function SeloStatus({ status }) {
   const s = STATUS_PACIENTE[status] ?? STATUS_PACIENTE.ATIVO;
   return (
-    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[12.5px] font-bold ${s.fundo} ${s.texto}`}>
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[0.78125rem] font-bold ${s.fundo} ${s.texto}`}>
       <span className={`size-1.5 rounded-full ${s.ponto}`} aria-hidden="true" />
       {s.rotulo}
     </span>

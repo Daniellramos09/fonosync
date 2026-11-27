@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, ArrowUpRight, ClipboardList, UserPlus } from 'lucide-react';
+import { AlertCircle, ArrowRight, ArrowUpRight, CalendarClock, ClipboardList, Hourglass, UserPlus } from 'lucide-react';
 import Notice from '../../components/Notice';
 import OndaSonora from '../../components/OndaSonora';
 import { buttonClass } from '../../components/buttonStyles';
@@ -8,6 +8,7 @@ import { IconeAgenda, IconePacientes, IconeProntuario, IconeRelatorios } from '.
 import { listPatients } from '../../services/patientService';
 import { listEvaluations } from '../../services/recordService';
 import { calculateAge, formatDateBR } from '../../utils/formatters';
+import { FAIXAS, ORDEM_FAIXAS, faixaPorIdade } from '../../experiencia/faixas';
 
 const ATALHOS = [
   { id: 'pacientes', titulo: 'Novo paciente', desc: 'Cadastro e pré-cadastro', icon: IconePacientes },
@@ -45,11 +46,11 @@ function Distribuicao({ grupos, total }) {
       <ul className="mt-4 grid grid-cols-3 gap-3">
         {grupos.map((g) => (
           <li key={g.rotulo}>
-            <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-white/70">
+            <span className="flex items-center gap-1.5 text-[0.78125rem] font-semibold text-white/70">
               <span className={`size-2 rounded-full ${g.cor}`} aria-hidden="true" />
               {g.rotulo}
             </span>
-            <span className="font-serif text-[30px] font-semibold leading-tight">{g.valor}</span>
+            <span className="font-serif text-[1.875rem] font-semibold leading-tight">{g.valor}</span>
           </li>
         ))}
       </ul>
@@ -86,6 +87,50 @@ export default function Home({ onNavigate, professionalName = '' }) {
   const archived = patients.filter((patient) => patient.patientStatus === 'ARQUIVADO');
   const recent = [...active, ...preRegistered].slice(-5).reverse();
 
+  // O que pede atenção agora (só dados reais: cadastro, avaliações e sessões registradas).
+  const diasDesde = (iso) => (iso ? Math.floor((agora - new Date(`${iso}T00:00:00`)) / 86400000) : 0);
+  const avaliacoesParadas = openEvaluations.filter((ev) => diasDesde(ev.dataAvaliacao) > 30);
+  const semSessao = active.filter((p) => {
+    try {
+      const lista = JSON.parse(window.localStorage.getItem(`fonosync:sessions:${p.id}`));
+      return !Array.isArray(lista) || lista.length === 0;
+    } catch {
+      return true;
+    }
+  });
+  const atencao = [
+    {
+      id: 'pre',
+      icon: Hourglass,
+      titulo: 'Pré-cadastros aguardando',
+      desc: 'Complete os dados para iniciar o acompanhamento.',
+      itens: preRegistered,
+      destino: (p) => `#/profissional/prontuario/${p.id}`,
+    },
+    {
+      id: 'aval',
+      icon: AlertCircle,
+      titulo: 'Avaliações abertas há mais de 30 dias',
+      desc: 'Conclua ou atualize a avaliação no prontuário.',
+      itens: avaliacoesParadas.map((ev) => ({ id: ev.id, name: ev.paciente?.name, alvo: ev.paciente?.id })),
+      destino: (p) => `#/profissional/prontuario/${p.alvo}`,
+    },
+    {
+      id: 'sessao',
+      icon: CalendarClock,
+      titulo: 'Em acompanhamento sem sessão registrada',
+      desc: 'Registre a primeira sessão para começar a linha do tempo.',
+      itens: semSessao,
+      destino: (p) => `#/profissional/prontuario/${p.id}`,
+    },
+  ].filter((g) => g.itens.length > 0);
+
+  const porFaixa = ORDEM_FAIXAS.map((id) => ({
+    id,
+    total: patients.filter((p) => p.patientStatus !== 'ARQUIVADO' && faixaPorIdade(calculateAge(p.dateOfBirth)) === id).length,
+  }));
+  const maiorFaixa = Math.max(1, ...porFaixa.map((x) => x.total));
+
   const primeiroNome = professionalName.includes('@') ? '' : professionalName.split(' ').slice(0, 2).join(' ');
   const dataLonga = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
@@ -98,12 +143,12 @@ export default function Home({ onNavigate, professionalName = '' }) {
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr] lg:p-10">
           <div className="flex flex-col justify-between gap-6">
             <div>
-              <p className="text-[13px] font-semibold text-white/65 first-letter:uppercase">{dataLonga}</p>
-              <h1 className="display mt-2 text-[38px] sm:text-[48px]">
+              <p className="text-[0.8125rem] font-semibold text-white/65 first-letter:uppercase">{dataLonga}</p>
+              <h1 className="display mt-2 text-[2.375rem] sm:text-[3rem]">
                 {saudacao(agora)}
                 {primeiroNome ? `, ${primeiroNome}` : ''}.
               </h1>
-              <p className="mt-3 max-w-[44ch] text-[16px] leading-relaxed text-white/80" aria-live="polite">
+              <p className="mt-3 max-w-[44ch] text-[1rem] leading-relaxed text-white/80" aria-live="polite">
                 {loading
                   ? 'Carregando o resumo do consultório...'
                   : `${active.length} paciente(s) em acompanhamento e ${openEvaluations.length} avaliação(ões) em andamento.`}
@@ -120,7 +165,7 @@ export default function Home({ onNavigate, professionalName = '' }) {
           </div>
 
           <div className="rounded-[22px] rounded-bl-[6px] bg-white/[0.07] p-5 ring-1 ring-white/12">
-            <p className="text-[13px] font-semibold text-white/70">Seus pacientes</p>
+            <p className="text-[0.8125rem] font-semibold text-white/70">Seus pacientes</p>
             {loading ? (
               <div className="mt-4 space-y-4">
                 <Esqueleto className="h-3 w-full opacity-30" />
@@ -128,8 +173,8 @@ export default function Home({ onNavigate, professionalName = '' }) {
               </div>
             ) : (
               <div className="mt-3">
-                <p className="mb-4 font-serif text-[18px]">
-                  <span className="text-[44px] font-semibold leading-none">{patients.length}</span> no total
+                <p className="mb-4 font-serif text-[1.125rem]">
+                  <span className="text-[2.75rem] font-semibold leading-none">{patients.length}</span> no total
                 </p>
                 <Distribuicao
                   total={patients.length}
@@ -151,14 +196,82 @@ export default function Home({ onNavigate, professionalName = '' }) {
         </Notice>
       )}
 
+      {!loading && !error && (
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          {/* Precisa de atenção */}
+          <section className="surge rounded-[26px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line sm:p-6" aria-labelledby="atencao-titulo">
+            <h2 id="atencao-titulo" className="font-serif text-[1.375rem] font-semibold text-azul-petroleo">
+              Precisa de atenção
+            </h2>
+            {atencao.length === 0 ? (
+              <p className="mt-4 rounded-[16px] rounded-bl-[4px] bg-success/10 p-4 text-[0.90625rem] font-semibold text-success">
+                Tudo em dia: nenhum pré-cadastro pendente, avaliação parada ou paciente sem sessão.
+              </p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {atencao.map(({ id, icon: Icon, titulo, desc, itens, destino }) => (
+                  <li key={id} className="rounded-[18px] rounded-bl-[5px] bg-mel/25 p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-[11px] bg-mel text-on-pastel">
+                        <Icon size={18} aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[0.96875rem] font-bold text-ink">
+                          {titulo} <span className="ml-1 rounded-full bg-surface px-2 text-[0.8125rem]">{itens.length}</span>
+                        </p>
+                        <p className="text-[0.84375rem] text-muted">{desc}</p>
+                        <ul className="mt-2.5 flex flex-wrap gap-2">
+                          {itens.slice(0, 6).map((p) => (
+                            <li key={p.id}>
+                              <a
+                                href={destino(p)}
+                                className="inline-flex min-h-9 items-center gap-2 rounded-full bg-surface py-1 pl-1 pr-3 text-[0.84375rem] font-semibold text-ink ring-1 ring-line transition hover:ring-azul"
+                              >
+                                <Avatar nome={p.name} className="size-7 text-[0.6875rem]" />
+                                {p.name}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Pacientes por faixa etária */}
+          <section className="surge rounded-[26px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line sm:p-6" style={{ '--i': 1 }} aria-labelledby="faixas-titulo">
+            <h2 id="faixas-titulo" className="font-serif text-[1.375rem] font-semibold text-azul-petroleo">
+              Por faixa etária
+            </h2>
+            <p className="text-[0.84375rem] text-muted">Pacientes ativos e em pré-cadastro. Cada faixa vê uma área do paciente própria.</p>
+            <ul className="mt-4 space-y-3">
+              {porFaixa.map(({ id, total }) => (
+                <li key={id}>
+                  <div className="flex items-baseline justify-between text-[0.90625rem]">
+                    <span className="font-semibold text-ink">{FAIXAS[id].rotulo}</span>
+                    <span className="font-serif text-[1.25rem] font-semibold text-azul-petroleo">{total}</span>
+                  </div>
+                  <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-gelo">
+                    <div className="barra-enche h-full rounded-full bg-azul" style={{ width: `${(total / maiorFaixa) * 100}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      )}
+
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         {/* Avaliações em andamento */}
         <section className="surge rounded-[26px] rounded-bl-[7px] bg-surface p-5 ring-1 ring-line sm:p-6" style={{ '--i': 1 }}>
           <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2.5 font-serif text-[22px] font-semibold text-azul-petroleo">
+            <h2 className="flex items-center gap-2.5 font-serif text-[1.375rem] font-semibold text-azul-petroleo">
               Avaliações em andamento
               {!loading && (
-                <span className="grid min-w-7 place-items-center rounded-full bg-mel px-2 text-[13px] font-bold text-on-pastel">
+                <span className="grid min-w-7 place-items-center rounded-full bg-mel px-2 text-[0.8125rem] font-bold text-on-pastel">
                   {openEvaluations.length}
                 </span>
               )}
@@ -173,7 +286,7 @@ export default function Home({ onNavigate, professionalName = '' }) {
             </div>
           )}
           {!loading && openEvaluations.length === 0 && (
-            <p className="mt-5 rounded-[16px] rounded-bl-[4px] bg-canvas p-5 text-[14.5px] text-muted">
+            <p className="mt-5 rounded-[16px] rounded-bl-[4px] bg-canvas p-5 text-[0.90625rem] text-muted">
               Nenhuma avaliação em andamento. As avaliações abertas no prontuário aparecem aqui.
             </p>
           )}
@@ -186,10 +299,10 @@ export default function Home({ onNavigate, professionalName = '' }) {
                 >
                   <Avatar nome={evaluation.paciente?.name} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[15px] font-bold text-ink">{evaluation.paciente?.name}</span>
-                    <span className="block truncate text-[13.5px] text-muted">{evaluation.tipoAvaliacao}</span>
+                    <span className="block truncate text-[0.9375rem] font-bold text-ink">{evaluation.paciente?.name}</span>
+                    <span className="block truncate text-[0.84375rem] text-muted">{evaluation.tipoAvaliacao}</span>
                   </span>
-                  <span className="shrink-0 text-[13px] font-semibold text-muted">{formatDateBR(evaluation.dataAvaliacao)}</span>
+                  <span className="shrink-0 text-[0.8125rem] font-semibold text-muted">{formatDateBR(evaluation.dataAvaliacao)}</span>
                   <ArrowUpRight
                     size={18}
                     aria-hidden="true"
@@ -203,7 +316,7 @@ export default function Home({ onNavigate, professionalName = '' }) {
 
         {/* Atalhos */}
         <section className="surge" style={{ '--i': 2 }} aria-labelledby="atalhos-titulo">
-          <h2 id="atalhos-titulo" className="mb-3 font-serif text-[22px] font-semibold text-azul-petroleo">
+          <h2 id="atalhos-titulo" className="mb-3 font-serif text-[1.375rem] font-semibold text-azul-petroleo">
             Atalhos
           </h2>
           <ul className="grid grid-cols-2 gap-3">
@@ -219,11 +332,11 @@ export default function Home({ onNavigate, professionalName = '' }) {
                     <Icon className="size-[22px]" />
                   </span>
                   <span>
-                    <span className="flex items-center gap-1 text-[15px] font-bold text-ink">
+                    <span className="flex items-center gap-1 text-[0.9375rem] font-bold text-ink">
                       {titulo}
                       <ArrowRight size={15} aria-hidden="true" className="text-azul transition-transform group-hover:translate-x-1" />
                     </span>
-                    <span className="block text-[13px] text-muted">{desc}</span>
+                    <span className="block text-[0.8125rem] text-muted">{desc}</span>
                   </span>
                 </button>
               </li>
@@ -235,13 +348,13 @@ export default function Home({ onNavigate, professionalName = '' }) {
       {/* Acesso rápido aos prontuários */}
       <section className="surge" style={{ '--i': 3 }} aria-labelledby="recentes-titulo">
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h2 id="recentes-titulo" className="font-serif text-[22px] font-semibold text-azul-petroleo">
+          <h2 id="recentes-titulo" className="font-serif text-[1.375rem] font-semibold text-azul-petroleo">
             Acesso rápido aos prontuários
           </h2>
           <button
             type="button"
             onClick={() => onNavigate('pacientes')}
-            className="inline-flex cursor-pointer items-center gap-1 text-[14px] font-bold text-azul underline decoration-azul/30 underline-offset-4 hover:decoration-azul"
+            className="inline-flex cursor-pointer items-center gap-1 text-[0.875rem] font-bold text-azul underline decoration-azul/30 underline-offset-4 hover:decoration-azul"
           >
             Ver todos
           </button>
@@ -253,7 +366,7 @@ export default function Home({ onNavigate, professionalName = '' }) {
             ))}
           </div>
         ) : recent.length === 0 ? (
-          <p className="rounded-[20px] rounded-bl-[5px] bg-surface p-5 text-[14.5px] text-muted ring-1 ring-line">
+          <p className="rounded-[20px] rounded-bl-[5px] bg-surface p-5 text-[0.90625rem] text-muted ring-1 ring-line">
             Nenhum paciente cadastrado.
           </p>
         ) : (
@@ -267,12 +380,12 @@ export default function Home({ onNavigate, professionalName = '' }) {
                     className="group flex h-full flex-col gap-3 rounded-[20px] rounded-bl-[5px] bg-surface p-4 ring-1 ring-line transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-24px_rgba(19,48,74,0.7)] hover:ring-azul/40"
                   >
                     <span className="flex items-center justify-between">
-                      <Avatar nome={patient.name} className="size-11 text-[15px]" />
+                      <Avatar nome={patient.name} className="size-11 text-[0.9375rem]" />
                       <ArrowUpRight size={18} aria-hidden="true" className="text-muted transition group-hover:text-azul" />
                     </span>
                     <span>
-                      <span className="block truncate text-[15px] font-bold text-ink">{patient.name}</span>
-                      <span className="text-[13px] text-muted">{age !== null && `${age} anos`}</span>
+                      <span className="block truncate text-[0.9375rem] font-bold text-ink">{patient.name}</span>
+                      <span className="text-[0.8125rem] text-muted">{age !== null && `${age} anos`}</span>
                     </span>
                     <span className="self-start">
                       <SeloStatus status={patient.patientStatus} />

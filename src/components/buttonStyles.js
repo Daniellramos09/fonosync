@@ -21,11 +21,11 @@ const variants = {
 };
 
 const base =
-  'group/btn inline-flex min-h-11 items-center justify-center gap-2.5 rounded-[12px] rounded-bl-[3px] border-[1.5px] px-5 py-2.5 font-sans text-[15px] font-semibold tracking-[-0.005em] transition-[background-color,border-color,color,transform,text-decoration-color] duration-200 ease-out disabled:pointer-events-none disabled:border-line disabled:bg-mist disabled:text-navy disabled:opacity-55';
+  'group/btn inline-flex min-h-11 items-center justify-center gap-2.5 rounded-[12px] rounded-bl-[3px] border-[1.5px] px-5 py-2.5 font-sans text-[0.9375rem] font-semibold tracking-[-0.005em] transition-[background-color,border-color,color,transform,text-decoration-color] duration-200 ease-out disabled:pointer-events-none disabled:border-line disabled:bg-mist disabled:text-navy disabled:opacity-55';
 
 const sizes = {
   md: '',
-  lg: 'min-h-14 px-7 text-[16px] whitespace-nowrap',
+  lg: 'min-h-14 px-7 text-[1rem] whitespace-nowrap',
 };
 
 export function buttonClass(variant = 'primary', size = 'md') {

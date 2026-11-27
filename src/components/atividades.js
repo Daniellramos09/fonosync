@@ -1,4 +1,6 @@
 // Catálogo único das atividades de rastreio, usado pela triagem e pela área do paciente.
+// `faixas` diz para quais perfis (src/experiencia/faixas.js) a atividade é indicada; novas
+// atividades para adolescentes, adultos e 60+ entram aqui e aparecem automaticamente.
 // `historico` é o nome que a triagem grava em localStorage ao concluir a atividade.
 import { Capivara, Sagui, Tartaruga, Tucano } from './Personagens';
 
@@ -12,6 +14,7 @@ export const ATIVIDADES = [
     campo: 'bg-coral',
     cor: '#F4B7A3',
     tipo: 'perguntas',
+    faixas: ['crianca'], // perfis para os quais a atividade é indicada
     historico: 'Formulário de Marcos',
     nomePersonagem: 'Capivara',
     Personagem: Capivara,
@@ -25,6 +28,7 @@ export const ATIVIDADES = [
     campo: 'bg-salvia',
     cor: '#D6EAE4',
     tipo: 'jogos',
+    faixas: ['crianca'], // perfis para os quais a atividade é indicada
     historico: 'Jogo Fonético',
     nomePersonagem: 'Tucano',
     Personagem: Tucano,
@@ -38,6 +42,7 @@ export const ATIVIDADES = [
     campo: 'bg-lavanda',
     cor: '#D8D0EB',
     tipo: 'jogos',
+    faixas: ['crianca'], // perfis para os quais a atividade é indicada
     historico: 'Jogo da Rima',
     nomePersonagem: 'Sagui',
     Personagem: Sagui,
@@ -51,6 +56,7 @@ export const ATIVIDADES = [
     campo: 'bg-mel',
     cor: '#F5D887',
     tipo: 'escola',
+    faixas: ['crianca'], // perfis para os quais a atividade é indicada
     historico: 'Checklist Escolar',
     nomePersonagem: 'Tartaruga',
     Personagem: Tartaruga,

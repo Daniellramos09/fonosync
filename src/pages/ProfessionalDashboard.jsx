@@ -97,11 +97,11 @@ export default function ProfessionalDashboard({ section = 'dashboard', recordId 
         {!['prontuario', 'dashboard', 'agenda', 'relatorios'].includes(activeSection) && (
           <header className="surge flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="display text-[38px] text-azul-petroleo sm:text-[46px]">{info.title}</h1>
-              <p className="mt-1 text-[15.5px] text-muted">{info.subtitle}</p>
+              <h1 className="display text-[2.375rem] text-azul-petroleo sm:text-[2.875rem]">{info.title}</h1>
+              <p className="mt-1 text-[0.96875rem] text-muted">{info.subtitle}</p>
             </div>
-            <p className="inline-flex items-center gap-2.5 rounded-full bg-surface py-1.5 pl-1.5 pr-4 text-[13.5px] font-semibold text-ink ring-1 ring-line">
-              <span className="grid min-w-8 place-items-center rounded-full bg-azul-petroleo px-2 py-1 font-serif text-[15px] text-on-azul">
+            <p className="inline-flex items-center gap-2.5 rounded-full bg-surface py-1.5 pl-1.5 pr-4 text-[0.84375rem] font-semibold text-ink ring-1 ring-line">
+              <span className="grid min-w-8 place-items-center rounded-full bg-azul-petroleo px-2 py-1 font-serif text-[0.9375rem] text-on-azul">
                 {patientsLoading || patientsError ? '—' : ativos}
               </span>
               pacientes ativos

@@ -118,7 +118,7 @@ export default function Header() {
   const active = menus.find((m) => m.id === openMenu);
 
   const navItemClass = (isOpen) =>
-    `inline-flex min-h-10 items-center gap-1.5 rounded-[10px] rounded-bl-[3px] px-3.5 text-[15px] font-semibold transition-colors ${
+    `inline-flex min-h-10 items-center gap-1.5 rounded-[10px] rounded-bl-[3px] px-3.5 text-[0.9375rem] font-semibold transition-colors ${
       dark
         ? 'text-white hover:bg-white/12'
         : `text-navy ${isOpen ? 'bg-salvia' : 'hover:bg-salvia/60'}`
@@ -178,7 +178,7 @@ export default function Header() {
               title="Acessibilidade"
             >
               <PersonStanding size={17} aria-hidden="true" />
-              <span className="sr-only xl:not-sr-only xl:text-[14px] xl:font-semibold">Acessibilidade</span>
+              <span className="sr-only xl:not-sr-only xl:text-[0.875rem] xl:font-semibold">Acessibilidade</span>
             </button>
             <button
               type="button"
@@ -194,7 +194,7 @@ export default function Header() {
             </button>
             <a
               href="#/acesso"
-              className={`hidden min-h-10 items-center px-3 text-[15px] font-semibold underline-offset-[6px] hover:underline sm:inline-flex ${
+              className={`hidden min-h-10 items-center px-3 text-[0.9375rem] font-semibold underline-offset-[6px] hover:underline sm:inline-flex ${
                 dark ? 'text-white' : 'text-navy'
               }`}
             >
@@ -237,10 +237,10 @@ export default function Header() {
                         }}
                         className="group flex items-center gap-4 py-4"
                       >
-                        <span className="display w-[4.5rem] shrink-0 text-[34px] text-primary">{f.idade}</span>
+                        <span className="display w-[4.5rem] shrink-0 text-[2.125rem] text-primary">{f.idade}</span>
                         <span>
-                          <span className="block text-[15px] font-bold text-navy group-hover:text-primary">{f.title}</span>
-                          <span className="text-[13px] text-muted">anos · abrir atividade</span>
+                          <span className="block text-[0.9375rem] font-bold text-navy group-hover:text-primary">{f.title}</span>
+                          <span className="text-[0.8125rem] text-muted">anos · abrir atividade</span>
                         </span>
                       </a>
                     </li>
@@ -255,11 +255,11 @@ export default function Header() {
                         onClick={scrollToId(item.section, close)}
                         className="group block border-b border-line py-4"
                       >
-                        <span className="flex items-center gap-1.5 font-serif text-[19px] font-semibold text-navy group-hover:text-primary">
+                        <span className="flex items-center gap-1.5 font-serif text-[1.1875rem] font-semibold text-navy group-hover:text-primary">
                           {item.title}
                           <ArrowUpRight size={15} aria-hidden="true" className="opacity-0 transition-opacity group-hover:opacity-100" />
                         </span>
-                        <span className="mt-1 block text-[13.5px] leading-snug text-muted">{item.desc}</span>
+                        <span className="mt-1 block text-[0.84375rem] leading-snug text-muted">{item.desc}</span>
                       </a>
                     </li>
                   ))}
@@ -267,7 +267,7 @@ export default function Header() {
               )}
               <figure className="relative overflow-hidden rounded-[14px] rounded-br-[4px]">
                 <img src={active.foto} alt={active.fotoAlt} className="h-full min-h-48 w-full object-cover" />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3 pt-12 font-serif text-[17px] leading-tight text-white">
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3 pt-12 font-serif text-[1.0625rem] leading-tight text-white">
                   {active.destaque}
                 </figcaption>
               </figure>
@@ -297,7 +297,7 @@ export default function Header() {
             </button>
           </div>
           <nav aria-label="Principal (celular)" className="mt-10 flex-1">
-            <p className="text-[14px] font-semibold text-on-band-muted">Rastreio por idade</p>
+            <p className="text-[0.875rem] font-semibold text-on-band-muted">Rastreio por idade</p>
             <ul className="mt-3 grid grid-cols-2 gap-2">
               {menus[2].faixas.map((f) => (
                 <li key={f.idade}>
@@ -309,8 +309,8 @@ export default function Header() {
                     }}
                     className="block rounded-[12px] rounded-bl-[3px] bg-white/8 p-3"
                   >
-                    <span className="display block text-[30px] text-mel">{f.idade}</span>
-                    <span className="text-[14px] font-semibold">{f.title}</span>
+                    <span className="display block text-[1.875rem] text-mel">{f.idade}</span>
+                    <span className="text-[0.875rem] font-semibold">{f.title}</span>
                   </a>
                 </li>
               ))}
@@ -326,7 +326,7 @@ export default function Header() {
                   <a
                     href={`#${id}`}
                     onClick={scrollToId(id, () => setMobileOpen(false))}
-                    className="flex min-h-14 items-center justify-between font-serif text-[24px]"
+                    className="flex min-h-14 items-center justify-between font-serif text-[1.5rem]"
                   >
                     {label}
                     <ArrowUpRight size={20} aria-hidden="true" className="text-mel" />

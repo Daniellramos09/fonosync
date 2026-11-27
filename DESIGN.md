@@ -79,3 +79,19 @@ Formulário à esquerda, banner fotográfico à direita ocupando toda a altura (
 
 Paciente: boas-vindas com foto e tucano, dica do dia, portas das atividades por idade, trilha (tartaruga avança com as atividades concluídas) e álbum de figurinhas — ambos a partir do histórico real da triagem salvo no aparelho, sem regras novas no backend.
 Profissional: abertura com distribuição dos pacientes por status, avaliações em andamento, atalhos e acesso rápido; lista de pacientes com busca, situação com contagens e CID; prontuário com capa do paciente, ficha, objetivo terapêutico em destaque, abas com contagens e linha do tempo das sessões.
+
+## Experiência por faixa etária (`src/experiencia/`)
+
+Uma só área do paciente, quatro perfis. `faixas.js` concentra o que muda em cada um (tom dos textos, nomes do menu, variante da navegação, mascote, gamificação, nível de movimento); `index.css` aplica o visual sob `[data-faixa="…"]`.
+
+| Perfil | Idade | Início | Navegação | Movimento |
+| --- | --- | --- | --- | --- |
+| Criança | até 10 | Saudação com tucano, próxima aventura indicada pela idade, mapa da aventura ilustrado, figurinhas, aviso de figurinha nova, dica para quem cuida | clara, itens coloridos, capivara | vivo |
+| Adolescente | 11–17 | Abertura escura em sans extrabold, meta semanal que a pessoa define, dias ativos, evolução em 4 semanas; sem personagens | variante `jovem` (escura, acento em gradiente azul) | sutil |
+| Adulto | 18–59 | Saudação tipográfica, linha do tempo do acompanhamento, "Para começar bem" | clara, sem mascote | discreto (personagens parados) |
+| 60+ | 60 ou mais | Foto, três ações grandes com rótulo por extenso, últimas atividades | clara + menu inferior fixo no celular com "Ajustes" | mínimo; conteúdo com `zoom: 1.12` e alvos ≥ 3,25rem |
+
+- **De onde vem a idade:** `useExperiencia()` usa, nesta ordem, a escolha manual da pessoa, a data de nascimento guardada na sessão no cadastro (`birthDate`) e a data informada na própria área. Sem nenhuma delas, a área pergunta uma vez (`EscolhaExperiencia`). Tudo é por conta e fica no aparelho; dá para trocar em "Minha conta".
+- **Acessibilidade por cima:** tamanhos de texto estão em `rem`, então o ajuste de letras do painel vale em todas as faixas e soma-se ao aumento do perfil 60+.
+- **Atividades:** cada item de `components/atividades.js` tem `faixas`. Hoje só existem rastreios infantis; para adolescentes, adultos e 60+ eles aparecem como "Rastreio para crianças da família", e a seção "Para você" mostra o estado vazio até existirem atividades indicadas para a faixa.
+- **Profissional:** "Precisa de atenção" (pré-cadastros, avaliações abertas há mais de 30 dias, pacientes ativos sem sessão registrada) e "Por faixa etária"; a lista de pacientes mostra a faixa de cada um.
