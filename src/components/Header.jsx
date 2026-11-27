@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ChevronDown, Menu, PersonStanding, Volume2, X } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Menu, PersonStanding, X } from 'lucide-react';
 import consultorioImg from '../assets/images/care/consultorio-familia-atendimento.jpg';
 import brincarImg from '../assets/images/photos/brincar-clinica.jpg';
 import silabasImg from '../assets/images/care/silabas-girafa-ludico.jpg';
 import A11yModal from './A11yModal';
 import Logo from './Logo';
 import { buttonClass } from './buttonStyles';
-import { useA11y } from '../hooks/useA11y';
 import { iniciarTriagem } from '../utils/triagemInicio';
 
 const scrollToId = (id, onComplete) => (e) => {
@@ -70,7 +69,6 @@ export default function Header() {
   const [solid, setSolid] = useState(false);
   const navRef = useRef(null);
   const closeTimeoutRef = useRef(null);
-  const { speakPageContent, isPlayerOpen } = useA11y();
 
   // Sobre a foto do hero o cabeçalho é vidro escuro; depois vira faixa clara.
   useEffect(() => {
@@ -118,7 +116,7 @@ export default function Header() {
   const active = menus.find((m) => m.id === openMenu);
 
   const navItemClass = (isOpen) =>
-    `inline-flex min-h-10 items-center gap-1.5 rounded-[10px] rounded-bl-[3px] px-3.5 text-[0.9375rem] font-semibold transition-colors ${
+    `inline-flex min-h-10 items-center gap-1.5 rounded-[10px] rounded-bl-[3px] px-3.5 text-[15px] font-semibold transition-colors ${
       dark
         ? 'text-white hover:bg-white/12'
         : `text-navy ${isOpen ? 'bg-salvia' : 'hover:bg-salvia/60'}`
@@ -130,17 +128,17 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] md:pr-[max(1.25rem,env(safe-area-inset-right))] md:pl-[max(1.25rem,env(safe-area-inset-left))]">
+      <header className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5">
         <div
           ref={navRef}
           className={`relative mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-3 rounded-[14px] px-3 transition-[background-color,box-shadow,color] duration-300 md:px-5 ${
             dark
-              ? 'on-dark bg-veu/50 text-white backdrop-blur-xl'
-              : 'bg-quente/95 text-navy shadow-[0_12px_32px_-14px_color-mix(in_srgb,var(--color-ocean-deep)_30%,transparent)] backdrop-blur-xl'
+              ? 'on-dark bg-[#0f2a2f]/50 text-white backdrop-blur-xl'
+              : 'bg-quente/95 text-navy shadow-[0_12px_32px_-14px_rgba(23,67,74,0.3)] backdrop-blur-xl'
           }`}
         >
           <a href="#/" aria-label="FonoSync, página inicial" className="shrink-0">
-            <Logo tone={dark ? 'claro' : 'ocean'} markClassName="size-9" />
+            <Logo tone={dark ? 'claro' : 'ocean'} markClassName="size-9" nameClassName="hidden sm:inline" />
           </a>
 
           <nav aria-label="Principal" className="hidden lg:block">
@@ -170,31 +168,19 @@ export default function Header() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
             <button
               type="button"
               onClick={() => setShowA11y(true)}
-              className={`inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors xl:w-auto xl:gap-2 xl:px-3 ${chipClass}`}
+              className={`inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors sm:size-10 xl:w-auto xl:gap-2 xl:px-3 ${chipClass}`}
               title="Acessibilidade"
             >
               <PersonStanding size={17} aria-hidden="true" />
-              <span className="sr-only xl:not-sr-only xl:text-[0.875rem] xl:font-semibold">Acessibilidade</span>
-            </button>
-            <button
-              type="button"
-              aria-pressed={isPlayerOpen}
-              onClick={() => speakPageContent()}
-              className={`hidden size-10 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors md:inline-flex ${
-                isPlayerOpen ? 'border-mel bg-mel text-on-pastel' : chipClass
-              }`}
-              title="Ouvir página"
-            >
-              <Volume2 size={17} aria-hidden="true" />
-              <span className="sr-only">Ouvir página</span>
+              <span className="sr-only xl:not-sr-only xl:text-[14px] xl:font-semibold">Acessibilidade</span>
             </button>
             <a
               href="#/acesso"
-              className={`hidden min-h-10 items-center px-3 text-[0.9375rem] font-semibold underline-offset-[6px] hover:underline sm:inline-flex ${
+              className={`inline-flex min-h-9 shrink-0 items-center px-1.5 text-[13.5px] font-semibold underline-offset-[6px] hover:underline sm:min-h-10 sm:px-3 sm:text-[15px] ${
                 dark ? 'text-white' : 'text-navy'
               }`}
             >
@@ -203,16 +189,18 @@ export default function Header() {
             <a
               href="#/triagem"
               onClick={() => iniciarTriagem()}
-              className={`${buttonClass(dark ? 'mel' : 'primary')} min-h-10 py-2 max-md:hidden`}
+              className={`${buttonClass(dark ? 'mel' : 'primary')} min-h-9! shrink-0 whitespace-nowrap px-3! py-1.5! text-[13px]! sm:min-h-10! sm:px-5! sm:py-2! sm:text-[15px]!`}
             >
-              Começar o rastreio
+              <span className="min-[380px]:hidden">Rastreio</span>
+              <span className="hidden min-[380px]:inline sm:hidden">Começar rastreio</span>
+              <span className="hidden sm:inline">Começar o rastreio</span>
             </a>
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-expanded={mobileOpen}
               aria-controls="menu-movel"
-              className={`inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border lg:hidden ${chipClass}`}
+              className={`inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] rounded-bl-[3px] border sm:size-10 lg:hidden ${chipClass}`}
             >
               <Menu size={20} aria-hidden="true" />
               <span className="sr-only">Abrir menu</span>
@@ -223,7 +211,7 @@ export default function Header() {
             <div
               onMouseEnter={() => handleMouseEnter(active.id)}
               onMouseLeave={handleMouseLeave}
-              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[820px] -translate-x-1/2 grid-cols-[1fr_250px] gap-6 rounded-[18px] rounded-tl-[4px] bg-quente p-6 text-ink shadow-[0_30px_70px_-20px_color-mix(in_srgb,var(--color-ocean-deep)_35%,transparent)] lg:grid"
+              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[820px] -translate-x-1/2 grid-cols-[1fr_250px] gap-6 rounded-[18px] rounded-tl-[4px] bg-quente p-6 text-ink shadow-[0_30px_70px_-20px_rgba(23,67,74,0.35)] lg:grid"
             >
               {active.faixas ? (
                 <ul className="grid grid-cols-2 gap-x-6">
@@ -237,10 +225,10 @@ export default function Header() {
                         }}
                         className="group flex items-center gap-4 py-4"
                       >
-                        <span className="display w-[4.5rem] shrink-0 text-[2.125rem] text-primary">{f.idade}</span>
+                        <span className="display w-[4.5rem] shrink-0 text-[34px] text-primary">{f.idade}</span>
                         <span>
-                          <span className="block text-[0.9375rem] font-bold text-navy group-hover:text-primary">{f.title}</span>
-                          <span className="text-[0.8125rem] text-muted">anos · abrir atividade</span>
+                          <span className="block text-[15px] font-bold text-navy group-hover:text-primary">{f.title}</span>
+                          <span className="text-[13px] text-muted">anos · abrir atividade</span>
                         </span>
                       </a>
                     </li>
@@ -255,11 +243,11 @@ export default function Header() {
                         onClick={scrollToId(item.section, close)}
                         className="group block border-b border-line py-4"
                       >
-                        <span className="flex items-center gap-1.5 font-serif text-[1.1875rem] font-semibold text-navy group-hover:text-primary">
+                        <span className="flex items-center gap-1.5 font-serif text-[19px] font-semibold text-navy group-hover:text-primary">
                           {item.title}
                           <ArrowUpRight size={15} aria-hidden="true" className="opacity-0 transition-opacity group-hover:opacity-100" />
                         </span>
-                        <span className="mt-1 block text-[0.84375rem] leading-snug text-muted">{item.desc}</span>
+                        <span className="mt-1 block text-[13.5px] leading-snug text-muted">{item.desc}</span>
                       </a>
                     </li>
                   ))}
@@ -267,7 +255,7 @@ export default function Header() {
               )}
               <figure className="relative overflow-hidden rounded-[14px] rounded-br-[4px]">
                 <img src={active.foto} alt={active.fotoAlt} className="h-full min-h-48 w-full object-cover" />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3 pt-12 font-serif text-[1.0625rem] leading-tight text-white">
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3 pt-12 font-serif text-[17px] leading-tight text-white">
                   {active.destaque}
                 </figcaption>
               </figure>
@@ -282,7 +270,7 @@ export default function Header() {
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className="on-dark fixed inset-0 z-50 flex flex-col overflow-y-auto overscroll-contain bg-ocean-deep pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1.25rem,env(safe-area-inset-right))] pb-[max(2rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))] text-white lg:hidden"
+          className="on-dark fixed inset-0 z-50 flex flex-col overflow-y-auto bg-ocean-deep px-5 pt-5 pb-8 text-white lg:hidden"
         >
           <div className="flex items-center justify-between">
             <Logo tone="claro" />
@@ -296,8 +284,8 @@ export default function Header() {
               <span className="sr-only">Fechar menu</span>
             </button>
           </div>
-          <nav aria-label="Principal (celular)" className="mt-8 flex-1">
-            <p className="text-[0.875rem] font-semibold text-on-band-muted">Rastreio por idade</p>
+          <nav aria-label="Principal (celular)" className="mt-10 flex-1">
+            <p className="text-[14px] font-semibold text-on-band-muted">Rastreio por idade</p>
             <ul className="mt-3 grid grid-cols-2 gap-2">
               {menus[2].faixas.map((f) => (
                 <li key={f.idade}>
@@ -309,8 +297,8 @@ export default function Header() {
                     }}
                     className="block rounded-[12px] rounded-bl-[3px] bg-white/8 p-3"
                   >
-                    <span className="display block text-[1.875rem] text-mel">{f.idade}</span>
-                    <span className="text-[0.875rem] font-semibold">{f.title}</span>
+                    <span className="display block text-[30px] text-mel">{f.idade}</span>
+                    <span className="text-[14px] font-semibold">{f.title}</span>
                   </a>
                 </li>
               ))}
@@ -326,7 +314,7 @@ export default function Header() {
                   <a
                     href={`#${id}`}
                     onClick={scrollToId(id, () => setMobileOpen(false))}
-                    className="flex min-h-14 items-center justify-between font-serif text-[1.5rem]"
+                    className="flex min-h-14 items-center justify-between font-serif text-[24px]"
                   >
                     {label}
                     <ArrowUpRight size={20} aria-hidden="true" className="text-mel" />
@@ -336,19 +324,19 @@ export default function Header() {
             </ul>
           </nav>
           <div className="mt-8 grid gap-3">
-            <a href="#/acesso" className={`${buttonClass('claro', 'lg')} w-full`}>
+            <a
+              href="#/triagem"
+              onClick={() => {
+                iniciarTriagem();
+                setMobileOpen(false);
+              }}
+              className={`${buttonClass('mel', 'lg')} w-full`}
+            >
+              Começar o rastreio
+            </a>
+            <a href="#/acesso" onClick={() => setMobileOpen(false)} className={`${buttonClass('claro', 'lg')} w-full`}>
               Entrar na plataforma
             </a>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileOpen(false);
-                speakPageContent();
-              }}
-              className={`${buttonClass('claro', 'lg')} w-full`}
-            >
-              <Volume2 size={18} aria-hidden="true" /> Ouvir página
-            </button>
           </div>
         </div>
       )}

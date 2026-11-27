@@ -18,15 +18,12 @@ import {
   User,
   UserCheck,
   Users,
-  Volume2,
-  VolumeX,
 } from 'lucide-react';
 import logoImg from '../assets/images/ModeloA_Semnome.jpg';
 import fotoProfissional from '../assets/images/photos/hero-fono-gesto.jpg';
 import fotoFamilia from '../assets/images/photos/leitura-chao.jpg';
 import { Capivara, Sapinho, Tucano } from '../components/Personagens';
 import OndaSonora from '../components/OndaSonora';
-import { useA11y } from '../hooks/useA11y';
 import A11yModal from '../components/A11yModal';
 import InfoDialog from '../components/InfoDialog';
 import Notice from '../components/Notice';
@@ -39,13 +36,19 @@ import { registerProfessional } from '../services/professionalService';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Contas de demonstração usadas pelos botões de acesso rápido.
+const CONTAS_DEMO = {
+  profissional: { email: 'renata.fono@fonosync.com.br', password: '123456', role: 'ROLE_FONO' },
+  paciente: { email: 'usuario@gmail.com', password: '123456', role: 'ROLE_PACIENTE' },
+};
+
 /* ------------------------------------------------------------------ estilos */
 
 const botaoPrincipal =
-  'botao-seta relative flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] rounded-bl-[4px] bg-azul-petroleo px-5 text-[0.9375rem] font-bold text-on-azul shadow-[0_14px_30px_-16px_rgba(29,78,104,0.9)] transition duration-200 hover:-translate-y-0.5 hover:bg-azul hover:shadow-[0_20px_36px_-16px_rgba(44,106,166,0.9)] active:translate-y-0 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60';
+  'botao-seta relative flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] rounded-bl-[4px] bg-azul-petroleo px-5 text-[15px] font-bold text-on-azul shadow-[0_14px_30px_-16px_rgba(29,78,104,0.9)] transition duration-200 hover:-translate-y-0.5 hover:bg-azul hover:shadow-[0_20px_36px_-16px_rgba(44,106,166,0.9)] active:translate-y-0 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60';
 
 const botaoGoogle =
-  'flex min-h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-[14px] rounded-bl-[4px] border-[1.5px] border-line bg-surface px-4 text-[0.875rem] font-semibold text-ink transition duration-200 hover:-translate-y-0.5 hover:border-azul/40 hover:shadow-[0_14px_26px_-18px_rgba(19,48,74,0.55)] active:translate-y-0';
+  'flex min-h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-[14px] rounded-bl-[4px] border-[1.5px] border-line bg-surface px-4 text-[14px] font-semibold text-ink transition duration-200 hover:-translate-y-0.5 hover:border-azul/40 hover:shadow-[0_14px_26px_-18px_rgba(19,48,74,0.55)] active:translate-y-0';
 
 const TEXTOS = {
   profissional: {
@@ -106,7 +109,7 @@ function LogoOriginal() {
       <span className="grid size-11 place-items-center overflow-hidden rounded-full bg-white shadow-[0_8px_18px_-10px_rgba(19,48,74,0.6)] ring-1 ring-azul/15 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
         <img src={logoImg} alt="" className="size-full scale-[1.12] object-cover" />
       </span>
-      <span className="font-serif text-[1.375rem] font-semibold tracking-[-0.02em] text-azul-petroleo">FonoSync</span>
+      <span className="font-serif text-[22px] font-semibold tracking-[-0.02em] text-azul-petroleo">FonoSync</span>
     </a>
   );
 }
@@ -115,7 +118,7 @@ function LogoOriginal() {
 function Titulo({ partes, cor }) {
   const [antes, destaque, depois] = partes;
   return (
-    <h1 className="display text-[2.125rem] text-azul-petroleo sm:text-[2.5rem] xl:text-[2.875rem]">
+    <h1 className="display text-[34px] text-azul-petroleo sm:text-[40px] xl:text-[46px]">
       {antes}
       <span className="relative inline-block whitespace-nowrap">
         {destaque}
@@ -145,7 +148,7 @@ function Silaba({ texto, cor }) {
   const partes = texto.split('·');
   return (
     <span
-      className="inline-flex rounded-[14px] rounded-bl-[4px] px-3.5 py-1.5 font-serif text-[1.375rem] font-semibold text-on-pastel shadow-[0_14px_30px_-14px_rgba(0,0,0,0.55)]"
+      className="inline-flex rounded-[14px] rounded-bl-[4px] px-3.5 py-1.5 font-serif text-[22px] font-semibold text-on-pastel shadow-[0_14px_30px_-14px_rgba(0,0,0,0.55)]"
       style={{ background: cor }}
     >
       {partes.map((p, i) => (
@@ -170,7 +173,7 @@ function FormInput({ id, label, icon: Icon, error, hint, trailing, value, ...pro
     <div className="group/campo space-y-1.5">
       <label
         htmlFor={id}
-        className="block text-[0.8125rem] font-semibold text-ink transition-colors duration-200 group-focus-within/campo:text-azul"
+        className="block text-[13px] font-semibold text-ink transition-colors duration-200 group-focus-within/campo:text-azul"
       >
         {label}
       </label>
@@ -197,17 +200,17 @@ function FormInput({ id, label, icon: Icon, error, hint, trailing, value, ...pro
           value={value}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
-          className="w-full min-w-0 bg-transparent py-2.5 text-[0.9375rem] font-medium text-ink outline-none placeholder:text-muted/70"
+          className="w-full min-w-0 bg-transparent py-2.5 text-[15px] font-medium text-ink outline-none placeholder:text-muted/70"
           {...props}
         />
         {trailing}
       </div>
       {error ? (
-        <p id={`${id}-erro`} className="text-[0.78125rem] font-semibold text-danger">
+        <p id={`${id}-erro`} className="text-[12.5px] font-semibold text-danger">
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-dica`} className="text-[0.78125rem] text-muted">
+        <p id={`${id}-dica`} className="text-[12.5px] text-muted">
           {hint}
         </p>
       ) : null}
@@ -220,7 +223,7 @@ function FormSelect({ id, label, icon: Icon, error, options = [], ...props }) {
     <div className="group/campo space-y-1.5">
       <label
         htmlFor={id}
-        className="block text-[0.8125rem] font-semibold text-ink transition-colors duration-200 group-focus-within/campo:text-azul"
+        className="block text-[13px] font-semibold text-ink transition-colors duration-200 group-focus-within/campo:text-azul"
       >
         {label}
       </label>
@@ -238,7 +241,7 @@ function FormSelect({ id, label, icon: Icon, error, options = [], ...props }) {
         )}
         <select
           id={id}
-          className="w-full min-w-0 cursor-pointer appearance-none bg-transparent py-2.5 pr-6 text-[0.9375rem] font-medium text-ink outline-none"
+          className="w-full min-w-0 cursor-pointer appearance-none bg-transparent py-2.5 pr-6 text-[15px] font-medium text-ink outline-none"
           {...props}
         >
           {options.map((opt) => (
@@ -253,7 +256,7 @@ function FormSelect({ id, label, icon: Icon, error, options = [], ...props }) {
           className="pointer-events-none absolute right-3.5 text-muted transition-transform duration-200 group-focus-within/campo:rotate-180 group-focus-within/campo:text-azul"
         />
       </div>
-      {error && <p className="text-[0.78125rem] font-semibold text-danger">{error}</p>}
+      {error && <p className="text-[12.5px] font-semibold text-danger">{error}</p>}
     </div>
   );
 }
@@ -273,7 +276,7 @@ function BotaoSenha({ visivel, onToggle }) {
 
 function Divisor({ children }) {
   return (
-    <div className="flex items-center gap-3 text-[0.75rem] font-semibold text-muted">
+    <div className="flex items-center gap-3 text-[12px] font-semibold text-muted">
       <span className="h-px flex-1 bg-line" />
       {children}
       <span className="h-px flex-1 bg-line" />
@@ -293,8 +296,8 @@ function Carregando({ children }) {
 function Secao({ numero, titulo, icon: Icon, extra, children }) {
   return (
     <fieldset className="space-y-3">
-      <legend className="mb-3 flex w-full items-center gap-2.5 text-[0.875rem] font-bold text-azul-petroleo">
-        <span className="grid size-7 place-items-center rounded-full bg-mel font-serif text-[0.875rem] text-on-pastel">
+      <legend className="mb-3 flex w-full items-center gap-2.5 text-[14px] font-bold text-azul-petroleo">
+        <span className="grid size-7 place-items-center rounded-full bg-mel font-serif text-[14px] text-on-pastel">
           {numero}
         </span>
         <span className="flex-1">{titulo}</span>
@@ -369,7 +372,7 @@ function BannerProfissional({ ativo }) {
         style={{ '--d': '8s', '--y': '-8px' }}
       >
         <OndaSonora className="h-7 w-20 text-mel" />
-        <span className="text-[0.8125rem] font-semibold leading-tight">
+        <span className="text-[13px] font-semibold leading-tight">
           Sessão 12
           <span className="block font-medium text-white/80">/r/ em início de palavra</span>
         </span>
@@ -383,8 +386,8 @@ function BannerProfissional({ ativo }) {
 
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 sm:p-8 lg:p-12">
         <div className="max-w-md text-white">
-          <p className="display text-[1.625rem] sm:text-[2.125rem] xl:text-[2.875rem]">Cada sessão conta uma parte da história.</p>
-          <p className="mt-3 hidden max-w-sm text-[0.9375rem] leading-relaxed text-white/85 lg:block">
+          <p className="display text-[26px] sm:text-[34px] xl:text-[46px]">Cada sessão conta uma parte da história.</p>
+          <p className="mt-3 hidden max-w-sm text-[15px] leading-relaxed text-white/85 lg:block">
             Prontuário, rastreio fonológico e a evolução de cada criança, organizados para você.
           </p>
         </div>
@@ -432,11 +435,11 @@ function BannerFamilia({ ativo }) {
 
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 sm:p-8 lg:p-12">
         <div className="max-w-md text-white">
-          <p className="display text-[1.625rem] sm:text-[2.125rem] xl:text-[2.875rem]">
+          <p className="display text-[26px] sm:text-[34px] xl:text-[46px]">
             Aqui, cada pa<span className="text-coral" aria-hidden="true">·</span>la<span className="text-coral" aria-hidden="true">·</span>vra vira
             conquista.
           </p>
-          <p className="mt-3 hidden max-w-sm text-[0.9375rem] leading-relaxed text-white/85 lg:block">
+          <p className="mt-3 hidden max-w-sm text-[15px] leading-relaxed text-white/85 lg:block">
             Atividades para fazer em casa, no ritmo da criança, junto com quem cuida dela.
           </p>
         </div>
@@ -497,7 +500,6 @@ export default function AccessArea() {
   const [showA11y, setShowA11y] = useState(false);
   const [showGoogleModal, setShowGoogleModal] = useState(false);
 
-  const { isPlayerOpen, speakPageContent, stopSpeaking } = useA11y();
   const { login, register, updateSession } = useAuth();
 
   const changeMode = (newMode) => {
@@ -629,6 +631,34 @@ export default function AccessArea() {
     }
   };
 
+  // Acesso rápido com as contas de demonstração
+  const handleQuickLogin = async (perfil) => {
+    const conta = CONTAS_DEMO[perfil];
+    trocarPublico(perfil);
+    setLoginForm({ identifier: conta.email, password: conta.password });
+    setErrors({});
+    setLoading(true);
+    setNotice(null);
+    try {
+      let session;
+      try {
+        session = await login(conta.email, conta.password);
+      } catch (loginError) {
+        // Primeira vez no ambiente: cria a conta de demonstração
+        try {
+          session = await register(conta.email, conta.password, conta.role);
+        } catch {
+          throw loginError;
+        }
+      }
+      window.location.hash = homeFor(session.role);
+    } catch (error) {
+      setNotice({ tone: 'danger', title: 'Não foi possível entrar', text: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Submissão do Cadastro de Fonoaudiólogo
   const handleProRegisterSubmit = async (e) => {
     e.preventDefault();
@@ -738,8 +768,6 @@ export default function AccessArea() {
       updateSession({
         name: guardianForm.patientName.trim(),
         guardianName: guardianForm.guardianName.trim(),
-        // usada só no front para adaptar a experiência à idade do paciente
-        birthDate: guardianForm.patientBirthDate,
       });
 
       window.location.hash = homeFor(session.role);
@@ -792,7 +820,7 @@ export default function AccessArea() {
         console.warn('Aviso ao cadastrar paciente adulto:', patErr);
       }
 
-      updateSession({ name: adultPatientForm.name.trim(), birthDate: adultPatientForm.birthDate });
+      updateSession({ name: adultPatientForm.name.trim() });
       window.location.hash = homeFor(session.role);
     } catch (error) {
       setNotice({ tone: 'danger', title: 'Erro ao cadastrar paciente', text: error.message });
@@ -839,28 +867,11 @@ export default function AccessArea() {
             <button
               type="button"
               onClick={() => setShowA11y(true)}
-              className="flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface/80 px-3.5 text-[0.8125rem] font-semibold text-ink backdrop-blur transition hover:-translate-y-px hover:border-azul/40 hover:bg-gelo"
+              className="flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface/80 px-3.5 text-[13px] font-semibold text-ink backdrop-blur transition hover:-translate-y-px hover:border-azul/40 hover:bg-gelo"
             >
               <PersonStanding size={16} aria-hidden="true" className="text-azul" />
               <span className="hidden sm:inline">Acessibilidade</span>
               <span className="sr-only sm:hidden">Acessibilidade</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => (isPlayerOpen ? stopSpeaking() : speakPageContent())}
-              className={`flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-[0.8125rem] font-semibold backdrop-blur transition hover:-translate-y-px ${
-                isPlayerOpen
-                  ? 'border-danger/50 bg-danger/10 text-danger'
-                  : 'border-line bg-surface/80 text-ink hover:border-azul/40 hover:bg-gelo'
-              }`}
-            >
-              {isPlayerOpen ? (
-                <VolumeX size={16} aria-hidden="true" />
-              ) : (
-                <Volume2 size={16} aria-hidden="true" className="text-azul" />
-              )}
-              <span className="hidden sm:inline">{isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}</span>
-              <span className="sr-only sm:hidden">{isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}</span>
             </button>
           </div>
         </header>
@@ -870,7 +881,7 @@ export default function AccessArea() {
             {/* Título que muda com o perfil e o modo */}
             <div key={`titulo-${publico}-${mode}`} className="auth-troca space-y-2">
               <Titulo partes={texto.titulo} cor={corGrifo} />
-              <p className="text-[1rem] leading-relaxed text-muted">{texto.sub}</p>
+              <p className="text-[16px] leading-relaxed text-muted">{texto.sub}</p>
             </div>
 
             {/* Perfil: profissional ou família */}
@@ -897,7 +908,7 @@ export default function AccessArea() {
                     type="button"
                     aria-pressed={ativo}
                     onClick={() => trocarPublico(id)}
-                    className={`relative z-10 flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-[12px] px-2 text-[0.875rem] font-bold transition-colors duration-300 ${
+                    className={`relative z-10 flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-[12px] px-2 text-[14px] font-bold transition-colors duration-300 ${
                       ativo ? 'text-azul-petroleo' : 'text-muted hover:text-ink'
                     }`}
                   >
@@ -926,7 +937,7 @@ export default function AccessArea() {
                     type="button"
                     aria-pressed={ativo}
                     onClick={() => changeMode(id)}
-                    className={`relative cursor-pointer pb-3 text-[0.9375rem] font-bold transition-colors ${
+                    className={`relative cursor-pointer pb-3 text-[15px] font-bold transition-colors ${
                       ativo ? 'text-azul-petroleo' : 'text-muted hover:text-ink'
                     }`}
                   >
@@ -995,6 +1006,40 @@ export default function AccessArea() {
                     )}
                   </button>
                 </form>
+
+                {/* Acesso rápido: entra direto com as contas de demonstração */}
+                <div className="space-y-2.5 border-t border-line pt-4">
+                  <p className="text-center text-[11.5px] font-bold uppercase tracking-[0.08em] text-muted">
+                    Acesso rápido
+                  </p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {[
+                      {
+                        id: 'profissional',
+                        rotulo: 'Área profissional',
+                        icon: Stethoscope,
+                        estilo: 'border-azul/25 bg-gelo text-azul-petroleo hover:border-azul/50',
+                      },
+                      {
+                        id: 'paciente',
+                        rotulo: 'Paciente',
+                        icon: HeartHandshake,
+                        estilo: 'border-coral/60 bg-coral/25 text-on-pastel hover:border-coral',
+                      },
+                    ].map(({ id, rotulo, icon: Icon, estilo }) => (
+                      <button
+                        key={id}
+                        type="button"
+                        disabled={loading}
+                        onClick={() => handleQuickLogin(id)}
+                        className={`flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[12px] rounded-bl-[3px] border-[1.5px] px-3 text-[13.5px] font-bold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-60 ${estilo}`}
+                      >
+                        <Icon size={16} aria-hidden="true" />
+                        {rotulo}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1047,8 +1092,8 @@ export default function AccessArea() {
                             <Icon size={19} aria-hidden="true" />
                           </span>
                           <span className="min-w-0">
-                            <span className="block text-[0.875rem] font-bold leading-tight text-ink">{title}</span>
-                            <span className="block text-[0.78125rem] text-muted">{subtitle}</span>
+                            <span className="block text-[14px] font-bold leading-tight text-ink">{title}</span>
+                            <span className="block text-[12.5px] text-muted">{subtitle}</span>
                           </span>
                         </button>
                       );
@@ -1068,7 +1113,7 @@ export default function AccessArea() {
                 {/* ------------------------------------------------------ */}
                 {registerCategory === 'fonoaudiologo' && (
                   <form onSubmit={handleProRegisterSubmit} noValidate className="space-y-3.5">
-                    <p className="flex items-start gap-2.5 rounded-[12px] rounded-bl-[3px] bg-gelo px-3.5 py-3 text-[0.8125rem] leading-relaxed text-ink">
+                    <p className="flex items-start gap-2.5 rounded-[12px] rounded-bl-[3px] bg-gelo px-3.5 py-3 text-[13px] leading-relaxed text-ink">
                       <Sparkles size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-azul" />
                       Seus dados de CRFa e especialidade serão exibidos nos laudos e prontuários dos pacientes.
                     </p>
@@ -1228,7 +1273,7 @@ export default function AccessArea() {
                       icon={Baby}
                       extra={
                         guardianForm.patientBirthDate && (
-                          <span className="rounded-full bg-salvia px-2.5 py-0.5 text-[0.75rem] font-bold text-on-pastel">
+                          <span className="rounded-full bg-salvia px-2.5 py-0.5 text-[12px] font-bold text-on-pastel">
                             {calculateAge(guardianForm.patientBirthDate)} anos
                           </span>
                         )
@@ -1265,7 +1310,7 @@ export default function AccessArea() {
                             { value: 'OUTRO', label: 'Outro' },
                           ]}
                         />
-                        <p className="flex items-start gap-2 rounded-[12px] rounded-bl-[3px] bg-salvia/70 px-3 py-2.5 text-[0.75rem] leading-snug text-on-pastel">
+                        <p className="flex items-start gap-2 rounded-[12px] rounded-bl-[3px] bg-salvia/70 px-3 py-2.5 text-[12px] leading-snug text-on-pastel">
                           <ShieldCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-success" />
                           <span>
                             <strong>Proteção de menores (LGPD):</strong> não coletamos CPF nem dados sensíveis da
@@ -1323,7 +1368,7 @@ export default function AccessArea() {
                 {/* ------------------------------------------------------ */}
                 {registerCategory === 'paciente_adulto' && (
                   <form onSubmit={handleAdultRegisterSubmit} noValidate className="space-y-3.5">
-                    <p className="flex items-start gap-2.5 rounded-[12px] rounded-bl-[3px] bg-mel/40 px-3.5 py-3 text-[0.8125rem] leading-relaxed text-on-pastel">
+                    <p className="flex items-start gap-2.5 rounded-[12px] rounded-bl-[3px] bg-mel/40 px-3.5 py-3 text-[13px] leading-relaxed text-on-pastel">
                       <UserCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
                       Para quem tem 18 anos ou mais e cuida do próprio tratamento. O prontuário fica no seu nome.
                     </p>
@@ -1430,7 +1475,7 @@ export default function AccessArea() {
         </main>
 
         {/* Rodapé da coluna: LGPD, privacidade e créditos */}
-        <footer className={`relative flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 px-5 pb-5 text-[0.78125rem] text-muted sm:px-10 xl:px-16 ${familia ? 'lg:pr-36 xl:pr-40' : ''}`}>
+        <footer className={`relative flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 px-5 pb-5 text-[12.5px] text-muted sm:px-10 xl:px-16 ${familia ? 'lg:pr-36 xl:pr-40' : ''}`}>
           <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
             <ShieldCheck size={15} aria-hidden="true" className="text-success" />
             Ambiente seguro e criptografado, em conformidade com a LGPD.
@@ -1486,7 +1531,7 @@ export default function AccessArea() {
             <div className="flex items-center justify-between border-b border-line pb-3">
               <div className="flex items-center gap-2">
                 <GoogleIcon />
-                <span id="google-modal-titulo" className="text-[0.9375rem] font-bold text-azul-petroleo">
+                <span id="google-modal-titulo" className="text-[15px] font-bold text-azul-petroleo">
                   FonoSync Google Auth
                 </span>
               </div>
@@ -1500,7 +1545,7 @@ export default function AccessArea() {
               </button>
             </div>
 
-            <p className="text-[0.84375rem] text-muted">Escolha uma conta Google para entrar ou sincronizar com o FonoSync:</p>
+            <p className="text-[13.5px] text-muted">Escolha uma conta Google para entrar ou sincronizar com o FonoSync:</p>
 
             <div className="space-y-2">
               <button
@@ -1512,8 +1557,8 @@ export default function AccessArea() {
                   DR
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[0.84375rem] font-bold text-ink">Dra. Renata Lima (Fonoaudióloga)</span>
-                  <span className="block truncate text-[0.75rem] text-muted">renata.fono@fonosync.com.br</span>
+                  <span className="block truncate text-[13.5px] font-bold text-ink">Dra. Renata Lima (Fonoaudióloga)</span>
+                  <span className="block truncate text-[12px] text-muted">renata.fono@fonosync.com.br</span>
                 </span>
               </button>
 
@@ -1526,8 +1571,8 @@ export default function AccessArea() {
                   CF
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[0.84375rem] font-bold text-ink">Clara Ferreira (Mãe / Paciente)</span>
-                  <span className="block truncate text-[0.75rem] text-muted">clara.mae@gmail.com</span>
+                  <span className="block truncate text-[13.5px] font-bold text-ink">Clara Ferreira (Mãe / Paciente)</span>
+                  <span className="block truncate text-[12px] text-muted">clara.mae@gmail.com</span>
                 </span>
               </button>
             </div>
@@ -1535,7 +1580,7 @@ export default function AccessArea() {
             <button
               type="button"
               onClick={() => setShowGoogleModal(false)}
-              className="w-full cursor-pointer py-2 text-[0.8125rem] font-bold text-muted transition hover:text-ink"
+              className="w-full cursor-pointer py-2 text-[13px] font-bold text-muted transition hover:text-ink"
             >
               Cancelar
             </button>

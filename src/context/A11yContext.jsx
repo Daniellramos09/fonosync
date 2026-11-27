@@ -96,8 +96,14 @@ function applyToDocument(settings) {
   setVar(root, '--a11y-text', textHex);
 }
 
+/* ------------------------------------------------------------ leitura por voz */
+
 // média de caracteres falados por segundo na velocidade 1x
 const CHARS_PER_SECOND = 14;
+// se a voz não começar nesse tempo, ela travou: tenta com outra
+const START_TIMEOUT_MS = 5000;
+// erros em que vale trocar de voz e tentar de novo
+const RETRY_ERRORS = ['synthesis-failed', 'synthesis-unavailable', 'network', 'voice-unavailable', 'language-unavailable', 'audio-busy'];
 
 const supportsSpeech = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
 
@@ -107,32 +113,49 @@ function splitIntoChunks(text) {
   return sentences.map(s => s.trim()).filter(Boolean);
 }
 
-const MALE_VOICE = /\b(male|masculin[oa]?|homem)\b|daniel|felipe|ricardo|ant[oô]nio|donato|f[aá]bio|humberto|j[uú]lio|leandro|nicolau|val[eé]rio|thiago|eddy|reed|rocko|grandpa/i;
-const FEMALE_VOICE = /female|feminin[oa]?|mulher|luciana|fernanda|maria|francisca|helena|helo[ií]sa|thalita|brenda|giovanna|let[ií]cia|manuela|yara|elza|joana|google portugu[eê]s|\bflo\b|sandy|shelley|grandma/i;
-const MALE_FALLBACK_PITCH = 0.6;
+// nomes das vozes em português de Windows/Edge, macOS/iOS, Chrome e Android
+const MALE_VOICE = /\b(male|masculin[oa]?|homem)\b|daniel|felipe|ricardo|ant[oô]nio|donato|f[aá]bio|humberto|j[uú]lio|leandro|nicolau|val[eé]rio|thiago|duarte|eddy|reed|rocko|grandpa|pt-br-x-ptd|pt-br-x-pte|pt-pt-x-jmn|pt-pt-x-pmj/i;
+const FEMALE_VOICE = /female|feminin[oa]?|mulher|luciana|fernanda|maria|francisca|helena|helo[ií]sa|h[eé]lia|thalita|brenda|giovanna|leila|let[ií]cia|manuela|yara|elza|joana|catarina|raquel|google portugu[eê]s|\bflo\b|sandy|shelley|grandma|pt-br-x-afs|pt-br-x-pmj|pt-pt-x-sfs/i;
+// sem voz do tipo pedido no aparelho, muda o tom da voz disponível para diferenciar
+const FALLBACK_PITCH = { male: 0.55, female: 1.35 };
 
+const isPortuguese = (voice) => /^pt([-_]|$)/i.test(voice.lang || '');
 const isBrazilian = (voice) => /^pt[-_]br$/i.test(voice.lang || '');
+const voiceKey = (voice) => voice.voiceURI || voice.name;
 
-// vozes neurais (Edge) e do Google soam mais humanas que as instaladas no sistema
+// vozes neurais (Edge) e do Google soam mais humanas, mas dependem de internet;
+// por isso as vozes instaladas no aparelho vêm logo atrás e entram se a online falhar
 function voiceScore(voice) {
-  let score = isBrazilian(voice) ? 1 : 0;
-  if (/natural|neural|online/i.test(voice.name)) score += 4;
+  // português do Brasil sempre antes do de Portugal
+  let score = isBrazilian(voice) ? 10 : 0;
+  if (/natural|neural/i.test(voice.name)) score += 4;
   else if (/google/i.test(voice.name)) score += 2;
+  if (voice.localService) score += 1;
+  if (voice.default) score += 0.5;
   return score;
 }
 
-function resolveVoice(voices, gender) {
-  const portuguese = voices.filter((voice) => /^pt([-_]|$)/i.test(voice.lang || ''));
-  const ordered = [...portuguese].sort((first, second) => voiceScore(second) - voiceScore(first));
+const matches = (pattern, voice) => pattern.test(voice.name) || pattern.test(voiceKey(voice));
+
+function resolveVoice(voices, gender, failed = new Set()) {
+  const usable = voices.filter((voice) => !failed.has(voiceKey(voice)));
+  const portuguese = usable.filter(isPortuguese).sort((first, second) => voiceScore(second) - voiceScore(first));
 
   const wanted = gender === 'male' ? MALE_VOICE : FEMALE_VOICE;
   const other = gender === 'male' ? FEMALE_VOICE : MALE_VOICE;
 
-  const exact = ordered.find((voice) => wanted.test(voice.name));
+  // 1. voz em português do tipo pedido
+  const exact = portuguese.find((voice) => matches(wanted, voice) && !matches(other, voice));
   if (exact) return { voice: exact, pitch: 1, exact: true };
 
-  const neutral = ordered.find((voice) => !other.test(voice.name)) || ordered[0] || voices[0] || null;
-  return { voice: neutral, pitch: gender === 'male' ? MALE_FALLBACK_PITCH : 1, exact: false };
+  // 2. voz em português sem gênero conhecido (ex.: Android): tom ajustado para o tipo pedido
+  const unknown = portuguese.find((voice) => !matches(other, voice));
+  // (essas vozes padrão costumam ser femininas, então só a masculina muda de tom)
+  if (unknown) return { voice: unknown, pitch: gender === 'male' ? FALLBACK_PITCH.male : 1, exact: gender !== 'male' };
+
+  // 3. só há voz do outro tipo: usa com o tom bem diferente para a troca ser perceptível
+  // (sem voz em português nenhuma, o navegador escolhe pelo idioma pt-BR)
+  return { voice: portuguese[0] || null, pitch: FALLBACK_PITCH[gender] ?? 1, exact: false };
 }
 
 export function A11yProvider({ children }) {
@@ -153,6 +176,7 @@ export function A11yProvider({ children }) {
   const [volume, setVolumeState] = useState(1);
   const [spokenChars, setSpokenChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
+  const [speechError, setSpeechError] = useState(null);
 
   const runRef = useRef(0);
   const chunkStartRef = useRef(0);
@@ -160,7 +184,16 @@ export function A11yProvider({ children }) {
   const startsRef = useRef([]);
   const pageRef = useRef(null);
   const indexRef = useRef(0);
-  const liveRef = useRef({ rate: speechRate, gender: voiceGender, voices: [], volume: 1 });
+  // a fala em andamento fica guardada: sem isso o Chrome pode descartá-la e cortar a leitura
+  const utteranceRef = useRef(null);
+  const watchdogRef = useRef(null);
+  const failedVoicesRef = useRef(new Set());
+  const liveRef = useRef({
+    rate: speechRate,
+    gender: voiceGender,
+    voices: [],
+    volume: 1,
+  });
 
   useEffect(() => {
     liveRef.current = { rate: speechRate, gender: voiceGender, voices: availableVoices, volume };
@@ -208,6 +241,11 @@ export function A11yProvider({ children }) {
     setSaveStatus('reset');
   };
 
+  const clearWatchdog = () => {
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    watchdogRef.current = null;
+  };
+
   useEffect(() => {
     if (!supportsSpeech()) return undefined;
     const synth = window.speechSynthesis;
@@ -218,12 +256,14 @@ export function A11yProvider({ children }) {
     };
 
     updateVoices();
-    if (synth.onvoiceschanged !== undefined) {
-      synth.onvoiceschanged = updateVoices;
-    }
+    // alguns navegadores (Chrome no Android, Safari) carregam as vozes aos poucos
+    if (synth.addEventListener) synth.addEventListener('voiceschanged', updateVoices);
+    else synth.onvoiceschanged = updateVoices;
+    const retry = setTimeout(updateVoices, 1000);
 
     const stopOnNavigate = () => {
       runRef.current += 1;
+      clearWatchdog();
       synth.cancel();
       clearReadingHighlight();
       setPlayerStatus('idle');
@@ -233,37 +273,99 @@ export function A11yProvider({ children }) {
     window.addEventListener('hashchange', stopOnNavigate);
 
     return () => {
-      synth.onvoiceschanged = null;
+      clearTimeout(retry);
+      if (synth.removeEventListener) synth.removeEventListener('voiceschanged', updateVoices);
+      else synth.onvoiceschanged = null;
       window.removeEventListener('hashchange', stopOnNavigate);
+      clearWatchdog();
       synth.cancel();
       clearReadingHighlight();
     };
   }, []);
 
+  // monta uma fala com a voz, velocidade e volume atuais
+  const buildUtterance = (text) => {
+    const live = liveRef.current;
+    const voices = live.voices.length ? live.voices : window.speechSynthesis.getVoices() || [];
+    const utterance = new SpeechSynthesisUtterance(text);
+    const { voice, pitch } = resolveVoice(voices, live.gender, failedVoicesRef.current);
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    } else {
+      utterance.lang = 'pt-BR';
+    }
+    utterance.pitch = pitch;
+    utterance.rate = live.rate;
+    utterance.volume = live.volume;
+    return { utterance, voice };
+  };
+
+  /*
+   * Fala imediatamente quando o sintetizador está livre. Isso é essencial no celular:
+   * iPhone e Android só liberam o áudio se a fala começar dentro do próprio toque.
+   * Só espera um instante quando precisa interromper uma fala anterior (o Chrome
+   * engole a fala nova se ela vier colada ao cancel()).
+   */
+  const dispatch = (utterance, runId) => {
+    const synth = window.speechSynthesis;
+    const busy = synth.speaking || synth.pending;
+    if (busy) synth.cancel();
+
+    const go = () => {
+      if (runRef.current !== runId) return;
+      if (synth.paused) synth.resume();
+      utteranceRef.current = utterance;
+      synth.speak(utterance);
+    };
+
+    if (busy) setTimeout(go, 150);
+    else go();
+  };
+
   const charsBefore = (index) => chunksRef.current.slice(0, index).reduce((sum, chunk) => sum + chunk.length, 0);
+
+  const failSpeech = (reason) => {
+    clearWatchdog();
+    clearReadingHighlight();
+    setSpeechError(reason);
+    setPlayerStatus('idle');
+  };
 
   const speakChunk = (index) => {
     if (!supportsSpeech()) return;
-    const synth = window.speechSynthesis;
     runRef.current += 1;
     const runId = runRef.current;
-    synth.cancel();
+    clearWatchdog();
 
     if (index >= chunksRef.current.length) {
+      window.speechSynthesis.cancel();
       clearReadingHighlight();
       setSpokenChars(0);
       setPlayerStatus('done');
       return;
     }
 
-    const live = liveRef.current;
-    const utterance = new SpeechSynthesisUtterance(chunksRef.current[index]);
-    const { voice, pitch } = resolveVoice(live.voices, live.gender);
-    if (voice) utterance.voice = voice;
-    utterance.lang = 'pt-BR';
-    utterance.pitch = pitch;
-    utterance.rate = live.rate;
-    utterance.volume = live.volume;
+    const text = chunksRef.current[index];
+    // trecho sem letras (ex.: "—") pode terminar sem som; não é falha da voz
+    if (!/[\p{L}\p{N}]/u.test(text)) {
+      speakChunk(index + 1);
+      return;
+    }
+
+    const { utterance, voice } = buildUtterance(text);
+    let started = false;
+
+    // a voz escolhida travou ou falhou: marca e tenta a mesma frase com outra
+    const retryWithAnotherVoice = () => {
+      if (runRef.current !== runId) return;
+      if (voice) {
+        failedVoicesRef.current.add(voiceKey(voice));
+        speakChunk(index);
+      } else {
+        failSpeech('unavailable');
+      }
+    };
 
     const page = pageRef.current;
     const start = startsRef.current[index];
@@ -275,29 +377,49 @@ export function A11yProvider({ children }) {
     }
 
     utterance.onstart = () => {
+      if (runRef.current !== runId) return;
+      started = true;
+      clearWatchdog();
       chunkStartRef.current = Date.now();
     };
     // o cancel() também dispara onend e onerror, então falas antigas são ignoradas
     utterance.onend = () => {
-      if (runRef.current === runId) speakChunk(index + 1);
+      if (runRef.current !== runId) return;
+      // terminou sem nunca ter começado: a voz não funcionou
+      if (!started && voice) {
+        retryWithAnotherVoice();
+        return;
+      }
+      speakChunk(index + 1);
     };
     utterance.onerror = (event) => {
       if (runRef.current !== runId || event.error === 'interrupted' || event.error === 'canceled') return;
-      clearReadingHighlight();
-      setPlayerStatus('idle');
+      if (event.error === 'not-allowed') {
+        failSpeech('blocked');
+        return;
+      }
+      if (RETRY_ERRORS.includes(event.error) || !started) {
+        retryWithAnotherVoice();
+        return;
+      }
+      failSpeech('unavailable');
     };
 
     indexRef.current = index;
     chunkStartRef.current = 0;
     setSpokenChars(charsBefore(index));
+    setSpeechError(null);
     setPlayerStatus('playing');
 
-    // o navegador precisa de um instante depois do cancel(), senão corta a fala nova
-    setTimeout(() => {
-      if (runRef.current !== runId) return;
-      synth.resume();
-      synth.speak(utterance);
-    }, 100);
+    dispatch(utterance, runId);
+
+    watchdogRef.current = setTimeout(() => {
+      if (runRef.current !== runId || started) return;
+      // em alguns Android o onstart não dispara, mas a voz está saindo
+      if (window.speechSynthesis.speaking && !voice) return;
+      window.speechSynthesis.cancel();
+      retryWithAnotherVoice();
+    }, START_TIMEOUT_MS);
   };
 
   const startReading = (customText) => {
@@ -329,6 +451,7 @@ export function A11yProvider({ children }) {
 
   function stopAudio() {
     runRef.current += 1;
+    clearWatchdog();
     if (supportsSpeech()) window.speechSynthesis.cancel();
     clearReadingHighlight();
     setSpokenChars(0);
@@ -337,6 +460,7 @@ export function A11yProvider({ children }) {
 
   const closePlayer = () => {
     stopAudio();
+    setSpeechError(null);
     setPlayerOpen(false);
   };
 
@@ -354,33 +478,52 @@ export function A11yProvider({ children }) {
   };
 
   // pausar para a frase atual; ao continuar, ela recomeça do início
+  // (pause()/resume() nativos não funcionam no Android, por isso o cancel)
   const pauseAudio = () => {
     if (playerStatus !== 'playing') return;
     runRef.current += 1;
+    clearWatchdog();
     window.speechSynthesis.cancel();
     setPlayerStatus('paused');
   };
 
-  const speakText = (text) => {
-    if (!supportsSpeech()) return;
-    const synth = window.speechSynthesis;
+  // fala um texto curto (palavras dos jogos, teste de voz), sem abrir o leitor
+  const speakShort = (text, attempt = 0) => {
+    if (!supportsSpeech() || !text) return;
     runRef.current += 1;
-    synth.cancel();
+    const runId = runRef.current;
+    clearWatchdog();
     clearReadingHighlight();
-    setPlayerStatus('idle');
-    synth.resume();
+    if (playerStatus === 'playing') setPlayerStatus('idle');
 
-    const live = liveRef.current;
-    const utterance = new SpeechSynthesisUtterance(text);
-    const { voice, pitch } = resolveVoice(live.voices, live.gender);
-    if (voice) utterance.voice = voice;
-    utterance.lang = 'pt-BR';
-    utterance.pitch = pitch;
-    utterance.rate = live.rate;
-    utterance.volume = live.volume;
+    const { utterance, voice } = buildUtterance(text);
+    let started = false;
+    const retry = () => {
+      if (runRef.current !== runId || !voice || attempt > 3) return;
+      failedVoicesRef.current.add(voiceKey(voice));
+      speakShort(text, attempt + 1);
+    };
+    utterance.onstart = () => {
+      started = true;
+      clearWatchdog();
+    };
+    utterance.onerror = (event) => {
+      if (runRef.current !== runId || event.error === 'interrupted' || event.error === 'canceled') return;
+      if (event.error === 'not-allowed') return;
+      retry();
+    };
 
-    synth.speak(utterance);
+    dispatch(utterance, runId);
+
+    watchdogRef.current = setTimeout(() => {
+      if (runRef.current !== runId || started || !voice) return;
+      window.speechSynthesis.cancel();
+      retry();
+    }, START_TIMEOUT_MS);
   };
+
+  const speakText = (text) => speakShort(text);
+  const testVoice = () => speakShort('Olá! Esta é a voz que vai ler as páginas do FonoSync para você.');
 
   // tempo do player, estimado pela quantidade de texto
   useEffect(() => {
@@ -413,13 +556,24 @@ export function A11yProvider({ children }) {
     applyLive({ volume: value });
   };
 
+  // trocar o tipo de voz: durante a leitura recomeça a frase com a nova voz;
+  // fora dela, fala uma amostra curta para a pessoa ouvir a diferença na hora
   const changeVoiceGender = (gender) => {
+    if (gender === liveRef.current.gender) return;
     setVoiceGender(gender);
+    failedVoicesRef.current.clear();
     applyLive({ gender });
+    if (playerStatus !== 'playing' && supportsSpeech()) {
+      speakShort(gender === 'male' ? 'Voz masculina selecionada.' : 'Voz feminina selecionada.');
+    }
   };
 
   const resolved = resolveVoice(availableVoices, voiceGender);
-  const voiceInfo = { exact: resolved.exact, hasPortuguese: Boolean(resolved.voice), name: resolved.voice?.name ?? null };
+  const voiceInfo = {
+    exact: resolved.exact,
+    hasPortuguese: Boolean(resolved.voice),
+    name: resolved.voice?.name ?? null,
+  };
 
   return (
     <A11yContext.Provider
@@ -435,6 +589,7 @@ export function A11yProvider({ children }) {
         speechRate,
         setSpeechRate: setSpeed,
         speechSupported: supportsSpeech(),
+        speechError,
         voiceInfo,
         isPlaying: playerStatus === 'playing',
         isPlayerOpen: playerOpen,
@@ -447,6 +602,7 @@ export function A11yProvider({ children }) {
         progress: totalChars ? spokenChars / totalChars : 0,
         speakPageContent,
         speakText,
+        testVoice,
         playAudio,
         pauseAudio,
         stopAudio,
