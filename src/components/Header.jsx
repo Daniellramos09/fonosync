@@ -1,24 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  ArrowRight,
-  Calendar,
-  ChevronDown,
-  FileText,
-  Gamepad2,
-  HeartHandshake,
-  PersonStanding,
-  School,
-  ShieldCheck,
-  Stethoscope,
-  Users,
-  Volume2,
-} from 'lucide-react';
-import logoImg from '../assets/images/ModeloA_Semnome.jpg';
+import { ArrowUpRight, ChevronDown, Menu, PersonStanding, Volume2, X } from 'lucide-react';
 import consultorioImg from '../assets/images/care/consultorio-familia-atendimento.jpg';
-import articulacaoImg from '../assets/images/care/terapia-fala-articulacao.jpg';
+import brincarImg from '../assets/images/photos/brincar-clinica.jpg';
 import silabasImg from '../assets/images/care/silabas-girafa-ludico.jpg';
 import A11yModal from './A11yModal';
+import Logo from './Logo';
+import { buttonClass } from './buttonStyles';
 import { useA11y } from '../hooks/useA11y';
+import { iniciarTriagem } from '../utils/triagemInicio';
 
 const scrollToId = (id, onComplete) => (e) => {
   if (onComplete) onComplete();
@@ -32,121 +21,74 @@ const scrollToId = (id, onComplete) => (e) => {
   }
 };
 
-const productItems = [
+const menus = [
   {
-    icon: FileText,
-    title: 'Prontuário Clínico',
-    desc: 'Anamnese, diagnóstico CID-10, plano terapêutico e histórico completo por paciente.',
-    href: '#sobre',
-    isSection: true,
+    id: 'produto',
+    label: 'Produto',
+    foto: consultorioImg,
+    fotoAlt: 'Fonoaudióloga em atendimento com criança e mãe no consultório',
+    destaque: 'Consultório e casa no mesmo plano',
+    items: [
+      { title: 'Prontuário clínico', desc: 'Anamnese, diagnóstico CID-10, avaliações e histórico por paciente.', section: 'sobre' },
+      { title: 'Agenda e sessões', desc: 'Consultas presenciais ou online que viram sessão registrada.', section: 'sobre' },
+      { title: 'Jornada terapêutica', desc: 'Do rastreio à evolução, passo a passo.', section: 'jornada' },
+      { title: 'Área da família', desc: 'Orientações para casa, próximas consultas e conquistas.', section: 'familias' },
+    ],
   },
   {
-    icon: Calendar,
-    title: 'Agenda & Sessões',
-    desc: 'Organização de consultas presenciais ou online com conversão direta em sessão evoluída.',
-    href: '#fluxo-clinico',
-    isSection: true,
+    id: 'publico',
+    label: 'Para quem é',
+    foto: brincarImg,
+    fotoAlt: 'Terapeuta brincando de empilhar copos com uma criança pequena',
+    destaque: 'Cada perfil com o que precisa',
+    items: [
+      { title: 'Famílias', desc: 'Rastreio em casa e acompanhamento entre as sessões.', section: 'para-quem' },
+      { title: 'Fonoaudiólogos', desc: 'Prontuário estruturado, agenda e relatórios.', section: 'para-quem' },
+      { title: 'Escolas', desc: 'Checklist em sala para apoiar encaminhamentos.', section: 'para-quem' },
+      { title: 'Acessibilidade', desc: 'Leitura por voz, alto contraste e modos de cor.', section: 'cuidado' },
+    ],
   },
   {
-    icon: ShieldCheck,
-    title: 'Evolução & Anexos',
-    desc: 'Linha do tempo documentada, upload de exames em nuvem e emissão de laudos com CRFa.',
-    href: '#recursos',
-    isSection: true,
-  },
-  {
-    icon: HeartHandshake,
-    title: 'Portal da Família',
-    desc: 'Orientações domiciliares claras, treino entre consultas e acompanhamento de conquistas.',
-    href: '#sobre',
-    isSection: true,
-  },
-];
-
-const audienceItems = [
-  {
-    icon: Stethoscope,
-    title: 'Fonoaudiólogos',
-    desc: 'Gestão clínica integrada, prontuário estruturado e relatórios interdisciplinares.',
-    href: '#/acesso',
-    isSection: false,
-  },
-  {
-    icon: Users,
-    title: 'Famílias e Crianças',
-    desc: 'Continuidade terapêutica em casa e atividades lúdicas calibradas por idade.',
-    href: '#/triagem',
-    isSection: false,
-  },
-  {
-    icon: School,
-    title: 'Escolas e Educadores',
-    desc: 'Observação estruturada em sala de aula para apoiar encaminhamentos precoces.',
-    href: '#/triagem',
-    isSection: false,
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Redes de Saúde',
-    desc: 'Padronização de registros, controle de acesso RBAC e proteção de dados sob a LGPD.',
-    href: '#seguranca',
-    isSection: true,
-  },
-];
-
-const triagemItems = [
-  {
-    age: '0 – 2 anos',
-    title: 'Marcos da Comunicação',
-    desc: 'Observação guiada de reação a sons, contato visual, balbucio e primeiras palavras.',
-    href: '#/triagem',
-  },
-  {
-    age: '2 – 4 anos',
-    title: 'Jogo da Palavra',
-    desc: 'Nomeação de figuras para identificar trocas e processos fonológicos iniciais.',
-    href: '#/triagem',
-  },
-  {
-    age: '4 – 5 anos',
-    title: 'Jogo da Rima',
-    desc: 'Percepção sonora e consciência fonológica em 5 rodadas interativas.',
-    href: '#/triagem',
-  },
-  {
-    age: '6+ anos',
-    title: 'Checklist Escolar',
-    desc: 'Mapeamento funcional de fala, fluência, leitura e compreensão em sala.',
-    href: '#/triagem',
+    id: 'rastreio',
+    label: 'Rastreio',
+    foto: silabasImg,
+    fotoAlt: 'Criança montando a palavra girafa com cartões de sílabas',
+    destaque: 'Atividades curtas, sem cadastro',
+    faixas: [
+      { idade: '0–2', title: 'Marcos da comunicação', atividade: 'form02' },
+      { idade: '2–4', title: 'Jogo da Palavra', atividade: 'game24' },
+      { idade: '4–5', title: 'Jogo da Rima', atividade: 'rima45' },
+      { idade: '6+', title: 'Checklist escolar', atividade: 'check6' },
+    ],
   },
 ];
 
 export default function Header() {
   const [showA11y, setShowA11y] = useState(false);
-  const [openMenu, setOpenMenu] = useState(null); // 'produto' | 'publico' | 'rastreio' | null
+  const [openMenu, setOpenMenu] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [solid, setSolid] = useState(false);
   const navRef = useRef(null);
   const closeTimeoutRef = useRef(null);
   const { speakPageContent, isPlayerOpen } = useA11y();
 
-  const handleMouseEnter = (menuId) => {
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    setOpenMenu(menuId);
-  };
-
-  const handleMouseLeave = () => {
-    closeTimeoutRef.current = setTimeout(() => {
-      setOpenMenu(null);
-    }, 140);
-  };
+  // Sobre a foto do hero o cabeçalho é vidro escuro; depois vira faixa clara.
+  useEffect(() => {
+    const onScroll = () => setSolid(window.scrollY > window.innerHeight * 0.72);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setOpenMenu(null);
+      if (e.key === 'Escape') {
+        setOpenMenu(null);
+        setMobileOpen(false);
+      }
     };
     const handleClickOutside = (e) => {
-      if (navRef.current && !navRef.current.contains(e.target)) {
-        setOpenMenu(null);
-      }
+      if (navRef.current && !navRef.current.contains(e.target)) setOpenMenu(null);
     };
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousedown', handleClickOutside);
@@ -156,372 +98,260 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
+
+  const handleMouseEnter = (menuId) => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    setOpenMenu(menuId);
+  };
+  const handleMouseLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => setOpenMenu(null), 160);
+  };
+
+  const close = () => setOpenMenu(null);
+  const dark = !solid && !openMenu;
+  const active = menus.find((m) => m.id === openMenu);
+
+  const navItemClass = (isOpen) =>
+    `inline-flex min-h-10 items-center gap-1.5 rounded-[10px] rounded-bl-[3px] px-3.5 text-[15px] font-semibold transition-colors ${
+      dark
+        ? 'text-white hover:bg-white/12'
+        : `text-navy ${isOpen ? 'bg-salvia' : 'hover:bg-salvia/60'}`
+    }`;
+
+  const chipClass = dark
+    ? 'border-white/30 text-white hover:bg-white/12'
+    : 'border-primary/25 text-navy hover:bg-salvia/60';
+
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-black/6 bg-surface/95 px-5 py-3.5 backdrop-blur-md md:px-10">
+      <header className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5">
         <div
           ref={navRef}
-          className="relative mx-auto flex max-w-[1240px] items-center justify-between gap-4"
+          className={`relative mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-3 rounded-[14px] px-3 transition-[background-color,box-shadow,color] duration-300 md:px-5 ${
+            dark
+              ? 'on-dark bg-[#0f2a2f]/50 text-white backdrop-blur-xl'
+              : 'bg-quente/95 text-navy shadow-[0_12px_32px_-14px_rgba(23,67,74,0.3)] backdrop-blur-xl'
+          }`}
         >
-          {/* Identidade Visual à Esquerda */}
-          <a href="#/" className="flex items-center gap-2.5 group">
-            <img
-              src={logoImg}
-              alt="FonoSync"
-              className="h-9 w-9 rounded-[10px] border border-black/8 object-contain bg-white"
-            />
-            <span className="font-sans text-[19px] font-medium tracking-[-0.03em] text-ink leading-none">
-              FonoSync
-            </span>
+          <a href="#/" aria-label="FonoSync, página inicial" className="shrink-0">
+            <Logo tone={dark ? 'claro' : 'ocean'} markClassName="size-9" />
           </a>
 
-          {/* Navegação Central com Mega-Menus */}
           <nav aria-label="Principal" className="hidden lg:block">
-            <ul className="flex items-center gap-1.5">
-              {/* Dropdown 1: Produto */}
-              <li
-                onMouseEnter={() => handleMouseEnter('produto')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <button
-                  type="button"
-                  aria-expanded={openMenu === 'produto'}
-                  onClick={() => setOpenMenu(openMenu === 'produto' ? null : 'produto')}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
-                    openMenu === 'produto'
-                      ? 'bg-[#f6f5f3] text-ink'
-                      : 'text-ink/80 hover:bg-[#f6f5f3] hover:text-ink'
-                  }`}
-                >
-                  <span>Produto</span>
-                  <ChevronDown
-                    size={14}
-                    aria-hidden="true"
-                    className={`transition-transform duration-150 ${
-                      openMenu === 'produto' ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-              </li>
-
-              {/* Dropdown 2: Para quem é */}
-              <li
-                onMouseEnter={() => handleMouseEnter('publico')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <button
-                  type="button"
-                  aria-expanded={openMenu === 'publico'}
-                  onClick={() => setOpenMenu(openMenu === 'publico' ? null : 'publico')}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
-                    openMenu === 'publico'
-                      ? 'bg-[#f6f5f3] text-ink'
-                      : 'text-ink/80 hover:bg-[#f6f5f3] hover:text-ink'
-                  }`}
-                >
-                  <span>Para quem é</span>
-                  <ChevronDown
-                    size={14}
-                    aria-hidden="true"
-                    className={`transition-transform duration-150 ${
-                      openMenu === 'publico' ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-              </li>
-
-              {/* Dropdown 3: Rastreio Fonológico */}
-              <li
-                onMouseEnter={() => handleMouseEnter('rastreio')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <button
-                  type="button"
-                  aria-expanded={openMenu === 'rastreio'}
-                  onClick={() => setOpenMenu(openMenu === 'rastreio' ? null : 'rastreio')}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
-                    openMenu === 'rastreio'
-                      ? 'bg-[#f6f5f3] text-ink'
-                      : 'text-ink/80 hover:bg-[#f6f5f3] hover:text-ink'
-                  }`}
-                >
-                  <span>Rastreio Fonológico</span>
-                  <ChevronDown
-                    size={14}
-                    aria-hidden="true"
-                    className={`transition-transform duration-150 ${
-                      openMenu === 'rastreio' ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-              </li>
-
-              {/* Link Direto: Sobre */}
+            <ul className="flex items-center gap-1">
+              {menus.map((menu) => (
+                <li key={menu.id} onMouseEnter={() => handleMouseEnter(menu.id)} onMouseLeave={handleMouseLeave}>
+                  <button
+                    type="button"
+                    aria-expanded={openMenu === menu.id}
+                    onClick={() => setOpenMenu(openMenu === menu.id ? null : menu.id)}
+                    className={navItemClass(openMenu === menu.id)}
+                  >
+                    {menu.label}
+                    <ChevronDown
+                      size={15}
+                      aria-hidden="true"
+                      className={`transition-transform duration-200 ${openMenu === menu.id ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                </li>
+              ))}
               <li>
-                <a
-                  href="#sobre"
-                  onClick={scrollToId('sobre', () => setOpenMenu(null))}
-                  className="inline-flex items-center rounded-full px-4 py-2 text-[14px] font-medium text-ink/80 transition-colors hover:bg-[#f6f5f3] hover:text-ink"
-                >
-                  Sobre
+                <a href="#sobre" onClick={scrollToId('sobre', close)} className={navItemClass(false)}>
+                  A plataforma
                 </a>
               </li>
             </ul>
           </nav>
 
-          {/* Ações à Direita: Acessibilidade, Ouvir Página, Entrar e CTA */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => setShowA11y(true)}
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#f6f5f3] px-3.5 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-[#ebe9e4]"
-              title="Opções de acessibilidade visual e motora"
+              className={`inline-flex size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors xl:w-auto xl:gap-2 xl:px-3 ${chipClass}`}
+              title="Acessibilidade"
             >
-              <PersonStanding size={15} aria-hidden="true" />
-              <span className="hidden sm:inline">Acessibilidade</span>
-              <span className="sr-only sm:hidden">Acessibilidade</span>
+              <PersonStanding size={17} aria-hidden="true" />
+              <span className="sr-only xl:not-sr-only xl:text-[14px] xl:font-semibold">Acessibilidade</span>
             </button>
-
-            <span className="hidden md:inline-flex">
-              <button
-                type="button"
-                aria-pressed={isPlayerOpen}
-                onClick={() => speakPageContent()}
-                className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium transition-colors ${
-                  isPlayerOpen
-                    ? 'bg-primary text-on-primary'
-                    : 'bg-[#f6f5f3] text-ink hover:bg-[#ebe9e4]'
-                }`}
-              >
-                <Volume2 size={15} aria-hidden="true" />
-                <span>Ouvir página</span>
-              </button>
-            </span>
-
+            <button
+              type="button"
+              aria-pressed={isPlayerOpen}
+              onClick={() => speakPageContent()}
+              className={`hidden size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border transition-colors md:inline-flex ${
+                isPlayerOpen ? 'border-mel bg-mel text-on-pastel' : chipClass
+              }`}
+              title="Ouvir página"
+            >
+              <Volume2 size={17} aria-hidden="true" />
+              <span className="sr-only">Ouvir página</span>
+            </button>
             <a
               href="#/acesso"
-              className="hidden sm:inline-flex min-h-10 items-center px-3.5 py-2 text-[14px] font-medium text-ink/85 transition-colors hover:text-primary"
+              className={`hidden min-h-10 items-center px-3 text-[15px] font-semibold underline-offset-[6px] hover:underline sm:inline-flex ${
+                dark ? 'text-white' : 'text-navy'
+              }`}
             >
               Entrar
             </a>
-
             <a
               href="#/triagem"
-              className="inline-flex min-h-10 items-center justify-center rounded-full bg-primary px-4.5 py-2 text-[14px] font-medium text-on-primary transition-colors hover:bg-navy"
+              onClick={() => iniciarTriagem()}
+              className={`${buttonClass(dark ? 'mel' : 'primary')} hidden min-h-10 py-2 md:inline-flex`}
             >
-              Iniciar triagem
+              Começar o rastreio
             </a>
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              aria-expanded={mobileOpen}
+              aria-controls="menu-movel"
+              className={`inline-flex size-10 items-center justify-center rounded-[10px] rounded-bl-[3px] border lg:hidden ${chipClass}`}
+            >
+              <Menu size={20} aria-hidden="true" />
+              <span className="sr-only">Abrir menu</span>
+            </button>
           </div>
 
-          {/* ==================== MEGA-MENU 1: PRODUTO ==================== */}
-          {openMenu === 'produto' && (
+          {active && (
             <div
-              onMouseEnter={() => handleMouseEnter('produto')}
+              onMouseEnter={() => handleMouseEnter(active.id)}
               onMouseLeave={handleMouseLeave}
-              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[780px] -translate-x-1/2 rounded-2xl border border-black/6 bg-surface p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] lg:grid lg:grid-cols-12 lg:gap-6"
+              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[820px] -translate-x-1/2 grid-cols-[1fr_250px] gap-6 rounded-[18px] rounded-tl-[4px] bg-quente p-6 text-ink shadow-[0_30px_70px_-20px_rgba(23,67,74,0.35)] lg:grid"
             >
-              <div className="col-span-8">
-                <p className="mb-3 px-2.5 text-[11px] font-medium tracking-wider text-muted uppercase">
-                  Arquitetura Clínica &amp; Acompanhamento
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {productItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
+              {active.faixas ? (
+                <ul className="grid grid-cols-2 gap-x-6">
+                  {active.faixas.map((f) => (
+                    <li key={f.idade} className="border-b border-line">
                       <a
-                        key={item.title}
-                        href={item.href}
-                        onClick={
-                          item.isSection
-                            ? scrollToId(item.href.replace('#', ''), () => setOpenMenu(null))
-                            : () => setOpenMenu(null)
-                        }
-                        className="group flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-[#f6f5f3]"
+                        href="#/triagem"
+                        onClick={() => {
+                          iniciarTriagem(f.atividade);
+                          close();
+                        }}
+                        className="group flex items-center gap-4 py-4"
                       >
-                        <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f6f5f3] text-primary transition-colors group-hover:bg-white">
-                          <Icon size={17} aria-hidden="true" />
+                        <span className="display w-[4.5rem] shrink-0 text-[34px] text-primary">{f.idade}</span>
+                        <span>
+                          <span className="block text-[15px] font-bold text-navy group-hover:text-primary">{f.title}</span>
+                          <span className="text-[13px] text-muted">anos · abrir atividade</span>
                         </span>
-                        <div>
-                          <p className="font-sans text-[14px] font-medium text-ink">
-                            {item.title}
-                          </p>
-                          <p className="mt-0.5 text-[12.5px] leading-snug text-muted">
-                            {item.desc}
-                          </p>
-                        </div>
                       </a>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="col-span-4 flex flex-col justify-between rounded-xl bg-[#f6f5f3] p-4">
-                <div className="space-y-3">
-                  <img
-                    src={consultorioImg}
-                    alt="Consultório fonoaudiológico em atendimento familiar"
-                    className="h-32 w-full rounded-lg object-cover"
-                  />
-                  <div>
-                    <p className="font-sans text-[14px] font-medium text-ink">
-                      Consultório e casa conectados
-                    </p>
-                    <p className="mt-1 text-[12px] leading-relaxed text-muted">
-                      Prontuário estruturado para o fonoaudiólogo e atividades guiadas para a família.
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href="#sobre"
-                  onClick={scrollToId('sobre', () => setOpenMenu(null))}
-                  className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline"
-                >
-                  <span>Explorar prévia dos painéis</span>
-                  <ArrowRight size={14} aria-hidden="true" />
-                </a>
-              </div>
-            </div>
-          )}
-
-          {/* ==================== MEGA-MENU 2: PARA QUEM É ==================== */}
-          {openMenu === 'publico' && (
-            <div
-              onMouseEnter={() => handleMouseEnter('publico')}
-              onMouseLeave={handleMouseLeave}
-              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[780px] -translate-x-1/2 rounded-2xl border border-black/6 bg-surface p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] lg:grid lg:grid-cols-12 lg:gap-6"
-            >
-              <div className="col-span-8">
-                <p className="mb-3 px-2.5 text-[11px] font-medium tracking-wider text-muted uppercase">
-                  Por Perfil de Cuidado
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {audienceItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <a
-                        key={item.title}
-                        href={item.href}
-                        onClick={
-                          item.isSection
-                            ? scrollToId(item.href.replace('#', ''), () => setOpenMenu(null))
-                            : () => setOpenMenu(null)
-                        }
-                        className="group flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-[#f6f5f3]"
-                      >
-                        <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f6f5f3] text-primary transition-colors group-hover:bg-white">
-                          <Icon size={17} aria-hidden="true" />
-                        </span>
-                        <div>
-                          <p className="font-sans text-[14px] font-medium text-ink">
-                            {item.title}
-                          </p>
-                          <p className="mt-0.5 text-[12.5px] leading-snug text-muted">
-                            {item.desc}
-                          </p>
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="col-span-4 flex flex-col justify-between rounded-xl bg-[#f6f5f3] p-4">
-                <div className="space-y-3">
-                  <img
-                    src={articulacaoImg}
-                    alt="Fonoaudióloga demonstrando ponto articulatório com criança"
-                    className="h-32 w-full rounded-lg object-cover"
-                  />
-                  <div>
-                    <p className="font-sans text-[14px] font-medium text-ink">
-                      Cuidado fonoaudiológico em rede
-                    </p>
-                    <p className="mt-1 text-[12px] leading-relaxed text-muted">
-                      Fluxos desenhados para clínicas, famílias e educadores com ética e privacidade.
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href="#/acesso"
-                  onClick={() => setOpenMenu(null)}
-                  className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline"
-                >
-                  <span>Acessar área da plataforma</span>
-                  <ArrowRight size={14} aria-hidden="true" />
-                </a>
-              </div>
-            </div>
-          )}
-
-          {/* ==================== MEGA-MENU 3: RASTREIO FONOLÓGICO ==================== */}
-          {openMenu === 'rastreio' && (
-            <div
-              onMouseEnter={() => handleMouseEnter('rastreio')}
-              onMouseLeave={handleMouseLeave}
-              className="absolute top-[calc(100%+10px)] left-1/2 z-50 hidden w-[780px] -translate-x-1/2 rounded-2xl border border-black/6 bg-surface p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] lg:grid lg:grid-cols-12 lg:gap-6"
-            >
-              <div className="col-span-8">
-                <p className="mb-3 px-2.5 text-[11px] font-medium tracking-wider text-muted uppercase">
-                  Triagem Lúdica por Faixa Etária (5 Rodadas)
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {triagemItems.map((item) => (
-                    <a
-                      key={item.age}
-                      href={item.href}
-                      onClick={() => setOpenMenu(null)}
-                      className="group flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-[#f6f5f3]"
-                    >
-                      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f6f5f3] text-primary transition-colors group-hover:bg-white">
-                        <Gamepad2 size={17} aria-hidden="true" />
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-sans text-[14px] font-medium text-ink">
-                            {item.title}
-                          </p>
-                          <span className="rounded-full bg-[#f6f5f3] px-2 py-0.5 text-[11px] font-medium text-primary group-hover:bg-white">
-                            {item.age}
-                          </span>
-                        </div>
-                        <p className="mt-0.5 text-[12.5px] leading-snug text-muted">
-                          {item.desc}
-                        </p>
-                      </div>
-                    </a>
+                    </li>
                   ))}
-                </div>
-              </div>
-
-              <div className="col-span-4 flex flex-col justify-between rounded-xl bg-[#f6f5f3] p-4">
-                <div className="space-y-3">
-                  <img
-                    src={silabasImg}
-                    alt="Criança montando sílabas com cartões ilustrados"
-                    className="h-32 w-full rounded-lg object-cover"
-                  />
-                  <div>
-                    <p className="font-sans text-[14px] font-medium text-ink">
-                      Rastreio aberto sem cadastro
-                    </p>
-                    <p className="mt-1 text-[12px] leading-relaxed text-muted">
-                      Devolutiva ética imediata ao final das 5 rodadas com relatório para o fonoaudiólogo.
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href="#/triagem"
-                  onClick={() => setOpenMenu(null)}
-                  className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline"
-                >
-                  <span>Abrir módulo de triagem</span>
-                  <ArrowRight size={14} aria-hidden="true" />
-                </a>
-              </div>
+                </ul>
+              ) : (
+                <ul className="grid grid-cols-2 content-start gap-x-6">
+                  {active.items.map((item) => (
+                    <li key={item.title}>
+                      <a
+                        href={`#${item.section}`}
+                        onClick={scrollToId(item.section, close)}
+                        className="group block border-b border-line py-4"
+                      >
+                        <span className="flex items-center gap-1.5 font-serif text-[19px] font-semibold text-navy group-hover:text-primary">
+                          {item.title}
+                          <ArrowUpRight size={15} aria-hidden="true" className="opacity-0 transition-opacity group-hover:opacity-100" />
+                        </span>
+                        <span className="mt-1 block text-[13.5px] leading-snug text-muted">{item.desc}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <figure className="relative overflow-hidden rounded-[14px] rounded-br-[4px]">
+                <img src={active.foto} alt={active.fotoAlt} className="h-full min-h-48 w-full object-cover" />
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3 pt-12 font-serif text-[17px] leading-tight text-white">
+                  {active.destaque}
+                </figcaption>
+              </figure>
             </div>
           )}
         </div>
       </header>
+
+      {mobileOpen && (
+        <div
+          id="menu-movel"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu"
+          className="on-dark fixed inset-0 z-50 flex flex-col overflow-y-auto bg-ocean-deep px-5 pt-5 pb-8 text-white lg:hidden"
+        >
+          <div className="flex items-center justify-between">
+            <Logo tone="claro" />
+            <button
+              type="button"
+              autoFocus
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex size-11 items-center justify-center rounded-[10px] rounded-bl-[3px] border border-white/25"
+            >
+              <X size={22} aria-hidden="true" />
+              <span className="sr-only">Fechar menu</span>
+            </button>
+          </div>
+          <nav aria-label="Principal (celular)" className="mt-10 flex-1">
+            <p className="text-[14px] font-semibold text-on-band-muted">Rastreio por idade</p>
+            <ul className="mt-3 grid grid-cols-2 gap-2">
+              {menus[2].faixas.map((f) => (
+                <li key={f.idade}>
+                  <a
+                    href="#/triagem"
+                    onClick={() => {
+                      iniciarTriagem(f.atividade);
+                      setMobileOpen(false);
+                    }}
+                    className="block rounded-[12px] rounded-bl-[3px] bg-white/8 p-3"
+                  >
+                    <span className="display block text-[30px] text-mel">{f.idade}</span>
+                    <span className="text-[14px] font-semibold">{f.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <ul className="mt-8 border-t border-white/15">
+              {[
+                ['Para quem é', 'para-quem'],
+                ['Como funciona', 'jornada'],
+                ['A plataforma', 'sobre'],
+                ['Para famílias', 'familias'],
+              ].map(([label, id]) => (
+                <li key={id} className="border-b border-white/15">
+                  <a
+                    href={`#${id}`}
+                    onClick={scrollToId(id, () => setMobileOpen(false))}
+                    className="flex min-h-14 items-center justify-between font-serif text-[24px]"
+                  >
+                    {label}
+                    <ArrowUpRight size={20} aria-hidden="true" className="text-mel" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="mt-8 grid gap-3">
+            <a href="#/acesso" className={`${buttonClass('claro', 'lg')} w-full`}>
+              Entrar na plataforma
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileOpen(false);
+                speakPageContent();
+              }}
+              className={`${buttonClass('claro', 'lg')} w-full`}
+            >
+              <Volume2 size={18} aria-hidden="true" /> Ouvir página
+            </button>
+          </div>
+        </div>
+      )}
 
       <A11yModal isOpen={showA11y} onClose={() => setShowA11y(false)} />
     </>

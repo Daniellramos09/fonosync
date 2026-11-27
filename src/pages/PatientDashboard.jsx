@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AudioWaveform, ClipboardList, Gamepad2, Home, LogOut, Menu, MessageSquare, PersonStanding, School, Settings, Volume2, X } from 'lucide-react';
-import logoImg from '../assets/images/ModeloA_Semnome.jpg';
+import Logo from '../components/Logo';
 import A11yModal from '../components/A11yModal';
 import { buttonClass } from '../components/buttonStyles';
 import { useA11y } from '../hooks/useA11y';
@@ -69,8 +69,7 @@ export default function PatientDashboard() {
       {/* Barra de Topo exclusiva para Mobile */}
       <div className="flex items-center justify-between border-b border-line bg-band p-4 text-white md:hidden">
         <div className="flex items-center gap-2.5">
-          <img src={logoImg} alt="FonoSync Logo" className="h-8 w-auto rounded bg-white object-contain p-0.5" />
-          <span className="font-serif text-lg font-bold text-white">FonoSync</span>
+          <Logo tone="claro" markClassName="size-8" />
         </div>
         <button
           type="button"
@@ -90,8 +89,7 @@ export default function PatientDashboard() {
       >
         <div>
           <div className="mb-8 hidden items-center gap-3 md:flex">
-            <img src={logoImg} alt="FonoSync Logo" className="h-9 w-auto rounded bg-white object-contain p-0.5" />
-            <span className="font-serif text-xl font-bold text-white">FonoSync</span>
+            <Logo tone="claro" />
           </div>
 
           <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-on-band-muted">Área do paciente</p>
