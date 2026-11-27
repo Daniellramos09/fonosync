@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import logoImg from '../assets/images/ModeloA_Semnome.jpg';
 import A11yModal from './A11yModal';
+import Logo from './Logo';
 import Button from './Button';
 import InfoDialog from './InfoDialog';
 import Notice from './Notice';
 import { INFO_PAGES } from '../utils/constants';
 
 const fieldClass =
-  'min-h-11 w-full rounded-[10px] border border-black/10 bg-surface px-3.5 text-[15px] text-ink focus:border-primary focus:outline-hidden';
+  'min-h-12 w-full rounded-[10px] rounded-bl-[3px] border-[1.5px] border-line bg-surface px-3.5 text-[16px] text-ink transition-colors hover:border-primary/40 focus:border-primary';
 
 function ContactForm() {
   const [sent, setSent] = useState(false);
@@ -63,55 +63,32 @@ export default function Footer() {
 
   const info = dialog && dialog !== 'contato' ? INFO_PAGES[dialog] : null;
   const linkClass =
-    'text-[15px] text-[#5e5e5e] transition-colors hover:text-ink text-left underline-offset-4 hover:underline';
+    'text-left text-[16px] text-white/80 underline-offset-[6px] transition-colors hover:text-white hover:underline';
 
   return (
-    <footer className="border-t border-black/8 bg-[#f6f5f3] text-ink">
-      <div className="mx-auto max-w-[1240px] px-6 py-20 md:px-10">
-        <div className="flex flex-col justify-between gap-14 border-b border-black/8 pb-16 lg:flex-row lg:items-start">
-          <div className="max-w-md space-y-4">
-            <div className="flex items-center gap-3">
-              <img
-                src={logoImg}
-                alt="FonoSync"
-                className="h-10 w-10 rounded-[10px] border border-black/8 bg-white object-contain"
-              />
-              <div>
-                <span className="font-sans text-xl font-medium tracking-[-0.03em] text-ink block leading-none">
-                  FonoSync
-                </span>
-                <span className="mt-1 block text-xs font-medium text-[#5e5e5e]">
-                  Cuidado Fonoaudiológico Integrado
-                </span>
-              </div>
-            </div>
-            <p className="text-[15px] leading-[1.6] text-[#5e5e5e]">
-              Plataforma acadêmico-clínica desenvolvida para apoiar o acompanhamento fonoaudiológico
-              contínuo entre consultório, família e ambiente escolar. As atividades de rastreio inicial
-              não substituem a avaliação clínica presencial.
+    <footer className="on-dark bg-ocean-deep text-white">
+      <div className="mx-auto max-w-[1320px] px-5 pt-20 pb-10 md:px-10">
+        <div className="grid gap-14 border-b border-white/15 pb-16 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-24">
+          <div>
+            <Logo tone="claro" markClassName="size-10" />
+            <p className="display mt-10 max-w-[16ch] text-[40px] sm:text-[56px]">
+              Cada criança encontra a sua voz no seu tempo.
+            </p>
+            <p className="mt-6 max-w-[52ch] text-[15px] leading-[1.6] text-white/72">
+              Plataforma acadêmico-clínica para o acompanhamento fonoaudiológico entre consultório,
+              família e escola. As atividades de rastreio não substituem a avaliação presencial.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-12 sm:grid-cols-3">
+          <nav aria-label="Rodapé" className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:gap-16">
             <div className="flex flex-col items-start gap-3">
-              <span className="font-sans text-sm font-medium tracking-[-0.01em] text-ink">
-                Plataforma
-              </span>
-              <a href="#/triagem" className={linkClass}>
-                Rastreio Fonológico
-              </a>
-              <a href="#/acesso" className={linkClass}>
-                Prontuário do Profissional
-              </a>
-              <a href="#/acesso" className={linkClass}>
-                Ambiente da Família
-              </a>
+              <p className="text-[13px] font-semibold text-on-band-muted">Plataforma</p>
+              <a href="#/triagem" className={linkClass}>Rastreio fonológico</a>
+              <a href="#/acesso" className={linkClass}>Área do profissional</a>
+              <a href="#/acesso" className={linkClass}>Área da família</a>
             </div>
-
             <div className="flex flex-col items-start gap-3">
-              <span className="font-sans text-sm font-medium tracking-[-0.01em] text-ink">
-                Diretrizes &amp; Ética
-              </span>
+              <p className="text-[13px] font-semibold text-on-band-muted">Ética</p>
               <button type="button" onClick={() => setDialog('pesquisa')} className={linkClass}>
                 Pesquisa e validação
               </button>
@@ -119,26 +96,21 @@ export default function Footer() {
                 Privacidade e LGPD
               </button>
             </div>
-
             <div className="flex flex-col items-start gap-3">
-              <span className="font-sans text-sm font-medium tracking-[-0.01em] text-ink">
-                Suporte &amp; Inclusão
-              </span>
+              <p className="text-[13px] font-semibold text-on-band-muted">Suporte</p>
               <button type="button" onClick={() => setShowA11y(true)} className={linkClass}>
-                Painel de acessibilidade
+                Acessibilidade
               </button>
               <button type="button" onClick={() => setDialog('contato')} className={linkClass}>
                 Contato acadêmico
               </button>
             </div>
-          </div>
+          </nav>
         </div>
 
-        <div className="pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[14px] text-[#5e5e5e]">
-          <p>© {new Date().getFullYear()} FonoSync · Projeto Acadêmico-Clínico (FATEC).</p>
-          <p className="text-xs text-[#5e5e5e]">
-            Conformidade LGPD · Rastreio não configura diagnóstico clínico
-          </p>
+        <div className="flex flex-col items-start justify-between gap-3 pt-8 text-[14px] text-white/65 sm:flex-row sm:items-center">
+          <p>© {new Date().getFullYear()} FonoSync · Projeto acadêmico-clínico (FATEC)</p>
+          <p>Rastreio não é diagnóstico clínico</p>
         </div>
       </div>
 

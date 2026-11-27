@@ -1,11 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowLeft,
+  ArrowRight,
+  Check,
   Download,
+  Info,
+  PersonStanding,
   RotateCcw,
   Search,
+  ThumbsDown,
+  ThumbsUp,
   Volume2,
 } from 'lucide-react';
+import Logo from './Logo';
+import { Capivara, Comemoracao, Sagui, Tartaruga, Tucano } from './Personagens';
+import { lerInicioTriagem, limparInicioTriagem } from '../utils/triagemInicio';
 import A11yModal from './A11yModal';
 import DataTable from './DataTable';
 import Notice from './Notice';
@@ -130,7 +139,14 @@ const checklistItems = [
 ];
 
 export default function TriagemGame() {
-  const [screenStack, setScreenStack] = useState(['home']);
+  const [screenStack, setScreenStack] = useState(() => {
+    const inicio = lerInicioTriagem();
+    return inicio ? ['home', inicio] : ['home'];
+  });
+
+  useEffect(() => {
+    limparInicioTriagem();
+  }, []);
 
   // Etapa 2: Jogo Fonético (2-4 anos)
   const [phoneticIndex, setPhoneticIndex] = useState(0);
@@ -272,8 +288,8 @@ export default function TriagemGame() {
     const isCorrect = childSaidRimes === currentPair.rima;
 
     const feedbackText = isCorrect
-      ? `✅ Resposta correta! ${currentPair.w1} e ${currentPair.w2} ${currentPair.rima ? 'rimam' : 'não rimam'}.`
-      : `❌ Resposta registrada. ${currentPair.w1} e ${currentPair.w2} ${currentPair.rima ? 'rimam' : 'não rimam'}.`;
+      ? `Resposta esperada. ${currentPair.w1} e ${currentPair.w2} ${currentPair.rima ? 'rimam' : 'não rimam'}.`
+      : `Resposta registrada. ${currentPair.w1} e ${currentPair.w2} ${currentPair.rima ? 'rimam' : 'não rimam'}.`;
 
     setRimaFeedback(feedbackText);
 
@@ -362,44 +378,57 @@ export default function TriagemGame() {
   // ==========================================
   // TELA 1: HOME (ESCOLHA DA FAIXA ETÁRIA)
   // ==========================================
+  const atividades = [
+    { id: 'form02', idade: '0–2', titulo: 'Marcos da comunicação', quem: 'Para pais e cuidadores', desc: 'Balbucio, primeiras palavras e resposta a sons, em perguntas de sim ou não.', campo: 'bg-coral', Personagem: Capivara },
+    { id: 'game24', idade: '2–4', titulo: 'Jogo da Palavra', quem: 'A criança nomeia figuras', desc: 'Você toca no que ouviu. Trocas como vaca → faca ficam registradas.', campo: 'bg-salvia', Personagem: Tucano },
+    { id: 'rima45', idade: '4–5', titulo: 'Jogo da Rima', quem: 'Começa com um exemplo', desc: 'Gato e pato rimam? Rodadas curtas de consciência fonológica.', campo: 'bg-lavanda', Personagem: Sagui },
+    { id: 'check6', idade: '6+', titulo: 'Checklist escolar', quem: 'Para professores', desc: 'O que foi observado em sala nas últimas semanas: fala, leitura e compreensão.', campo: 'bg-mel', Personagem: Tartaruga },
+  ];
+
   const renderHomeScreen = () => (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="font-serif text-3xl font-extrabold text-navy md:text-4xl">
-          Rastreio Fonoaudiológico Precoce
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-base text-muted">
-          Atividades lúdicas sem áudio para apoio a pais, familiares e educadores.
-          Quem escuta a criança é você! Selecione a faixa etária para iniciar.
+    <div className="space-y-10">
+      <div>
+        <h1 className="display max-w-[16ch] text-[38px] text-navy sm:text-[48px]">
+          Qual a idade da criança?
+        </h1>
+        <p className="mt-4 max-w-[56ch] text-[17px] leading-[1.6] text-muted">
+          Atividades curtas, sem microfone e sem cadastro. Quem escuta a criança é você: escolha a
+          faixa etária e siga as instruções na tela.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          { id: 'form02', emoji: '👶', title: '0 – 2 anos', subtitle: 'Primeira Infância', game: '📋 Formulário de Marcos', desc: 'Verifica marcos de comunicação como balbucio, primeiras palavras e resposta a sons.' },
-          { id: 'game24', emoji: '🐄', title: '2 – 4 anos', subtitle: 'Pré-Escolar Inicial', game: '🎮 Jogo Fonético', desc: 'Identifica trocas e simplificações comuns na fala através de opções rápidas ou digitação.' },
-          { id: 'rima45', emoji: '🎵', title: '4 – 5 anos', subtitle: 'Pré-Escolar Avançado', game: '🎵 Jogo da Rima', desc: 'Avalia percepção de rimas e consciência fonológica com instruções narradas pelo adulto.' },
-          { id: 'check6', emoji: '🏫', title: '6+ anos', subtitle: 'Ensino Fundamental', game: '✅ Checklist Escolar', desc: 'Observação de dificuldades persistentes na fala e no aprendizado em sala de aula.' },
-        ].map((card, index) => (
-          <div key={card.id} className="relative overflow-hidden rounded-[20px] border border-line bg-white p-6 text-center shadow-[0_8px_32px_rgba(0,0,0,0.13)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.16)] flex flex-col justify-between">
-            <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: ['linear-gradient(90deg, #74b9ff, #0984e3)', 'linear-gradient(90deg, #fd79a8, #e84393)', 'linear-gradient(90deg, #55efc4, #00b894)', 'linear-gradient(90deg, #fdcb6e, #e17055)'][index] }} />
-            <div>
-              <span className="mb-4 block text-5xl">{card.emoji}</span>
-              <div className="font-serif text-2xl font-extrabold text-navy">{card.title}</div>
-              <div className="mt-1 text-sm font-semibold text-muted">{card.subtitle}</div>
-              <div className="mt-4 rounded-xl bg-surface px-3 py-2 text-xs font-bold text-ink">{card.game}</div>
-              <div className="mt-4 text-sm leading-relaxed text-muted">{card.desc}</div>
-            </div>
+      <ul className="grid gap-4 sm:grid-cols-2">
+        {atividades.map(({ Personagem, ...a }) => (
+          <li key={a.id}>
             <button
               type="button"
-              onClick={() => handleSelectActivity(card.id)}
-              className="mt-6 w-full rounded-xl bg-[#0284C7] py-3 text-sm font-extrabold text-white transition hover:bg-sky-700 shadow-sm cursor-pointer"
+              onClick={() => handleSelectActivity(a.id)}
+              className={`group relative flex h-full w-full flex-col overflow-hidden rounded-[22px] rounded-bl-[5px] p-6 text-left text-on-pastel transition-transform duration-200 hover:-translate-y-0.5 ${a.campo}`}
             >
-              Iniciar Atividade →
+              <span className="flex items-start justify-between gap-4">
+                <span>
+                  <span className="display block text-[44px]">{a.idade}</span>
+                  <span className="text-[14px] font-semibold opacity-75">anos</span>
+                </span>
+                <Personagem className="-mt-2 -mr-2 w-28 shrink-0 sm:w-32" animated={false} />
+              </span>
+              <span className="mt-4 block font-serif text-[24px] leading-tight font-semibold">{a.titulo}</span>
+              <span className="mt-1 block text-[14px] font-semibold opacity-75">{a.quem}</span>
+              <span className="mt-3 block max-w-[38ch] flex-1 text-[15px] leading-[1.55] opacity-85">{a.desc}</span>
+              <span className="mt-5 inline-flex items-center gap-2 text-[15px] font-bold">
+                Começar
+                <ArrowRight size={17} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
+              </span>
             </button>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
+
+      <p className="flex items-start gap-2 text-[14px] leading-[1.55] text-muted">
+        <Info size={17} aria-hidden="true" className="mt-0.5 shrink-0 text-primary" />
+        O rastreio não é diagnóstico. Ele indica se vale a pena procurar um fonoaudiólogo para uma
+        avaliação presencial.
+      </p>
     </div>
   );
 
@@ -416,49 +445,51 @@ export default function TriagemGame() {
             <ArrowLeft size={16} aria-hidden="true" /> Voltar
           </button>
           <div>
-            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo Fonético (2 a 4 anos)</h2>
-            <span className="text-xs text-muted">Triagem lúdica de trocas fonéticas</span>
+            <h2 className="font-serif text-2xl font-semibold text-navy">Jogo da Palavra · 2 a 4 anos</h2>
+            <span className="text-sm text-muted">Trocas e simplificações na fala</span>
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-          <div className="flex items-center gap-4 bg-gradient-to-r from-pink-500 to-rose-600 p-6 text-white">
-            <div className="text-4xl">🎮</div>
+        <div className="overflow-hidden rounded-[22px] rounded-bl-[5px] border border-line bg-surface">
+          <div className="on-dark flex items-center gap-4 bg-ocean px-6 py-5 text-white">
+            <Tucano key={phoneticIndex} className={`w-20 shrink-0 ${phoneticFeedback?.isCorrect ? 'char-pula' : ''}`} galho={false} />
             <div>
-              <h3 className="font-serif text-2xl font-extrabold">Identificação de Trocas Fonéticas</h3>
-              <p className="mt-1 text-sm text-white/90">
-                Mostre a imagem para a criança e pergunte: <strong>"O que é isso?"</strong>. Registre abaixo o que ela falou.
-              </p>
+              <h3 className="font-serif text-[22px] font-semibold">Mostre a figura e pergunte: “O que é isso?”</h3>
+              <p className="mt-1 text-[15px] text-white/85">Depois toque no que a criança falou. Não corrija, apenas registre.</p>
             </div>
           </div>
 
           <div className="p-8">
-            <div className="mb-6 flex justify-between items-center text-xs font-bold text-muted">
+            <div className="mb-6 flex items-center justify-between gap-4 text-sm font-semibold text-muted">
               <span>Palavra {phoneticIndex + 1} de {phoneticWords.length}</span>
-              <span className="rounded-full bg-pink-100 px-3 py-1 text-pink-700">Opções Rápidas sem Áudio</span>
+              <span className="flex gap-1" aria-hidden="true">
+                {phoneticWords.map((w, i) => (
+                  <span key={w.id} className={`h-1.5 w-6 rounded-full ${i <= phoneticIndex ? 'bg-primary' : 'bg-line'}`} />
+                ))}
+              </span>
             </div>
 
             {/* Imagem e Alvo */}
             <div className="mb-8 text-center">
-              <div className="inline-block rounded-[24px] border-4 border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100 px-10 py-8 shadow-sm">
-                <div className="text-8xl">{currentWord.emoji}</div>
-                <div className="mt-3 font-serif text-3xl font-black text-navy">{currentWord.name}</div>
-                <div className="mt-1 text-xs font-semibold text-muted">Som-alvo: {currentWord.phonemes}</div>
+              <div className="inline-block rounded-[26px] rounded-bl-[6px] bg-mel px-12 py-8 text-on-pastel">
+                <div className="text-8xl" role="img" aria-label={currentWord.name.toLowerCase()}>{currentWord.emoji}</div>
+                <div className="mt-3 font-serif text-4xl font-semibold">{currentWord.name}</div>
+                <div className="mt-1 text-sm font-semibold opacity-75">Som-alvo: {currentWord.phonemes}</div>
               </div>
             </div>
 
             {/* Feedback da rodada */}
             {phoneticFeedback && (
-              <div className={`mb-6 p-4 rounded-xl text-center text-sm font-bold border ${phoneticFeedback.isCorrect ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-amber-50 border-amber-300 text-amber-800'}`}>
-                {phoneticFeedback.isCorrect ? '✅ Pronúncia padrão registrada!' : `⚠️ Registrado: "${phoneticFeedback.spoken}" — ${phoneticFeedback.note}`}
+              <div role="status" className={`mb-6 rounded-[14px] rounded-bl-[3px] p-4 text-center text-[15px] font-semibold text-on-pastel ${phoneticFeedback.isCorrect ? 'bg-salvia' : 'bg-coral/60'}`}>
+                {phoneticFeedback.isCorrect ? 'Pronúncia esperada registrada.' : `Registrado: "${phoneticFeedback.spoken}" · ${phoneticFeedback.note}`}
               </div>
             )}
 
             {/* Botões Rápidos recomendados pela especificação */}
             {!isTypingCustom ? (
               <div className="space-y-4">
-                <p className="text-sm font-bold text-slate-700 text-center">
-                  O que a criança disse? (Toque na opção mais próxima):
+                <p className="text-center text-[15px] font-semibold text-ink">
+                  O que a criança disse? Toque na opção mais próxima.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {currentWord.quickOptions.map((opt, i) => (
@@ -466,7 +497,7 @@ export default function TriagemGame() {
                       key={i}
                       type="button"
                       onClick={() => handlePhoneticSelection(opt)}
-                      className="rounded-2xl border-2 border-line bg-surface hover:border-pink-500 hover:bg-pink-50/50 p-4 text-center transition font-bold text-lg text-ink shadow-xs"
+                      className="rounded-[16px] rounded-bl-[4px] border-2 border-line bg-surface p-4 text-center text-lg font-bold text-ink transition-colors hover:border-primary hover:bg-salvia/40"
                     >
                       "{opt.label}"
                       <span className="block text-[11px] font-normal text-muted mt-1">{opt.note}</span>
@@ -478,14 +509,14 @@ export default function TriagemGame() {
                   <button
                     type="button"
                     onClick={() => handlePhoneticSelection(null, true)}
-                    className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
+                    className={buttonClass('secondary')}
                   >
                     A criança não respondeu
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsTypingCustom(true)}
-                    className="rounded-xl border border-pink-300 bg-pink-50 px-4 py-2 text-xs font-bold text-pink-700 hover:bg-pink-100"
+                    className={buttonClass('tertiary')}
                   >
                     Outra pronúncia... (Digitar)
                   </button>
@@ -493,22 +524,23 @@ export default function TriagemGame() {
               </div>
             ) : (
               <div className="space-y-4 max-w-md mx-auto">
-                <label className="block text-sm font-bold text-slate-700 text-center">
+                <label htmlFor="pronuncia-digitada" className="block text-center text-[15px] font-semibold text-ink">
                   Digite exatamente como a criança pronunciou:
                 </label>
                 <div className="flex gap-2">
                   <input
+                    id="pronuncia-digitada"
                     type="text"
                     value={customWordInput}
                     onChange={(e) => setCustomWordInput(e.target.value)}
                     placeholder="Ex.: faca, baca, tata..."
-                    className="flex-1 rounded-xl border-2 border-line px-4 py-3 text-base font-bold outline-none focus:border-pink-500"
+                    className="min-h-12 flex-1 rounded-[12px] rounded-bl-[3px] border-2 border-line bg-surface px-4 text-base font-bold focus:border-primary"
                   />
                   <button
                     type="button"
                     disabled={!customWordInput.trim()}
                     onClick={() => handlePhoneticSelection(customWordInput)}
-                    className="rounded-xl bg-pink-600 disabled:opacity-50 text-white px-5 py-3 font-bold text-sm"
+                    className={buttonClass('primary')}
                   >
                     Confirmar
                   </button>
@@ -517,9 +549,9 @@ export default function TriagemGame() {
                   <button
                     type="button"
                     onClick={() => setIsTypingCustom(false)}
-                    className="text-xs font-bold text-muted hover:underline"
+                    className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
                   >
-                    ← Voltar para opções rápidas
+                    Voltar para as opções rápidas
                   </button>
                 </div>
               </div>
@@ -542,26 +574,24 @@ export default function TriagemGame() {
             <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
               <ArrowLeft size={16} aria-hidden="true" /> Voltar
             </button>
-            <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima (4 a 5 anos)</h2>
+            <h2 className="font-serif text-2xl font-semibold text-navy">Jogo da Rima · 4 a 5 anos</h2>
           </div>
 
-          <div className="rounded-[20px] border border-line bg-white p-8 shadow-sm space-y-6 text-center">
-            <div className="size-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-3xl mx-auto">
-              🎵
-            </div>
-            <h3 className="font-serif text-2xl font-bold text-navy">Como funciona a brincadeira?</h3>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <div className="space-y-6 rounded-[22px] rounded-bl-[5px] border border-line bg-surface p-8 text-center">
+            <Sagui className="mx-auto w-32" letra="r" />
+            <h3 className="font-serif text-2xl font-semibold text-navy">Como funciona a brincadeira?</h3>
+            <p className="text-base leading-relaxed text-muted">
               Vamos testar a percepção sonora da criança. Palavras rimam quando terminam com o mesmo som!
             </p>
 
-            <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6 space-y-3">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800">Exemplo para treinar</span>
-              <div className="flex items-center justify-center gap-6 text-2xl font-black text-navy">
-                <span>🐱 GATO</span>
-                <span className="text-muted">e</span>
-                <span>🦆 PATO</span>
+            <div className="space-y-3 rounded-[18px] rounded-bl-[4px] bg-lavanda p-6 text-on-pastel">
+              <span className="text-sm font-semibold opacity-80">Exemplo para treinar</span>
+              <div className="flex items-center justify-center gap-6 font-serif text-3xl font-semibold">
+                <span>GA<span className="text-coral-ink">TO</span></span>
+                <span className="font-sans text-lg font-semibold opacity-70">e</span>
+                <span>PA<span className="text-coral-ink">TO</span></span>
               </div>
-              <p className="text-xs text-emerald-900">
+              <p className="text-sm">
                 Terminam com o mesmo som (<strong>-ATO</strong>), então <strong>SIM, elas rimam!</strong>
               </p>
             </div>
@@ -569,9 +599,9 @@ export default function TriagemGame() {
             <button
               type="button"
               onClick={() => setRimaExampleFinished(true)}
-              className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 text-base font-bold transition shadow-sm cursor-pointer"
+              className={`${buttonClass('primary', 'lg')} w-full`}
             >
-              Entendi! Começar as Rodadas →
+              Entendi, começar as rodadas <ArrowRight size={18} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -587,53 +617,54 @@ export default function TriagemGame() {
           <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
             <ArrowLeft size={16} aria-hidden="true" /> Voltar
           </button>
-          <h2 className="font-serif text-2xl font-extrabold text-navy">Jogo da Rima</h2>
-          <span className="text-xs text-muted">Rodada {rimaIndex + 1} de {rimaPairs.length}</span>
+          <h2 className="font-serif text-2xl font-semibold text-navy">Jogo da Rima</h2>
+          <span className="text-sm font-semibold text-muted">Rodada {rimaIndex + 1} de {rimaPairs.length}</span>
         </div>
 
-        <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_8px_32px_rgba(0,0,0,0.13)]">
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-6 text-white text-center">
-            <h3 className="font-serif text-2xl font-extrabold">Essas palavras rimam?</h3>
-            <p className="mt-1 text-sm text-white/90">Leia em voz alta para a criança e pergunte o que ela acha:</p>
+        <div className="overflow-hidden rounded-[22px] rounded-bl-[5px] border border-line bg-surface">
+          <div className="on-dark flex items-center gap-4 bg-ocean px-6 py-5 text-white">
+            <Tucano key={rimaIndex} className={`w-20 shrink-0 ${rimaFeedback ? 'char-pula' : ''}`} galho={false} />
+            <div>
+              <h3 className="font-serif text-[22px] font-semibold">Essas palavras rimam?</h3>
+              <p className="mt-1 text-[15px] text-white/85">Leia as duas em voz alta e pergunte o que a criança acha.</p>
+            </div>
           </div>
 
           <div className="p-8">
             <div className="mb-8 flex flex-wrap items-center justify-center gap-5">
-              <div className="min-w-[150px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-xs">
-                <span className="mb-3 block text-6xl">{currentPair.e1}</span>
-                <div className="font-serif text-3xl font-extrabold text-navy">{currentPair.w1}</div>
+              <div className="min-w-[150px] flex-1 rounded-[22px] rounded-bl-[5px] bg-mel p-6 text-center text-on-pastel">
+                <span className="mb-3 block text-6xl" role="img" aria-label={currentPair.w1.toLowerCase()}>{currentPair.e1}</span>
+                <div className="font-serif text-3xl font-semibold">{currentPair.w1}</div>
               </div>
-              <div className="text-3xl font-black text-muted">VS</div>
-              <div className="min-w-[150px] flex-1 rounded-[20px] border-2 border-line bg-white p-6 text-center shadow-xs">
-                <span className="mb-3 block text-6xl">{currentPair.e2}</span>
-                <div className="font-serif text-3xl font-extrabold text-navy">{currentPair.w2}</div>
+              <div className="font-serif text-2xl font-semibold text-muted">e</div>
+              <div className="min-w-[150px] flex-1 rounded-[22px] rounded-bl-[5px] bg-lavanda p-6 text-center text-on-pastel">
+                <span className="mb-3 block text-6xl" role="img" aria-label={currentPair.w2.toLowerCase()}>{currentPair.e2}</span>
+                <div className="font-serif text-3xl font-semibold">{currentPair.w2}</div>
               </div>
             </div>
 
             <div className="mb-6 text-center">
-              <p className="text-xl font-bold text-ink">
-                🎤 A criança respondeu que:
-              </p>
+              <p className="text-lg font-semibold text-ink">A criança respondeu que:</p>
               <div className="mt-5 flex flex-wrap justify-center gap-4">
                 <button
                   type="button"
                   onClick={() => handleRimaAnswer(true)}
-                  className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 px-8 py-4 text-lg font-extrabold text-white shadow-sm transition"
+                  className={buttonClass('primary', 'lg')}
                 >
-                  👍 SIM, rimam!
+                  <ThumbsUp size={18} aria-hidden="true" /> Sim, rimam
                 </button>
                 <button
                   type="button"
                   onClick={() => handleRimaAnswer(false)}
-                  className="rounded-2xl bg-orange-600 hover:bg-orange-700 px-8 py-4 text-lg font-extrabold text-white shadow-sm transition"
+                  className={buttonClass('secondary', 'lg')}
                 >
-                  👎 NÃO rimam
+                  <ThumbsDown size={18} aria-hidden="true" /> Não rimam
                 </button>
               </div>
             </div>
 
             {rimaFeedback && (
-              <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-center text-sm font-bold text-emerald-800">
+              <div role="status" className="rounded-[14px] rounded-bl-[3px] bg-salvia p-4 text-center text-[15px] font-semibold text-on-pastel">
                 {rimaFeedback}
               </div>
             )}
@@ -651,7 +682,7 @@ export default function TriagemGame() {
       return (
         <div className="p-8 text-center">
           <p className="text-sm text-muted">Nenhum resultado de rastreio encontrado.</p>
-          <button type="button" onClick={() => showScreen('home')} className="mt-4 text-sm font-bold text-[#0284C7]">
+          <button type="button" onClick={() => showScreen('home')} className="mt-4 text-sm font-bold text-primary">
             Voltar ao início
           </button>
         </div>
@@ -667,23 +698,28 @@ export default function TriagemGame() {
           <button type="button" onClick={() => showScreen('home')} className={buttonClass('tertiary')}>
             <ArrowLeft size={16} aria-hidden="true" /> Início
           </button>
-          <h2 className="font-serif text-2xl font-extrabold text-navy">Resultado do Rastreio</h2>
+          <h2 className="font-serif text-2xl font-semibold text-navy">Resultado do rastreio</h2>
         </div>
 
-        <div className="overflow-hidden rounded-[20px] border border-line bg-white shadow-sm">
-          {/* Header por nível de atenção */}
-          <div className={`p-6 text-white ${isEsperado ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : isAtencao ? 'bg-gradient-to-r from-amber-500 to-orange-600' : 'bg-gradient-to-r from-rose-500 to-pink-600'}`}>
-            <span className="text-xs font-bold uppercase tracking-wider text-white/90">
-              {currentResult.activity} · {currentResult.age}
-            </span>
-            <h3 className="font-serif text-2xl sm:text-3xl font-extrabold mt-1">
-              {isEsperado ? 'Desenvolvimento Dentro do Esperado' : isAtencao ? 'Pontos que Merecem Atenção' : 'Recomendamos Conversar com Fonoaudiólogo'}
-            </h3>
+        <div className="overflow-hidden rounded-[22px] rounded-bl-[5px] border border-line bg-surface">
+          {/* Cabeçalho por nível de atenção: cor e personagem, sem alarme */}
+          <div className={`flex flex-col items-start gap-4 p-6 text-on-pastel sm:flex-row sm:items-end sm:justify-between ${isEsperado ? 'bg-salvia' : isAtencao ? 'bg-mel' : 'bg-coral'}`}>
+            <div>
+              <span className="text-sm font-semibold opacity-80">
+                {currentResult.activity} · {currentResult.age}
+              </span>
+              <h3 className="mt-1 font-serif text-2xl font-semibold sm:text-3xl">
+                {isEsperado ? 'Desenvolvimento dentro do esperado' : isAtencao ? 'Alguns pontos merecem atenção' : 'Vale conversar com um fonoaudiólogo'}
+              </h3>
+            </div>
+            <Comemoracao>
+              <Capivara acenando title="Capivara do FonoSync acenando" className="w-36 sm:w-40" />
+            </Comemoracao>
           </div>
 
           <div className="p-6 md:p-8 space-y-6">
             {/* Texto Acolhedor conforme especificação */}
-            <div className="text-sm sm:text-base leading-relaxed text-slate-700 space-y-3">
+            <div className="space-y-3 text-base leading-relaxed text-ink">
               {isEsperado && (
                 <p>
                   Para a faixa de <strong>{currentResult.age}</strong>, o desempenho ficou dentro do esperado. 
@@ -706,22 +742,23 @@ export default function TriagemGame() {
             </div>
 
             {/* Aviso fixo obrigatório */}
-            <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-xs font-bold text-sky-900 text-center">
-              ⚠️ Este resultado não é um diagnóstico. Ele apenas indica se vale a pena procurar um fonoaudiólogo para avaliação.
-            </div>
+            <p className="flex items-start gap-2 rounded-[14px] rounded-bl-[3px] bg-nevoa p-4 text-[14px] font-semibold text-navy">
+              <Info size={17} aria-hidden="true" className="mt-0.5 shrink-0 text-primary" />
+              Este resultado não é um diagnóstico. Ele apenas indica se vale a pena procurar um fonoaudiólogo para avaliação.
+            </p>
 
             {/* Detalhamento das rodadas */}
             {currentResult.answers && currentResult.answers.length > 0 && (
               <div className="space-y-3 pt-2">
-                <h4 className="font-serif text-base font-bold text-navy">O que foi observado nesta atividade:</h4>
+                <h4 className="font-serif text-lg font-semibold text-navy">O que foi observado nesta atividade</h4>
                 <div className="space-y-2">
                   {currentResult.answers.map((ans, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-line bg-surface text-xs">
+                    <div key={idx} className="flex items-center justify-between gap-3 border-b border-line py-3 text-sm">
                       <div>
                         <strong className="text-navy">{ans.word || ans.pair}</strong>
                         <span className="text-muted block">{ans.spoken ? `Registrado: "${ans.spoken}"` : ans.childSaidRimes ? 'Criança disse que rima' : 'Criança disse que não rima'}</span>
                       </div>
-                      <span className={`px-2.5 py-0.5 rounded-full font-bold ${ans.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                      <span className={`shrink-0 rounded-[8px] rounded-bl-[2px] px-2.5 py-1 text-xs font-bold text-on-pastel ${ans.isCorrect ? 'bg-salvia' : 'bg-mel'}`}>
                         {ans.isCorrect ? 'Dentro do padrão' : 'Atenção / Variação'}
                       </span>
                     </div>
@@ -737,7 +774,7 @@ export default function TriagemGame() {
                 onClick={() => showScreen('home')}
                 className={buttonClass('secondary')}
               >
-                <RotateCcw size={16} /> Fazer Outra Atividade
+                <RotateCcw size={16} aria-hidden="true" /> Fazer outra atividade
               </button>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -745,13 +782,13 @@ export default function TriagemGame() {
                   onClick={() => downloadReportTxt(currentResult)}
                   className={buttonClass('tertiary')}
                 >
-                  <Download size={16} /> Baixar Relatório (TXT)
+                  <Download size={16} aria-hidden="true" /> Baixar relatório (TXT)
                 </button>
                 <a
                   href="#/profissional/pacientes"
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0284C7] hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition"
+                  className={buttonClass('primary')}
                 >
-                  <Search size={14} /> Buscar Fonoaudiólogo
+                  <Search size={16} aria-hidden="true" /> Buscar fonoaudiólogo
                 </a>
               </div>
             </div>
@@ -768,22 +805,23 @@ export default function TriagemGame() {
         <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
           <ArrowLeft size={16} aria-hidden="true" /> Voltar
         </button>
-        <h2 className="font-serif text-2xl font-extrabold text-navy">Formulário de Marcos (0 a 2 anos)</h2>
+        <h2 className="font-serif text-2xl font-semibold text-navy">Marcos da comunicação · 0 a 2 anos</h2>
       </div>
 
-      <div className="rounded-[20px] border border-line bg-white p-6 md:p-8 space-y-6 shadow-sm">
+      <div className="space-y-6 rounded-[22px] rounded-bl-[5px] border border-line bg-surface p-6 md:p-8">
         <div className="space-y-4">
           {formQuestions.map((item) => (
-            <div key={item.id} className="p-4 rounded-xl border border-line bg-surface space-y-3">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#0284C7]">{item.category}</span>
-              <p className="text-base font-bold text-ink">{item.question}</p>
+            <div key={item.id} role="group" aria-labelledby={`marco-${item.id}`} className="space-y-3 border-b border-line pb-5">
+              <span className="text-sm font-semibold text-coral-ink">{item.category}</span>
+              <p id={`marco-${item.id}`} className="text-base font-bold text-ink">{item.question}</p>
               <div className="flex flex-wrap gap-2">
                 {item.options.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
+                    aria-pressed={formAnswers[item.id] === opt.value}
                     onClick={() => setFormAnswers((prev) => ({ ...prev, [item.id]: opt.value }))}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition ${formAnswers[item.id] === opt.value ? 'bg-[#0284C7] text-white border-[#0284C7]' : 'bg-white text-slate-700 border-line hover:border-slate-400'}`}
+                    className={`min-h-11 rounded-[10px] rounded-bl-[3px] border-[1.5px] px-4 text-sm font-bold transition-colors ${formAnswers[item.id] === opt.value ? 'border-primary bg-primary text-on-primary' : 'border-line bg-surface text-ink hover:border-primary/50'}`}
                   >
                     {opt.label}
                   </button>
@@ -814,9 +852,9 @@ export default function TriagemGame() {
             });
             showScreen('unified_result');
           }}
-          className="w-full rounded-xl bg-[#0284C7] text-white font-bold py-3 hover:bg-sky-700 transition"
+          className={`${buttonClass('primary', 'lg')} w-full`}
         >
-          Finalizar Formulário e Ver Parecer →
+          Ver o resultado <ArrowRight size={18} aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -829,11 +867,11 @@ export default function TriagemGame() {
         <button type="button" onClick={goBack} className={buttonClass('tertiary')}>
           <ArrowLeft size={16} aria-hidden="true" /> Voltar
         </button>
-        <h2 className="font-serif text-2xl font-extrabold text-navy">Checklist Escolar (6+ anos)</h2>
+        <h2 className="font-serif text-2xl font-semibold text-navy">Checklist escolar · 6+ anos</h2>
       </div>
 
-      <div className="rounded-[20px] border border-line bg-white p-6 md:p-8 space-y-6 shadow-sm">
-        <p className="text-xs text-muted">Marque os comportamentos observados nas últimas 3 semanas em sala:</p>
+      <div className="space-y-6 rounded-[22px] rounded-bl-[5px] border border-line bg-surface p-6 md:p-8">
+        <p className="text-[15px] text-muted">Marque os comportamentos observados nas últimas 3 semanas em sala:</p>
         <div className="space-y-3">
           {checklistItems.map((item, idx) => {
             const isChecked = !!checkListState[idx];
@@ -841,13 +879,15 @@ export default function TriagemGame() {
               <button
                 key={idx}
                 type="button"
+                role="checkbox"
+                aria-checked={isChecked}
                 onClick={() => setCheckListState((prev) => ({ ...prev, [idx]: !prev[idx] }))}
-                className={`w-full text-left p-4 rounded-xl border flex items-start gap-3 transition ${isChecked ? 'bg-amber-50 border-amber-300' : 'bg-surface border-line'}`}
+                className={`flex w-full items-start gap-3 rounded-[14px] rounded-bl-[3px] border-[1.5px] p-4 text-left transition-colors ${isChecked ? 'border-primary bg-mel/50' : 'border-line bg-surface hover:border-primary/40'}`}
               >
-                <div className={`size-5 rounded border flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold ${isChecked ? 'bg-amber-500 text-white border-amber-500' : 'bg-white border-slate-300'}`}>
-                  {isChecked ? '✓' : ''}
-                </div>
-                <span className="text-sm font-semibold text-slate-800">{item}</span>
+                <span aria-hidden="true" className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[5px] border-[1.5px] ${isChecked ? 'border-primary bg-primary text-on-primary' : 'border-muted/60 bg-surface'}`}>
+                  {isChecked && <Check size={13} strokeWidth={3} />}
+                </span>
+                <span className="text-[15px] font-semibold text-ink">{item}</span>
               </button>
             );
           })}
@@ -869,59 +909,61 @@ export default function TriagemGame() {
             });
             showScreen('unified_result');
           }}
-          className="w-full rounded-xl bg-[#0284C7] text-white font-bold py-3 hover:bg-sky-700 transition"
+          className={`${buttonClass('primary', 'lg')} w-full`}
         >
-          Finalizar Checklist e Ver Parecer →
+          Ver o resultado <ArrowRight size={18} aria-hidden="true" />
         </button>
       </div>
     </div>
   );
 
+  const abas = [
+    { id: 'home', title: 'Início', badge: null },
+    { id: 'form02', title: 'Marcos', badge: '0–2' },
+    { id: 'game24', title: 'Jogo da Palavra', badge: '2–4' },
+    { id: 'rima45', title: 'Jogo da Rima', badge: '4–5' },
+    { id: 'check6', title: 'Checklist', badge: '6+' },
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl border border-line bg-canvas font-sans text-ink shadow-xl">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line bg-band px-6 py-4 text-white">
-        <div className="flex items-center gap-3">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-white/10 text-2xl">🎙️</div>
-          <div>
-            <div className="font-serif text-2xl font-extrabold leading-none">FonoSync</div>
-            <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/80">Módulo de Rastreio Fonoaudiológico</div>
+    <div className="min-h-screen bg-nevoa font-sans text-ink">
+      <header className="on-dark bg-ocean-deep text-white">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-4 md:px-8">
+          <a href="#/" aria-label="FonoSync, voltar à página inicial">
+            <Logo tone="claro" />
+          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" onClick={() => setShowA11y(true)} className={buttonClass('claro')}>
+              <PersonStanding size={17} aria-hidden="true" /> Acessibilidade
+            </button>
+            <button type="button" onClick={() => (isPlayerOpen ? stopSpeaking() : speakPageContent())} className={buttonClass('claro')}>
+              <Volume2 size={17} aria-hidden="true" /> {isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}
+            </button>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="button" onClick={() => setShowA11y(true)} className="flex min-h-11 items-center gap-2 rounded-md border border-white/30 px-3 text-xs font-bold text-white hover:bg-white/10">
-            <span aria-hidden="true">♿</span> Acessibilidade
-          </button>
-          <button type="button" onClick={() => (isPlayerOpen ? stopSpeaking() : speakPageContent())} className="flex min-h-11 items-center gap-2 rounded-md border border-white/30 px-3 text-xs font-bold text-white hover:bg-white/10">
-            <Volume2 size={16} aria-hidden="true" /> {isPlayerOpen ? 'Parar leitura' : 'Ouvir página'}
-          </button>
-        </div>
+        <nav className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-3 md:px-6" aria-label="Atividades por faixa etária">
+          {abas.map((tab) => {
+            const ativo = activeScreen === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                aria-current={ativo ? 'page' : undefined}
+                onClick={() => {
+                  if (tab.id === 'home') showScreen('home');
+                  else handleSelectActivity(tab.id);
+                }}
+                className={`flex min-h-12 items-center gap-2 whitespace-nowrap border-b-[3px] px-3 text-[15px] font-semibold transition-colors ${ativo ? 'border-mel text-white' : 'border-transparent text-on-band-muted hover:text-white'}`}
+              >
+                {tab.title}
+                {tab.badge && <span className={`rounded-[6px] rounded-bl-[2px] px-1.5 py-0.5 text-[11px] font-bold ${ativo ? 'bg-mel text-on-pastel' : 'bg-white/10'}`}>{tab.badge}</span>}
+              </button>
+            );
+          })}
+        </nav>
       </header>
 
-      <nav className="flex gap-1 overflow-x-auto border-b-2 border-line bg-white px-6" aria-label="Navegação por faixa etária">
-        {[
-          { id: 'home', title: 'Início', badge: null },
-          { id: 'form02', title: 'Marcos', badge: '0–2 anos' },
-          { id: 'game24', title: 'Jogo Fonético', badge: '2–4 anos' },
-          { id: 'rima45', title: 'Jogo da Rima', badge: '4–5 anos' },
-          { id: 'check6', title: 'Checklist', badge: '6+ anos' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => {
-              if (tab.id === 'home') showScreen('home');
-              else handleSelectActivity(tab.id);
-            }}
-            className={`flex items-center gap-2 whitespace-nowrap border-b-[3px] px-5 py-4 text-sm font-extrabold transition ${activeScreen === tab.id ? 'border-[#0284C7] text-[#0284C7]' : 'border-transparent text-muted hover:text-navy'}`}
-          >
-            <span>{tab.id === 'home' ? '🏠' : tab.id === 'form02' ? '👶' : tab.id === 'game24' ? '🎮' : tab.id === 'rima45' ? '🎵' : '🏫'}</span>
-            {tab.title}
-            {tab.badge && <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${activeScreen === tab.id ? 'bg-[#0284C7] text-white' : 'bg-surface text-muted'}`}>{tab.badge}</span>}
-          </button>
-        ))}
-      </nav>
-
-      <main className="bg-canvas p-4 md:p-8">
+      <main id="primary" className="mx-auto max-w-5xl px-5 py-8 md:px-8 md:py-12">
         {activeScreen === 'home' && renderHomeScreen()}
         {activeScreen === 'game24' && renderGame24Screen()}
         {activeScreen === 'rima45' && renderRimaScreen()}
@@ -930,8 +972,8 @@ export default function TriagemGame() {
         {activeScreen === 'unified_result' && renderUnifiedResultScreen()}
       </main>
 
-      <footer className="bg-band px-4 py-4 text-center text-xs font-semibold text-white/80">
-        <strong className="text-white">FonoSync</strong> — Triagem e rastreio fonoaudiológico. Não substitui avaliação clínica profissional.
+      <footer className="mx-auto max-w-5xl px-5 pb-10 text-[14px] text-muted md:px-8">
+        FonoSync · Rastreio fonoaudiológico. Não substitui a avaliação clínica profissional.
       </footer>
 
       <A11yModal isOpen={showA11y} onClose={() => setShowA11y(false)} />

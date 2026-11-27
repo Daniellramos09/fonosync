@@ -1,47 +1,102 @@
 @import "tailwindcss";
 
 @theme {
+  /* Identidade FonoSync — rebrand 2026-11 */
+  --color-ocean: #235b63;      /* Verde Oceano: identidade e contraste */
+  --color-ocean-deep: #17434a; /* faixas profundas e hover do primário */
+  --color-nevoa: #f3f8f6;      /* Verde Névoa */
+  --color-salvia: #d6eae4;     /* Verde Sálvia */
+  --color-coral: #f4b7a3;      /* Coral Suave */
+  --color-coral-ink: #a8492c;  /* coral legível para texto e o ponto silábico */
+  --color-mel: #f5d887;        /* Amarelo Mel */
+  --color-lavanda: #d8d0eb;    /* Lavanda */
+  --color-quente: #fffcf7;     /* Branco Quente */
+  --color-on-pastel: #283a43;  /* texto sobre campos pastel (não inverte no escuro) */
 
-  --color-primary: #156082;  /* azul clínico editorial */
-  --color-on-primary: #ffffff; /* texto sobre a cor primária */
-  --color-navy: #14222c;     /* títulos escuros com contraste editorial */
-  --color-band: #16242f;     /* faixas estruturais profundas */
-  --color-on-band-muted: #c8dae6; /* texto secundário sobre as faixas escuras */
-  --color-mist: #eef3f5;     /* superfícies azuladas sutis */
-  --color-warm: #f6f5f3;     /* superfície editorial quente (alabastro) */
-  --color-warm-alt: #edece8; /* variação quente para blocos de destaque */
-  --color-terracotta: #b86a52; /* acento humano acolhedor */
-  --color-surface: #ffffff;  /* fundo da página e dos cards */
-  --color-canvas: #faf9f6;   /* fundo da área de trabalho e leitura */
-  --color-ink: #1a1d20;      /* Texto */
-  --color-muted: #52606b;    /* Texto secundário */
-  --color-success: #1b6b4d;  /* Sucesso */
-  --color-warning: #9c5214;  /* Atenção */
-  --color-danger: #a32e35;   /* Erro */
-  --color-line: #dedbd3;     /* Divisor: bordas */
-  --color-focus: #d9822b;    /* Contorno de foco (teclado) */
-  --color-accent: #e08e36;   /* ícones sobre as faixas escuras */
+  /* Papéis semânticos usados por todo o app */
+  --color-primary: #235b63;
+  --color-on-primary: #fffcf7;
+  --color-navy: #1b3a40;       /* títulos */
+  --color-band: #17434a;       /* menus laterais e faixas */
+  --color-on-band-muted: #c9e0d9;
+  --color-mist: #eaf3f0;
+  --color-warm: #f3f8f6;
+  --color-warm-alt: #d6eae4;
+  --color-terracotta: #a8492c;
+  --color-surface: #fffcf7;
+  --color-canvas: #f3f8f6;
+  --color-ink: #283a43;        /* Texto Principal */
+  --color-muted: #586b73;      /* Texto Secundário (ajustado p/ AA sobre névoa) */
+  --color-success: #2a7350;
+  --color-warning: #94570c;
+  --color-danger: #a63a36;
+  --color-line: #d5e2dd;
+  --color-focus: #c2571f;
+  --color-accent: #f5d887;     /* ícones sobre faixas oceano */
+
   --font-serif: "Fraunces", Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* painel de acessibilidade */
 
 :root[data-theme="dark"] {
-  --color-primary: #6db3e0;
-  --color-on-primary: #0f1c25;
-  --color-navy: #dbe8f1;
-  --color-band: #0a1620;
-  --color-mist: #16293a;
-  --color-surface: #0f1c25;
-  --color-canvas: #0b1720;
-  --color-ink: #e3edf4;
-  --color-muted: #a3b7c6;
-  --color-success: #5cc495;
-  --color-warning: #e08a43;
-  --color-danger: #f07a80;
-  --color-line: #2c4456;
+  --color-primary: #86c9c4;
+  --color-on-primary: #0c1d20;
+  --color-navy: #e3f0ec;
+  --color-band: #0b2227;
+  --color-mist: #15292c;
+  --color-warm: #122427;
+  --color-warm-alt: #1a3337;
+  --color-surface: #0f1d20;
+  --color-canvas: #0b1719;
+  --color-ink: #e4eeeb;
+  --color-muted: #a6bbb6;
+  --color-success: #6fcb9c;
+  --color-warning: #e6a24f;
+  --color-danger: #f08a82;
+  --color-line: #29403f;
+  --color-ocean: #1d4f56;
+  --color-ocean-deep: #0e2c31;
+  --color-nevoa: #122427;
+  --color-salvia: #a9cbc1;
+  --color-coral: #e3a591;
+  --color-coral-ink: #f2a48a;
+  --color-mel: #e6c56c;
+  --color-lavanda: #bdb3d8;
+  --color-quente: #0f1d20;
+}
+
+/* Alto contraste: campos de cor viram branco/preto, mantendo a leitura */
+:root[data-contrast="high"] {
+  --color-ocean: #000000;
+  --color-ocean-deep: #000000;
+  --color-nevoa: #ffffff;
+  --color-salvia: #ffffff;
+  --color-coral: #ffffff;
+  --color-coral-ink: #7a1f00;
+  --color-mel: #ffffff;
+  --color-lavanda: #ffffff;
+  --color-quente: #ffffff;
+  --color-on-pastel: #000000;
+  --color-warm: #ffffff;
+  --color-warm-alt: #ffffff;
+}
+
+:root[data-theme="dark"][data-contrast="high"] {
+  --color-nevoa: #000000;
+  --color-salvia: #000000;
+  --color-coral: #000000;
+  --color-coral-ink: #ffb08f;
+  --color-mel: #000000;
+  --color-lavanda: #000000;
+  --color-quente: #000000;
+  --color-on-pastel: #ffffff;
+  --color-warm: #000000;
+  --color-warm-alt: #000000;
 }
 
 :root[data-contrast="high"] {
@@ -193,6 +248,24 @@
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 60, "WONK" 0;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background-color: var(--color-mel);
+    color: var(--color-on-pastel);
+  }
+  html {
+    scrollbar-color: color-mix(in oklab, var(--color-ocean) 45%, transparent) transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+  input, textarea, select {
+    caret-color: var(--color-coral-ink);
+    accent-color: var(--color-ocean);
   }
   button:not(:disabled),
   [role="switch"],
@@ -237,4 +310,122 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+/* ===================== Linguagem visual FonoSync ===================== */
+
+/* Ponto silábico: pa·la·vra */
+.silaba-ponto {
+  color: var(--color-coral-ink);
+  font-weight: 400;
+  padding-inline: 0.04em;
+}
+.on-dark .silaba-ponto {
+  color: var(--color-coral);
+}
+
+/* Títulos de exibição: Fraunces bem macia */
+.display {
+  font-family: var(--font-serif);
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+
+/* Foco visível também sobre fotos e faixas oceano */
+.on-dark :focus-visible {
+  outline-color: var(--color-mel);
+}
+
+/* ---------- Personagens: movimentos com intenção ---------- */
+@keyframes fs-piscar {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes fs-acenar {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(-22deg); }
+  20% { transform: rotate(6deg); }
+  30% { transform: rotate(-18deg); }
+  40% { transform: rotate(4deg); }
+}
+@keyframes fs-respirar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes fs-bico {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  78% { transform: rotate(-7deg); }
+  86% { transform: rotate(0deg); }
+}
+@keyframes fs-pata {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(14deg); }
+}
+@keyframes fs-pulo {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  30% { transform: translateY(-14px) scale(0.97, 1.03); }
+  55% { transform: translateY(0) scale(1.04, 0.96); }
+  70% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes fs-cauda {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-8deg); }
+}
+@keyframes fs-confete {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(var(--dx, 0), var(--dy, -60px)) rotate(var(--rot, 180deg)); opacity: 0; }
+}
+
+.char-olho { transform-box: fill-box; transform-origin: center; animation: fs-piscar 4.8s infinite; }
+.char-acena { transform-box: fill-box; transform-origin: 20% 90%; animation: fs-acenar 3.6s var(--ease-out-soft) infinite; }
+.char-respira { animation: fs-respirar 3.2s ease-in-out infinite; }
+.char-bico { transform-box: fill-box; transform-origin: 8% 40%; animation: fs-bico 3.4s ease-in-out infinite; }
+.char-pata-a { transform-box: fill-box; transform-origin: 50% 10%; animation: fs-pata 0.9s ease-in-out infinite; }
+.char-pata-b { transform-box: fill-box; transform-origin: 50% 10%; animation: fs-pata 0.9s ease-in-out infinite reverse; }
+.char-pula { transform-box: fill-box; transform-origin: 50% 100%; animation: fs-pulo 1.1s var(--ease-out-soft) 2; }
+.char-cauda { transform-box: fill-box; transform-origin: 0% 0%; animation: fs-cauda 2.6s ease-in-out infinite; }
+.char-estatico * { animation: none !important; }
+
+.confete { animation: fs-confete 1.6s var(--ease-out-soft) forwards; }
+
+/* ---------- Revelação na rolagem (conteúdo visível por padrão) ---------- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-motion="reduce"]) .rolagem-sobe {
+      animation: fs-sobe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+    :root:not([data-motion="reduce"]) .trilha-tartaruga {
+      animation: fs-trilha linear both;
+      animation-timeline: view();
+      animation-range: entry 30% exit 30%;
+    }
+  }
+}
+@keyframes fs-sobe {
+  from { opacity: 0.25; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fs-trilha {
+  from { left: 0; }
+  to { left: calc(100% - 8rem); }
+}
+
+/* Título do hero: linhas entram uma a uma */
+@keyframes fs-linha {
+  from { transform: translateY(105%); }
+  to { transform: translateY(0); }
+}
+.hero-linha { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.hero-linha > span { display: inline-block; animation: fs-linha 0.9s var(--ease-out-soft) both; }
+.hero-linha:nth-child(2) > span { animation-delay: 0.08s; }
+.hero-linha:nth-child(3) > span { animation-delay: 0.16s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .char-olho, .char-acena, .char-respira, .char-bico, .char-pata-a, .char-pata-b, .char-pula, .char-cauda, .hero-linha > span { animation: none !important; }
+}
+:root[data-motion="reduce"] :is(.char-olho, .char-acena, .char-respira, .char-bico, .char-pata-a, .char-pata-b, .char-pula, .char-cauda, .hero-linha > span) {
+  animation: none !important;
 }

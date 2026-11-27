@@ -14,7 +14,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { listPatients } from '../../services/patientService';
-import logoImg from '../../assets/images/ModeloA_Semnome.jpg';
+import { LogoMark } from '../../components/Logo';
 
 const initialDocuments = [];
 
@@ -555,7 +555,7 @@ export default function Reports() {
             {/* Cabeçalho Clínico Timbrado */}
             <div className="flex items-center justify-between border-b-2 border-[#172C3A] pb-4">
               <div className="flex items-center gap-3">
-                <img src={logoImg} alt="FonoSync Logo" className="h-10 w-auto rounded object-contain" />
+                <LogoMark className="size-10" />
                 <div>
                   <h2 className="font-serif font-bold text-lg text-[#172C3A]">FonoSync Clínica Fonoaudiológica</h2>
                   <p className="text-[10px] text-slate-500 tracking-wide uppercase font-semibold">
@@ -926,7 +926,7 @@ export default function Reports() {
             <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-4 text-xs text-slate-700 leading-relaxed">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <img src={logoImg} alt="Logo" className="h-7 w-auto rounded object-contain" />
+                  <LogoMark className="size-7" />
                   <span className="font-serif font-bold text-sm text-[#172C3A]">FonoSync Clínica</span>
                 </div>
                 <span className="text-[10px] text-slate-500">Dra. Renata Lima · CRFa 2-19842</span>

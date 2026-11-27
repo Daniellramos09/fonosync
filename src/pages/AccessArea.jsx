@@ -20,7 +20,9 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import logoImg from '../assets/images/ModeloA_Semnome.jpg';
+import Logo from '../components/Logo';
+import { Tucano } from '../components/Personagens';
+import acessoImg from '../assets/images/photos/brincar-clinica.jpg';
 import { useA11y } from '../hooks/useA11y';
 import A11yModal from '../components/A11yModal';
 import InfoDialog from '../components/InfoDialog';
@@ -62,20 +64,20 @@ function FormInput({ id, label, icon: Icon, error, hint, trailing, ...props }) {
 
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-[#172C3A]">
+      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-navy">
         {label}
       </label>
       <div
-        className={`flex items-center gap-2.5 rounded-xl border bg-white px-3.5 py-2.5 text-sm transition focus-within:ring-2 focus-within:ring-[#0284C7] focus-within:border-[#0284C7] ${
-          error ? 'border-rose-400 bg-rose-50/20' : 'border-slate-300 hover:border-slate-400'
+        className={`flex items-center gap-2.5 rounded-xl border bg-surface px-3.5 py-2.5 text-sm transition focus-within:ring-2 focus-within:ring-primary focus-within:border-primary ${
+          error ? 'border-rose-400 bg-rose-50/20' : 'border-line hover:border-primary/40'
         }`}
       >
-        {Icon && <Icon size={17} className="shrink-0 text-slate-400" aria-hidden="true" />}
+        {Icon && <Icon size={17} className="shrink-0 text-muted" aria-hidden="true" />}
         <input
           id={id}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
-          className="w-full bg-transparent font-medium text-slate-900 placeholder:text-slate-400 outline-none text-xs"
+          className="w-full bg-transparent font-medium text-ink placeholder:text-muted outline-none text-xs"
           {...props}
         />
         {trailing}
@@ -85,7 +87,7 @@ function FormInput({ id, label, icon: Icon, error, hint, trailing, ...props }) {
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-dica`} className="text-[11px] text-slate-500">
+        <p id={`${id}-dica`} className="text-[11px] text-muted">
           {hint}
         </p>
       ) : null}
@@ -96,18 +98,18 @@ function FormInput({ id, label, icon: Icon, error, hint, trailing, ...props }) {
 function FormSelect({ id, label, icon: Icon, error, options = [], ...props }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-[#172C3A]">
+      <label htmlFor={id} className="block text-xs font-bold uppercase tracking-wider text-navy">
         {label}
       </label>
       <div
-        className={`flex items-center gap-2.5 rounded-xl border bg-white px-3.5 py-2.5 text-sm transition focus-within:ring-2 focus-within:ring-[#0284C7] focus-within:border-[#0284C7] ${
-          error ? 'border-rose-400 bg-rose-50/20' : 'border-slate-300 hover:border-slate-400'
+        className={`flex items-center gap-2.5 rounded-xl border bg-surface px-3.5 py-2.5 text-sm transition focus-within:ring-2 focus-within:ring-primary focus-within:border-primary ${
+          error ? 'border-rose-400 bg-rose-50/20' : 'border-line hover:border-primary/40'
         }`}
       >
-        {Icon && <Icon size={17} className="shrink-0 text-slate-400" aria-hidden="true" />}
+        {Icon && <Icon size={17} className="shrink-0 text-muted" aria-hidden="true" />}
         <select
           id={id}
-          className="w-full bg-transparent font-medium text-slate-900 outline-none text-xs cursor-pointer"
+          className="w-full bg-transparent font-medium text-ink outline-none text-xs cursor-pointer"
           {...props}
         >
           {options.map((opt) => (
@@ -476,20 +478,19 @@ export default function AccessArea() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-between bg-slate-50 font-sans">
+    <div className="flex min-h-screen flex-col justify-between bg-nevoa font-sans">
       {/* Header com Acessibilidade e Logo */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 px-4 py-3.5 backdrop-blur-md sm:px-6">
+      <header className="sticky top-0 z-40 border-b border-line bg-surface/95 px-4 py-3.5 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <a href="#/" className="flex items-center gap-2.5 transition hover:opacity-85">
-            <img src={logoImg} alt="FonoSync Logo" className="h-9 w-auto rounded-lg object-contain shadow-xs" />
-            <span className="font-serif text-xl font-bold tracking-tight text-[#172C3A]">FonoSync</span>
+            <Logo />
           </a>
 
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setShowA11y(true)}
-              className="flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 text-xs font-bold text-[#172C3A] hover:bg-slate-50 shadow-xs transition"
+              className="flex min-h-10 items-center gap-1.5 rounded-xl border border-line bg-surface px-3 text-xs font-bold text-navy hover:bg-nevoa shadow-xs transition"
             >
               <PersonStanding size={16} aria-hidden="true" /> Acessibilidade
             </button>
@@ -499,7 +500,7 @@ export default function AccessArea() {
               className={`flex min-h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-bold transition shadow-xs ${
                 isPlayerOpen
                   ? 'border-rose-300 bg-rose-50 text-rose-700'
-                  : 'border-slate-300 bg-white text-[#172C3A] hover:bg-slate-50'
+                  : 'border-line bg-surface text-navy hover:bg-nevoa'
               }`}
             >
               {isPlayerOpen ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
@@ -510,14 +511,22 @@ export default function AccessArea() {
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="flex flex-1 items-center justify-center p-4 sm:p-6 my-6">
-        <div className="w-full max-w-xl space-y-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xl">
+      <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_minmax(0,560px)] lg:py-12">
+        <aside className="on-dark relative hidden min-h-[620px] overflow-hidden rounded-[28px] rounded-bl-[6px] bg-ocean text-white lg:block">
+          <img src={acessoImg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80" />
+          <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(23,67,74,0)_30%,rgba(23,67,74,0.92)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-8">
+            <p className="display max-w-[14ch] text-[40px]">Cada sessão conta uma parte da história.</p>
+            <Tucano className="w-28 shrink-0" />
+          </div>
+        </aside>
+        <div className="mx-auto w-full max-w-xl space-y-6 rounded-[24px] rounded-bl-[6px] border border-line bg-surface p-6 shadow-[0_30px_60px_-30px_rgba(23,67,74,0.35)] sm:p-8">
           {/* Cabeçalho do Card */}
           <div className="text-center space-y-1.5">
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#172C3A]">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-navy">
               {mode === 'login' ? 'Acessar o FonoSync' : 'Criar Nova Conta'}
             </h1>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted">
               {mode === 'login'
                 ? 'Entre com suas credenciais ou faça login direto com sua conta Google'
                 : 'Selecione o seu perfil para preencher os dados de acordo com as regras clínicas'}
@@ -525,12 +534,12 @@ export default function AccessArea() {
           </div>
 
           {/* Toggle Modo: Login vs Cadastro */}
-          <div className="flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+          <div className="flex rounded-xl bg-salvia/50 p-1 border border-line">
             <button
               type="button"
               onClick={() => changeMode('login')}
               className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${
-                mode === 'login' ? 'bg-white text-[#172C3A] shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                mode === 'login' ? 'bg-surface text-navy shadow-sm' : 'text-muted hover:text-ink'
               }`}
             >
               Já tenho cadastro (Entrar)
@@ -539,7 +548,7 @@ export default function AccessArea() {
               type="button"
               onClick={() => changeMode('register')}
               className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${
-                mode === 'register' ? 'bg-[#0284C7] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                mode === 'register' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-ink'
               }`}
             >
               Criar novo cadastro
@@ -552,14 +561,14 @@ export default function AccessArea() {
           {mode === 'login' && (
             <div className="space-y-4">
               {/* Seleção de tipo de login */}
-              <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-1 border border-slate-200">
+              <div className="grid grid-cols-2 gap-2 rounded-xl bg-nevoa p-1 border border-line">
                 <button
                   type="button"
                   onClick={() => setLoginRole('profissional')}
                   className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition ${
                     loginRole === 'profissional'
-                      ? 'bg-[#172C3A] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-navy text-white shadow-xs'
+                      : 'text-muted hover:text-ink'
                   }`}
                 >
                   <Stethoscope size={16} /> Profissional (Fono)
@@ -569,8 +578,8 @@ export default function AccessArea() {
                   onClick={() => setLoginRole('paciente')}
                   className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition ${
                     loginRole === 'paciente'
-                      ? 'bg-[#172C3A] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-navy text-white shadow-xs'
+                      : 'text-muted hover:text-ink'
                   }`}
                 >
                   <User size={16} /> Paciente / Família
@@ -581,15 +590,15 @@ export default function AccessArea() {
               <button
                 type="button"
                 onClick={() => loginWithGoogle()}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-xs transition hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0284C7] cursor-pointer"
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5 text-xs font-bold text-ink shadow-xs transition hover:bg-nevoa hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
               >
                 <GoogleIcon />
                 <span>Continuar com o Google</span>
               </button>
 
               <div className="relative flex items-center justify-center my-4">
-                <div className="w-full border-t border-slate-200" />
-                <span className="absolute bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="w-full border-t border-line" />
+                <span className="absolute bg-surface px-3 text-[10px] font-bold uppercase tracking-wider text-muted">
                   ou entre com e-mail
                 </span>
               </div>
@@ -623,7 +632,7 @@ export default function AccessArea() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="text-slate-400 hover:text-slate-700 p-1"
+                      className="text-muted hover:text-ink p-1"
                       aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -640,7 +649,7 @@ export default function AccessArea() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0284C7] px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition cursor-pointer disabled:opacity-60"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
                 >
                   {loading ? (
                     'Entrando...'
@@ -664,15 +673,15 @@ export default function AccessArea() {
               <button
                 type="button"
                 onClick={() => loginWithGoogle()}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-xs transition hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0284C7] cursor-pointer"
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5 text-xs font-bold text-ink shadow-xs transition hover:bg-nevoa hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
               >
                 <GoogleIcon />
                 <span>Cadastrar rapidamente com o Google</span>
               </button>
 
               <div className="relative flex items-center justify-center">
-                <div className="w-full border-t border-slate-200" />
-                <span className="absolute bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="w-full border-t border-line" />
+                <span className="absolute bg-surface px-3 text-[10px] font-bold uppercase tracking-wider text-muted">
                   ou selecione seu tipo de perfil
                 </span>
               </div>
@@ -711,13 +720,13 @@ export default function AccessArea() {
                       }}
                       className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
                         selected
-                          ? 'border-[#0284C7] bg-sky-50/50 text-[#0284C7] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
+                          ? 'border-primary bg-nevoa/50 text-primary shadow-xs'
+                          : 'border-line hover:border-line bg-surface text-ink'
                       }`}
                     >
-                      <Icon size={20} className={`mb-1.5 ${selected ? 'text-[#0284C7]' : 'text-slate-400'}`} />
+                      <Icon size={20} className={`mb-1.5 ${selected ? 'text-primary' : 'text-muted'}`} />
                       <span className="text-xs font-bold leading-tight">{title}</span>
-                      <span className="text-[10px] text-slate-500 mt-0.5">{subtitle}</span>
+                      <span className="text-[10px] text-muted mt-0.5">{subtitle}</span>
                     </button>
                   );
                 })}
@@ -728,8 +737,8 @@ export default function AccessArea() {
               {/* ---------------------------------------------------------- */}
               {registerCategory === 'fonoaudiologo' && (
                 <form onSubmit={handleProRegisterSubmit} noValidate className="space-y-3.5">
-                  <div className="p-3 rounded-xl bg-sky-50/60 border border-sky-100 flex items-start gap-2.5 text-xs text-sky-900">
-                    <Sparkles size={16} className="text-[#0284C7] shrink-0 mt-0.5" />
+                  <div className="p-3 rounded-xl bg-nevoa/60 border border-salvia flex items-start gap-2.5 text-xs text-navy">
+                    <Sparkles size={16} className="text-primary shrink-0 mt-0.5" />
                     <p>
                       Cadastro completo do profissional clínico. Seus dados de CRFa e especialidade serão exibidos nos
                       laudos e prontuários dos pacientes.
@@ -811,7 +820,7 @@ export default function AccessArea() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="text-slate-400 hover:text-slate-700 p-1"
+                          className="text-muted hover:text-ink p-1"
                         >
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
@@ -828,7 +837,7 @@ export default function AccessArea() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0284C7] px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition cursor-pointer disabled:opacity-60"
+                    className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
                   >
                     {loading ? 'Criando conta profissional...' : 'Concluir Cadastro de Fonoaudiólogo(a)'}
                     <ArrowRight size={16} />
@@ -842,10 +851,10 @@ export default function AccessArea() {
               {registerCategory === 'responsavel' && (
                 <form onSubmit={handleGuardianRegisterSubmit} noValidate className="space-y-4">
                   {/* Seção 1: Dados do Responsável */}
-                  <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3.5 space-y-3">
-                    <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                      <HeartHandshake size={16} className="text-[#0284C7]" />
-                      <span className="text-xs font-bold text-[#172C3A] uppercase tracking-wide">
+                  <div className="rounded-xl border border-line bg-nevoa/60 p-3.5 space-y-3">
+                    <div className="flex items-center gap-2 border-b border-line pb-2">
+                      <HeartHandshake size={16} className="text-primary" />
+                      <span className="text-xs font-bold text-navy uppercase tracking-wide">
                         1. Dados do Responsável Legal
                       </span>
                     </div>
@@ -902,16 +911,16 @@ export default function AccessArea() {
                   </div>
 
                   {/* Seção 2: Dados do Dependente (Paciente) */}
-                  <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3.5 space-y-3">
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <div className="rounded-xl border border-line bg-nevoa/60 p-3.5 space-y-3">
+                    <div className="flex items-center justify-between border-b border-line pb-2">
                       <div className="flex items-center gap-2">
-                        <Baby size={16} className="text-[#0284C7]" />
-                        <span className="text-xs font-bold text-[#172C3A] uppercase tracking-wide">
+                        <Baby size={16} className="text-primary" />
+                        <span className="text-xs font-bold text-navy uppercase tracking-wide">
                           2. Dados da Criança / Dependente (Paciente)
                         </span>
                       </div>
                       {guardianForm.patientBirthDate && (
-                        <span className="text-[11px] font-bold text-[#0284C7] bg-sky-100 px-2 py-0.5 rounded-md">
+                        <span className="text-[11px] font-bold text-primary bg-salvia px-2 py-0.5 rounded-md">
                           {calculateAge(guardianForm.patientBirthDate)} anos
                         </span>
                       )}
@@ -987,7 +996,7 @@ export default function AccessArea() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="text-slate-400 hover:text-slate-700 p-1"
+                          className="text-muted hover:text-ink p-1"
                         >
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
@@ -1004,7 +1013,7 @@ export default function AccessArea() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0284C7] px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition cursor-pointer disabled:opacity-60"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
                   >
                     {loading ? 'Cadastrando família e dependente...' : 'Concluir Cadastro Familiar'}
                     <ArrowRight size={16} />
@@ -1105,7 +1114,7 @@ export default function AccessArea() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="text-slate-400 hover:text-slate-700 p-1"
+                          className="text-muted hover:text-ink p-1"
                         >
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
@@ -1122,7 +1131,7 @@ export default function AccessArea() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0284C7] px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition cursor-pointer disabled:opacity-60"
+                    className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-sm hover:bg-ocean-deep transition cursor-pointer disabled:opacity-60"
                   >
                     {loading ? 'Criando cadastro de paciente...' : 'Concluir Cadastro de Paciente Adulto'}
                     <ArrowRight size={16} />
@@ -1133,7 +1142,7 @@ export default function AccessArea() {
           )}
 
           {/* Rodapé do Card com LGPD */}
-          <div className="flex flex-col items-center gap-1.5 border-t border-slate-200 pt-4 text-center text-xs text-slate-500">
+          <div className="flex flex-col items-center gap-1.5 border-t border-line pt-4 text-center text-xs text-muted">
             <span className="flex items-center gap-1.5 font-medium">
               <ShieldCheck size={16} className="text-emerald-600" aria-hidden="true" />
               Ambiente clínico seguro e criptografado em conformidade com a LGPD
@@ -1141,7 +1150,7 @@ export default function AccessArea() {
             <button
               type="button"
               onClick={() => setShowPrivacy(true)}
-              className="font-bold text-[#0284C7] underline-offset-4 hover:underline cursor-pointer"
+              className="font-bold text-primary underline-offset-4 hover:underline cursor-pointer"
             >
               Política de Privacidade e Termos de Uso
             </button>
@@ -1150,7 +1159,7 @@ export default function AccessArea() {
       </main>
 
       {/* Footer simples */}
-      <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
+      <footer className="border-t border-line bg-surface py-4 text-center text-xs text-muted">
         © 2026 FonoSync — Projeto Integrador Fatec Ferraz de Vasconcelos. Todos os direitos reservados.
       </footer>
 
@@ -1167,22 +1176,22 @@ export default function AccessArea() {
       {/* Modal Interativo de Autenticação com Google */}
       {showGoogleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-2xl border border-line space-y-4">
+            <div className="flex items-center justify-between border-b border-line pb-3">
               <div className="flex items-center gap-2">
                 <GoogleIcon />
-                <span className="font-bold text-sm text-[#172C3A]">FonoSync Google Auth</span>
+                <span className="font-bold text-sm text-navy">FonoSync Google Auth</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowGoogleModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                className="text-muted hover:text-muted text-xs font-bold"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-muted">
               Escolha uma conta Google para entrar ou sincronizar com o FonoSync:
             </p>
 
@@ -1190,28 +1199,28 @@ export default function AccessArea() {
               <button
                 type="button"
                 onClick={() => handleSimulateGoogleLogin('ROLE_FONO')}
-                className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-[#0284C7] hover:bg-sky-50/40 text-left transition"
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-line hover:border-primary hover:bg-nevoa/40 text-left transition"
               >
-                <div className="w-9 h-9 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center">
+                <div className="w-9 h-9 rounded-full bg-primary text-white font-bold text-xs flex items-center justify-center">
                   DR
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-900 truncate">Dra. Renata Lima (Fonoaudióloga)</p>
-                  <p className="text-[11px] text-slate-500 truncate">renata.fono@fonosync.com.br</p>
+                  <p className="text-xs font-bold text-ink truncate">Dra. Renata Lima (Fonoaudióloga)</p>
+                  <p className="text-[11px] text-muted truncate">renata.fono@fonosync.com.br</p>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSimulateGoogleLogin('ROLE_PACIENTE')}
-                className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-[#0284C7] hover:bg-sky-50/40 text-left transition"
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-line hover:border-primary hover:bg-nevoa/40 text-left transition"
               >
                 <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">
                   CF
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-900 truncate">Clara Ferreira (Mãe / Paciente)</p>
-                  <p className="text-[11px] text-slate-500 truncate">clara.mae@gmail.com</p>
+                  <p className="text-xs font-bold text-ink truncate">Clara Ferreira (Mãe / Paciente)</p>
+                  <p className="text-[11px] text-muted truncate">clara.mae@gmail.com</p>
                 </div>
               </button>
             </div>
@@ -1219,7 +1228,7 @@ export default function AccessArea() {
             <button
               type="button"
               onClick={() => setShowGoogleModal(false)}
-              className="w-full py-2 text-xs font-bold text-slate-500 hover:text-slate-800"
+              className="w-full py-2 text-xs font-bold text-muted hover:text-ink"
             >
               Cancelar
             </button>

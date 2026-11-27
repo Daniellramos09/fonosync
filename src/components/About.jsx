@@ -14,7 +14,7 @@ import DataTable from './DataTable';
 import MetricCard from './MetricCard';
 import Panel from './Panel';
 import StatusBadge from './StatusBadge';
-import Reveal from './Reveal';
+import { Sagui, Tucano, Capivara } from './Personagens';
 import { buttonClass } from './buttonStyles';
 
 /* ---------- Dados da prévia (copiados dos painéis reais) ---------- */
@@ -65,19 +65,19 @@ const patientNav = [
 ];
 
 const patientViews = {
-  inicio: { title: 'Olá, Maria Luiza! 👋', subtitle: 'Pronta para treinar suas missões de hoje?' },
-  jogos: { title: 'Jogos Terapêuticos 🎮', subtitle: 'Exercícios recomendados pela Dra. Renata.' },
-  conquistas: { title: 'Suas Conquistas 🏆', subtitle: 'Selos por praticar os exercícios.' },
+  inicio: { title: 'Olá, Maria Luiza!', subtitle: 'Pronta para treinar suas missões de hoje?' },
+  jogos: { title: 'Jogos da semana', subtitle: 'Exercícios recomendados pela Dra. Renata.' },
+  conquistas: { title: 'Suas conquistas', subtitle: 'Selos por praticar os exercícios.' },
 };
 
 const games = [
-  { emoji: '🎯', name: 'Caça-Sons: Fonema /r/', desc: 'Identifique palavras com o som vibrante.' },
-  { emoji: '🧩', name: 'Jogo da Rima', desc: 'Combine pares de palavras com terminação igual.' },
+  { Personagem: Tucano, name: 'Caça-Sons: Fonema /r/', desc: 'Identifique palavras com o som vibrante.' },
+  { Personagem: Sagui, name: 'Jogo da Rima', desc: 'Combine pares de palavras com terminação igual.' },
 ];
 
 const badges = [
-  { emoji: '🌟', name: 'Primeira Triagem', desc: 'Concluiu o primeiro teste de fala.' },
-  { emoji: '🔥', name: '7 Dias Seguidos', desc: 'Treinou a articulação a semana toda!' },
+  { Personagem: Capivara, name: 'Primeira triagem', desc: 'Concluiu o primeiro teste de fala.' },
+  { Personagem: Tucano, name: '7 dias seguidos', desc: 'Treinou a articulação a semana toda!' },
 ];
 
 const cardClass = 'rounded-xl border border-line bg-surface shadow-sm';
@@ -142,10 +142,10 @@ function PatientPreview() {
                 type="button"
                 onClick={() => setView(id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex min-h-11 flex-1 items-center gap-2 rounded-r-md border-l-4 px-3 text-left text-sm font-bold transition-colors sm:flex-none sm:gap-3 ${
+                className={`flex min-h-11 flex-1 items-center gap-2 rounded-[10px] rounded-bl-[3px] px-3 text-left text-sm font-bold transition-colors sm:flex-none sm:gap-3 ${
                   isActive
-                    ? 'border-accent bg-white/10 text-white'
-                    : 'border-transparent text-on-band-muted hover:bg-white/10 hover:text-white'
+                    ? 'bg-white/14 text-white'
+                    : 'text-on-band-muted hover:bg-white/8 hover:text-white'
                 }`}
               >
                 <Icon size={18} className="shrink-0 text-accent" aria-hidden="true" />
@@ -199,14 +199,16 @@ function PatientPreview() {
 
         {view === 'jogos' && (
           <div className="grid gap-4 sm:grid-cols-2">
-            {games.map((game) => (
-              <div key={game.name} className={`${cardClass} space-y-3 p-5`}>
-                <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-xl" aria-hidden="true">
-                  {game.emoji}
+            {games.map(({ Personagem, ...game }) => (
+              <div key={game.name} className={`${cardClass} flex items-start gap-4 p-5`}>
+                <span className="flex size-16 shrink-0 items-end justify-center overflow-hidden rounded-[12px] rounded-bl-[3px] bg-salvia">
+                  <Personagem className="w-16 translate-y-1" animated={false} />
+                </span>
+                <div className="flex-1 space-y-2">
+                  <h4 className="font-bold text-navy">{game.name}</h4>
+                  <p className="text-xs text-muted">{game.desc}</p>
+                  <span className={`${buttonClass('primary')} min-h-9 py-1.5 text-[13px]`} aria-hidden="true">Jogar agora</span>
                 </div>
-                <h4 className="font-bold text-navy">{game.name}</h4>
-                <p className="text-xs text-muted">{game.desc}</p>
-                <span className={`${buttonClass('primary')} w-full`} aria-hidden="true">Jogar agora</span>
               </div>
             ))}
           </div>
@@ -214,11 +216,15 @@ function PatientPreview() {
 
         {view === 'conquistas' && (
           <div className="grid gap-4 sm:grid-cols-2">
-            {badges.map((badge) => (
-              <div key={badge.name} className={`${cardClass} space-y-2 p-5 text-center`}>
-                <span className="text-4xl" aria-hidden="true">{badge.emoji}</span>
-                <h4 className="text-sm font-bold text-navy">{badge.name}</h4>
-                <p className="text-xs text-muted">{badge.desc}</p>
+            {badges.map(({ Personagem, ...badge }, i) => (
+              <div key={badge.name} className={`${cardClass} flex items-center gap-4 p-5`}>
+                <span className={`flex size-16 shrink-0 items-end justify-center overflow-hidden rounded-full ${i === 0 ? 'bg-mel' : 'bg-coral'}`}>
+                  <Personagem className="w-16 translate-y-1" animated={false} />
+                </span>
+                <div>
+                  <h4 className="text-sm font-bold text-navy">{badge.name}</h4>
+                  <p className="text-xs text-muted">{badge.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -238,75 +244,84 @@ export default function About() {
       profile === id ? 'opacity-100' : 'pointer-events-none opacity-0'
     }`;
 
+  const onKeyDown = (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const next = profile === 'profissional' ? 'paciente' : 'profissional';
+    setProfile(next);
+    document.getElementById(`tab-${next}`)?.focus();
+  };
+
   return (
-    <section id="sobre" className="mx-auto max-w-[1240px] scroll-mt-24 px-6 md:px-10 py-20 lg:py-24">
-      <div className="rounded-[28px] bg-[#f6f5f3] p-6 sm:p-10 lg:p-14">
-        <Reveal className="mb-10 max-w-3xl">
-          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1 text-xs font-medium text-ink shadow-2xs">
-            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-            Ambiente da Plataforma · Demonstração Real
-          </span>
-          <h2 className="mb-4 font-sans text-3xl sm:text-[42px] font-medium tracking-[-0.03em] text-ink leading-[1.1]">
-            Visão integrada entre o consultório e a casa da família.
+    <section id="sobre" className="scroll-mt-24 bg-quente px-5 py-20 md:px-10 lg:py-28">
+      <div className="mx-auto max-w-[1320px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_minmax(0,420px)] lg:items-end">
+          <h2 className="display max-w-[15ch] text-[40px] text-navy sm:text-[52px] lg:text-[60px]">
+            O consultório e a casa, na mesma tela.
           </h2>
-          <p className="text-[17px] text-[#5e5e5e] leading-[1.6]">
-            O FonoSync reúne prontuário digital, agenda clínica e atividades terapêuticas em uma mesma
-            arquitetura. Alterne abaixo entre as duas visões reais da plataforma:
+          <p className="text-[17px] leading-[1.6] text-muted">
+            Estas são as duas áreas da plataforma, com dados de exemplo. Alterne entre a visão do
+            profissional e a da família.
           </p>
-        </Reveal>
+        </div>
 
-        <Reveal>
-          <div role="tablist" aria-label="Prévia das áreas do FonoSync" className="mb-4 inline-flex rounded-full bg-white p-1 shadow-2xs">
-            {profiles.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                role="tab"
-                id={`tab-${p.id}`}
-                aria-selected={profile === p.id}
-                aria-controls={`preview-${p.id}`}
-                onClick={() => setProfile(p.id)}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-                  profile === p.id ? 'bg-ink text-white' : 'text-[#5e5e5e] hover:text-ink'
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
+        <div className="mt-10 flex flex-wrap items-end justify-between gap-4 border-b border-line">
+          <div role="tablist" aria-label="Prévia das áreas do FonoSync" className="flex gap-6">
+            {profiles.map((p) => {
+              const selected = profile === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="tab"
+                  id={`tab-${p.id}`}
+                  aria-selected={selected}
+                  aria-controls={`preview-${p.id}`}
+                  tabIndex={selected ? 0 : -1}
+                  onClick={() => setProfile(p.id)}
+                  onKeyDown={onKeyDown}
+                  className={`relative -mb-px border-b-[3px] pb-3 font-serif text-[20px] font-semibold transition-colors sm:text-[24px] ${
+                    selected ? 'border-primary text-navy' : 'border-transparent text-navy/45 hover:text-navy/80'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
           </div>
-          <p aria-live="polite" className="mb-6 max-w-2xl text-[15px] text-[#5e5e5e]">{current.text}</p>
+          <p aria-live="polite" className="max-w-xl pb-3 text-[15px] text-muted">{current.text}</p>
+        </div>
 
-          <div className="overflow-hidden rounded-[22px] border border-black/6 bg-surface shadow-[0_12px_40px_rgba(0,0,0,0.05)]">
-            <div className="flex items-center gap-2 border-b border-black/6 bg-surface px-4 py-3">
-              <span className="size-2.5 rounded-full bg-black/15" />
-              <span className="size-2.5 rounded-full bg-black/15" />
-              <span className="size-2.5 rounded-full bg-black/15" />
-              <span className="ml-2 flex-1 truncate rounded-md bg-[#f6f5f3] px-3 py-1 text-xs text-muted">{current.url}</span>
+        <div className="mt-8 overflow-hidden rounded-[22px] rounded-bl-[6px] border border-line bg-surface shadow-[0_30px_60px_-30px_rgba(23,67,74,0.35)]">
+          <div className="flex items-center gap-2 border-b border-line bg-nevoa px-4 py-3" aria-hidden="true">
+            <span className="size-2.5 rounded-full bg-coral" />
+            <span className="size-2.5 rounded-full bg-mel" />
+            <span className="size-2.5 rounded-full bg-salvia" />
+            <span className="ml-2 flex-1 truncate rounded-[8px] bg-surface px-3 py-1 text-xs text-muted">{current.url}</span>
+          </div>
+
+          {/* Os dois painéis ocupam a mesma célula: a altura não "pula" ao trocar de aba */}
+          <div className="grid">
+            <div
+              role="tabpanel"
+              id="preview-profissional"
+              aria-labelledby="tab-profissional"
+              ref={setInert(profile !== 'profissional')}
+              className={panelClass('profissional')}
+            >
+              <ProfessionalPreview />
             </div>
-
-            {/* Os dois painéis ocupam a mesma célula: a altura não "pula" ao trocar de aba */}
-            <div className="grid">
-              <div
-                role="tabpanel"
-                id="preview-profissional"
-                aria-labelledby="tab-profissional"
-                ref={setInert(profile !== 'profissional')}
-                className={panelClass('profissional')}
-              >
-                <ProfessionalPreview />
-              </div>
-              <div
-                role="tabpanel"
-                id="preview-paciente"
-                aria-labelledby="tab-paciente"
-                ref={setInert(profile !== 'paciente')}
-                className={panelClass('paciente')}
-              >
-                <PatientPreview />
-              </div>
+            <div
+              role="tabpanel"
+              id="preview-paciente"
+              aria-labelledby="tab-paciente"
+              ref={setInert(profile !== 'paciente')}
+              className={panelClass('paciente')}
+            >
+              <PatientPreview />
             </div>
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
